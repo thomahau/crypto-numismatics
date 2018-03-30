@@ -1,2 +1,9 @@
 language: node_js
 node_js: node
+deploy:
+  provider: heroku
+  api_key:
+    secure: u/AuZkhS1EPmhpADVHP9k2YRVRNpuR5tQh4J4blvCnhqt0tqPpoKOu4UnYGvHWE94/3S90GRwgYtIoDWeW55gGl2JGrF/PUpcJyta6/C+CX+mb1+kc7uS3gT2SnjnXWsGhWU9NrfFIAV8g6D9s3jgr1hlGxjX1+5FnD1fweMKgXfzLZMMjfiOkhnoB+EGAoWcI2Y8xj1cPdbstjAodF+off0Nq2r3GnSPAD0qVLNUEraEdPg+IpaVeoargOWK4Vx89tWz20rXATbyIfJG4iAVz/x7gw7JAiuqv8wv46vox1I10v98bGLBhtE2Me+PaQ566oE+y1Prl9Ps+bixJZYISWNTSW2IEBBqbulzw2YlY+XL7gcsWsiSHXOLjizM0qj12Nzl9xw+bqERYslHlU/CZ+PQvHh/8LdbEDQywf5OhA9JuuLenLYRh5qwyisiVjjzc1+O6w1UIf5Ym3zewxVtqvbhMfHU/nK55D8uSmKd6N/Iw0TBHFvW5ABBIyvrdOC9KYEGNuJu9Yidj3F6Q+Ac/EQr6ryA5zuRIpI4jCIi6nKsaftV1pZNEAFGHXyi3dkovAsMXbbUUx0SqBzhaxoOwSTAijqF5HeXfE2ddV8f/MespUFIR4F4mpX1NzTYdp5UsYEatYnpUjYlUpdyqwuBmvL8K44BVLENrhFciQ/Yr4=
+  app: crypto-numismatics
+  on:
+    repo: thomahau/crypto-numismatics
