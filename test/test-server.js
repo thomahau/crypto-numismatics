@@ -1,3 +1,5 @@
+'use strict';
+
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const {app, runServer, closeServer} = require('../server');
@@ -6,7 +8,7 @@ const expect = chai.expect;
 
 chai.use(chaiHttp);
 
-describe('App', function() {
+describe('index page', function() {
 	before(function() {
 		return runServer();
 	});
@@ -15,7 +17,7 @@ describe('App', function() {
 		return closeServer();
 	});
 
-	it('should return an HTML page on GET', function() {
+	it('should return an HTML page', function() {
 		return chai
 			.request(app)
 			.get('/')
