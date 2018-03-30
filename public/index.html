@@ -5,8 +5,28 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="description" content="Cryptocurrency portfolio tracker">
 	<title>Crypto Numismatics</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-	<p>hello world</p>
+	<main class="container" role="main">
+		<h1>Crypto Numismatics</h1>
+		<form class="flex-grid">
+			<div class="col">
+				<select>
+					<option value="BTC">Bitcoin (BTC)</option>
+					<option value="ETH">Ethereum (ETH)</option>
+					<option value="BTC">Ripple (XRP)</option>
+				</select>
+			</div>
+			<div class="col">
+				<input type="number">
+			</div>
+			<div class="col">
+				<button type="submit">Add coin</button>
+			</div>
+		</form>
+	</main>
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 </body>
 </html>

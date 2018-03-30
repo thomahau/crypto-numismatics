@@ -1,0 +1,32 @@
+* {
+	box-sizing: border-box;
+}
+
+body {
+	background-color: #151e25;
+	color: white;
+}
+
+.container {
+	max-width: 1152px;
+	margin-left: 32px;
+	margin-right: 32px;
+}
+
+h1 {
+	text-align: center;
+}
+
+.flex-grid {
+	display: flex;
+}
+
+.col {
+	flex: 1;
+}
+
+@media (max-width: 640px) {
+	.flex-grid {
+		display: block;
+	}
+}
