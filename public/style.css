@@ -16,6 +16,52 @@ main {
 	color: white;
 }
 
+.add-coin-form {
+	max-width: 520px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.flex-grid {
+	display: block;
+}
+
+.flex-grid .col {
+	width: 100%;
+	margin: 0 0 5px 0;
+}
+
+.btn {
+	width: 166px;
+}
+
+input[type='number'] {
+	-moz-appearance: textfield;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+@media only screen and (min-width: 640px) {
+	.flex-grid {
+		display: flex;
+		/*justify-content: space-between;*/
+		/*align-items: center;*/
+	}
+
+	.col {
+		flex: 1;
+	}
+
+	.btn {
+		width: 80%;
+		height: 100%;
+	}
+}
+
 /* Styling for autocomplete widget */
 .ui-menu {
 	max-height: 40vh;
