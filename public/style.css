@@ -12,6 +12,20 @@ main {
 }
 
 .primary {
-	background-color: green;
+	background-color: #5dceb3;
 	color: white;
+}
+
+/* Styling for autocomplete widget */
+.ui-menu {
+	max-height: 40vh;
+	overflow-y: auto;
+	overflow-x: hidden;
+	font-size: 14px;
+	text-align: left;
+}
+
+.ui-widget-content .ui-state-active {
+	border: 1px solid #222222;
+	background: #5dceb3;
 }
