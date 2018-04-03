@@ -4,6 +4,27 @@ body {
 	text-align: center;
 }
 
+.container {
+	margin-top: 200px;
+}
+
+h1 {
+	font-size: 3.6rem;
+}
+
+.add-coin-form {
+	max-width: 60%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+@media only screen and (max-width: 640px) {
+	.button-primary {
+		width: 100%;
+	}
+}
+
+/*
 main {
 	max-width: 1200px;
 	padding-left: 24px;
@@ -48,8 +69,6 @@ input[type='number']::-webkit-outer-spin-button {
 @media only screen and (min-width: 640px) {
 	.flex-grid {
 		display: flex;
-		/*justify-content: space-between;*/
-		/*align-items: center;*/
 	}
 
 	.col {
@@ -60,18 +79,17 @@ input[type='number']::-webkit-outer-spin-button {
 		width: 80%;
 		height: 100%;
 	}
-}
+}*/
 
 /* Styling for autocomplete widget */
 .ui-menu {
 	max-height: 40vh;
 	overflow-y: auto;
 	overflow-x: hidden;
-	font-size: 14px;
 	text-align: left;
 }
 
 .ui-widget-content .ui-state-active {
 	border: 1px solid #222222;
-	background: #5dceb3;
+	background-color: #33c3f0;
 }

@@ -5,29 +5,40 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="description" content="Cryptocurrency portfolio tracker">
 	<title>Crypto Numismatics</title>
-	<link rel="stylesheet" href="normalize.css">
+	<link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/black-tie/jquery-ui.css">
-	<link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="stylesheet" href="css/normalize.css">
+	<link rel="stylesheet" href="css/skeleton.css">
+	<link rel="stylesheet" href="css/style.css">
+	<!-- <link rel="icon" type="image/png" href="images/favicon.png"> -->
 </head>
 <body>
 	<main role="main">
-		<h1>Crypto Numismatics</h1>
-		<form class="add-coin-form flex-grid">
-			<div class="col">
-				<input type="search" id="coin" placeholder="e.g. Bitcoin (BTC)" required />
+		<div class="container js-welcome-container">
+			<div class="row">
+				<h1>Crypto Numismatics</h1>
 			</div>
-			<div class="col">
-				<input type="number" id="amount" placeholder="Amount" min="0" step="any" required />
-			</div>
-			<div class="col">
-				<button type="submit" class="primary btn">Add coin</button>
-			</div>
-		</form>
+			<form class="add-coin-form">
+				<div class="row">
+					<div class="five columns">
+						<input class="u-full-width" type="search" id="coin" placeholder="e.g. Bitcoin (BTC)" required />
+					</div>
+					<div class="five columns">
+						<input class="u-full-width" type="number" id="amount" placeholder="Amount" min="0" step="any" required />
+					</div>
+					<div class="two columns">
+						<button type="submit" class="button-primary">Add coin</button>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="container js-portfolio-container" aria-live="polite" hidden></div>
 	</main>
+
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-	<script src="coinlist.js"></script>
-	<script src="mockData.js"></script>
-	<script src="client.js"></script>
+	<script src="js/coinlist.js"></script>
+	<script src="js/mockData.js"></script>
+	<script src="js/client.js"></script>
 </body>
 </html>
