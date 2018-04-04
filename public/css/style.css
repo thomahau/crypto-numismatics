@@ -24,6 +24,31 @@ h1 {
 	}
 }
 
+.portfolio-menu {
+	list-style: none;
+}
+
+.portfolio-link {
+	color: white;
+	cursor: pointer;
+}
+
+.li-space {
+	margin-right: 20px;
+}
+
+.text-left {
+	text-align: left;
+}
+
+.button {
+	color: white;
+}
+
+.button:hover {
+	color: #33c3f0;
+}
+
 /*
 main {
 	max-width: 1200px;

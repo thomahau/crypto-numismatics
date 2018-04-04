@@ -4,9 +4,13 @@ function populateSearchOptions() {
 	$('#coin').autocomplete({
 		source: COINS
 	});
+
+	$('.coin-search').autocomplete({
+		source: COINS
+	});
 }
 
-function handleNewHoldingSubmit() {
+function handleAddPortfolio() {
 	$('.add-coin-form').submit(function(event) {
 		event.preventDefault();
 		const inputAmount = $(this)
@@ -49,7 +53,6 @@ function isValidInput(input) {
 function addToPortfolio(item) {
 	// console.log(item);  CLEAN UP HERE
 	let portfolioItem = mockData.filter(coin => coin.symbol === item.symbol)[0];
-	console.log(portfolioItem);
 	portfolioItem.name = item.coin;
 	portfolioItem.amount = item.amount;
 	portfolioItem.value = item.amount * portfolioItem.price_usd;
@@ -58,9 +61,63 @@ function addToPortfolio(item) {
 }
 
 function renderPortfolio(item) {
-	// TODO: Add portfolio totals on top | Add colors for gain/loss | Add allocation formula | format decimals | Add "save portfolio"
-	// Different colors for thead + totals etc | delete cross in last cell
-	const portfolioHtml = `
+	// TODO: Add colors for gain/loss | Add allocation formula | format decimals
+	// Different colors for thead + totals etc? | functioning delete cross in last cell
+
+	const portfolioHeader = getPortfolioHeader(item);
+	const portfolioItem = getPortfolioItem(item);
+	const portfolioFooter = getPortfolioFooter();
+
+	$('.js-portfolio-container')
+		.attr('hidden', false)
+		.append(portfolioHeader)
+		.append(portfolioItem)
+		.append(portfolioFooter);
+}
+
+function getPortfolioHeader(item) {
+	const portfolioValue = item.value; // sum of all items
+	// const portfolio_percent_change_24h = ;
+
+	const portfolioHeader = `
+		<div class="row">
+			<ul class="portfolio-menu">
+				<li class="u-pull-left">My Portfolio</li>
+				<li class="u-pull-right">
+					<a class="portfolio-link share-portfolio">
+						<i class="fas fa-share-square"></i><span> Share</span>
+					</a>
+				</li>
+				<li class="u-pull-right li-space">
+					<a class="portfolio-link portfolio-settings">
+						<i class="fas fa-cog"></i><span> Settings</span>
+					</a>
+				</li>
+			</ul>
+		</div>
+		<div class="row">
+			<div class="three columns text-left">
+				<strong>PORTFOLIO VALUE</strong>
+				<p>$${portfolioValue}</p>
+			</div>
+			<div class="three columns text-left">
+				<strong>24 HOURS</strong>
+				<p>$X <small>X%</small></p>
+			</div>
+			<div class="three columns text-left">
+				<strong>7 DAYS</strong>
+				<p>$X <small>X%</small></p>
+			</div>
+			<div class="three columns">
+				<button class="button-primary">Save Portfolio</button>
+			</div>
+		</div>`;
+
+	return portfolioHeader;
+}
+
+function getPortfolioItem(item) {
+	const portfolioItem = `
 		<table class="u-full-width">
 		  <thead>
 		    <tr>
@@ -86,12 +143,55 @@ function renderPortfolio(item) {
 		  </tbody>
 		</table>`;
 
-	$('.js-portfolio-container')
-		.attr('hidden', false)
-		.html(portfolioHtml);
+	return portfolioItem;
+}
+
+function getPortfolioFooter() {
+	return `
+		<div class="row portfolio-footer">
+			<ul class="portfolio-menu">
+				<li class="u-pull-left li-space">
+					<a class="portfolio-link add-portfolio-item">
+						<i class="fas fa-plus"></i><span> Add</span>
+					</a>
+				</li>
+				<li class="u-pull-left">
+					<a class="portfolio-link edit-portfolio-holdings">
+						<i class="fas fa-edit"></i><span> Edit</span>
+					</a>
+				</li>
+			</ul>
+		</div>`;
+}
+
+function handleAddPortfolioItem() {
+	$('main').on('click', '.add-portfolio-item', function() {
+		const newItemForm = getNewItemForm();
+
+		$('.portfolio-footer').remove();
+		$('.js-portfolio-container').append(newItemForm);
+		populateSearchOptions();
+	});
+}
+
+function getNewItemForm() {
+	return `
+	<form>
+		<div class="row text-left">
+			<div class="six columns">
+				<input type="search" class="coin-search" placeholder="Coin name" required />
+				<input type="number" class="coin-amount" placeholder="Amount" min="0" step="any" required />
+			</div>
+			<div class="four columns">
+				<button type="submit" class="button">Add coin</button>
+				<a class="button">Cancel</a>
+			</div>
+		</div>
+	</form>`;
 }
 
 $(function() {
 	populateSearchOptions();
-	handleNewHoldingSubmit();
+	handleAddPortfolio();
+	handleAddPortfolioItem();
 });
