@@ -141,7 +141,9 @@ function getPortfolioHeader() {
 	// const portfolio7DayPercentChange = portfolio7DayChange / 100;
 
 	const gainOrLoss24Hrs = portfolio24HrPercentChange > 0 ? 'gain' : 'loss';
-
+	// <a class="portfolio-link portfolio-settings">
+	// 		<i class="fas fa-cog"></i><span> Settings</span>
+	// 	</a>
 	const portfolioHeader = `
 		<div class="row darkest">
 			<ul class="nav-list portfolio-header">
@@ -152,9 +154,18 @@ function getPortfolioHeader() {
 					</a>
 				</li>
 				<li class="u-pull-right li-space">
-					<a class="portfolio-link portfolio-settings">
-						<i class="fas fa-cog"></i><span> Settings</span>
-					</a>
+					<div class="dropdown">
+						<a class="portfolio-link portfolio-settings js-drop-btn">
+							<i class="fas fa-cog"></i><span> Settings</span>
+						</a>
+						<div class="dropdown-content">
+							<a class="">Edit holdings</a>
+							<a class="">Add holding</a>
+							<a class="">Edit currency</a>
+							<a class="">Rename portfolio</a>
+							<a class="">Delete portfolio</a>
+						</div>
+					</div>
 				</li>
 			</ul>
 		</div>
@@ -197,7 +208,9 @@ function getPortfolioTable() {
 		<td>${item.amount}</td>
 		<td>$${item.value}</td>
 		<td>${allocationPct}%</td>
-		<td><a class="portfolio-link delete-holding rightmost-cell">x</a></td>
+		<td><a class="portfolio-link delete-holding rightmost-cell" data-coin="${
+			item.symbol
+		}">x</a></td>
 		</tr>`;
 	});
 
@@ -236,6 +249,12 @@ function getPortfolioFooter() {
 				</li>
 			</ul>
 		</div>`;
+}
+
+function handleSettingsDropdown() {
+	$('main').on('click', '.js-drop-btn', function() {
+		$('.dropdown-content').toggleClass('show');
+	});
 }
 
 function handleAddPortfolioItemClick() {
@@ -301,10 +320,12 @@ function getEditPortfolioForm() {
 				<label for="${item.symbol}">${item.name}</label>
 			</div>
 			<div class="nine columns">
-				<input class="number" name="${item.symbol}" value=${
+				<input type="number" name="${item.symbol}" value=${
 			item.amount
 		} min="0" step="any" />
-				<a class="button delete-holding" role="button">Delete</a>
+				<a class="button delete-holding" role="button" data-coin="${
+					item.symbol
+				}">Delete</a>
 			</div>
 		</div>`;
 	});
@@ -341,11 +362,23 @@ function handleEditPortfolioSubmit() {
 	});
 }
 
+function handleDeletePortfolioItem() {
+	$('body').on('click', '.delete-holding', function(event) {
+		const coinSymbol = $(this).data('coin');
+		const indexOfItem = PORTFOLIO.findIndex(i => i.symbol === coinSymbol);
+		PORTFOLIO.splice(indexOfItem, 1);
+		renderPortfolio();
+		$('.modal').attr('hidden', true);
+	});
+}
+
 $(function() {
 	populateSearchOptions();
 	handleNewCoinSubmit();
+	handleSettingsDropdown();
 	handleAddPortfolioItemClick();
 	handleCancelAdditionBtn();
 	handleEditPortfolioModal();
 	handleEditPortfolioSubmit();
+	handleDeletePortfolioItem();
 });
