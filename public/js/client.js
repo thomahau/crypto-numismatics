@@ -1,23 +1,28 @@
 'use strict';
 
-function populateSearchOptions() {
-	$('#coin').autocomplete({
-		source: COINS
-	});
+// const PORTFOLIO = {
+// 	items: [],
+// 	value: 0,
+// 	value_24_hrs_ago: 0
+// };
 
+let PORTFOLIO = [];
+let globalPortfolioValue = 0;
+
+function populateSearchOptions() {
 	$('.coin-search').autocomplete({
 		source: COINS
 	});
 }
 
-function handleAddPortfolio() {
-	$('.add-coin-form').submit(function(event) {
+function handleNewCoinSubmit() {
+	$('main').on('submit', '.js-add-coin-form', function(event) {
 		event.preventDefault();
 		const inputAmount = $(this)
-			.find('#amount')
+			.find('.coin-amount')
 			.val();
 		const inputCoin = $(this)
-			.find('#coin')
+			.find('.coin-search')
 			.val();
 
 		if (isValidInput(inputCoin)) {
@@ -25,7 +30,7 @@ function handleAddPortfolio() {
 
 			// TODO: remove help text if visible
 			const portfolioItem = {
-				coin: coinElements[0],
+				coin: coinElements[0].slice(0, -1),
 				symbol: coinElements[1].slice(0, -1),
 				amount: parseFloat(inputAmount, 10)
 			};
@@ -51,37 +56,97 @@ function isValidInput(input) {
 }
 
 function addToPortfolio(item) {
-	// console.log(item);  CLEAN UP HERE
+	// CLEAN UP HERE
 	let portfolioItem = mockData.filter(coin => coin.symbol === item.symbol)[0];
+	// Look for coin already in PORTFOLIO
 	portfolioItem.name = item.coin;
-	portfolioItem.amount = item.amount;
-	portfolioItem.value = item.amount * portfolioItem.price_usd;
-	$('.js-welcome-container').remove(); // or empty?
-	renderPortfolio(portfolioItem);
+	addPastPrices(portfolioItem);
+
+	if (alreadyInPortfolio(portfolioItem)) {
+		const existingPortfolioItem = PORTFOLIO.filter(
+			el => el.symbol === portfolioItem.symbol
+		)[0];
+
+		portfolioItem.amount = existingPortfolioItem.amount + item.amount;
+	} else {
+		portfolioItem.amount = item.amount;
+	}
+
+	portfolioItem.value = portfolioItem.amount * portfolioItem.price_usd;
+	portfolioItem.value_24_hrs_ago =
+		portfolioItem.amount * portfolioItem.price_usd_24_hrs_ago;
+	// item.value_7_days_ago = item.amount * item.price_usd_7_days_ago;
+
+	PORTFOLIO.push(portfolioItem);
+	PORTFOLIO = [...new Set(PORTFOLIO)];
+	renderPortfolio();
 }
 
-function renderPortfolio(item) {
+function alreadyInPortfolio(newItem) {
+	let existsInPortfolio = false;
+
+	PORTFOLIO.forEach(item => {
+		if (newItem.symbol === item.symbol) {
+			existsInPortfolio = true;
+			return existsInPortfolio;
+		}
+	});
+	return existsInPortfolio;
+}
+
+function addPastPrices(item) {
+	const divider = (100 + item.percent_change_24h) / 100;
+	item.price_usd_24_hrs_ago = item.price_usd / divider;
+	// item.price_usd_7_days_ago = item.price_usd / ((100 + item.percent_change_7d) / 100);
+	return item;
+}
+
+function renderPortfolio() {
 	// TODO: Add colors for gain/loss | Add allocation formula | format decimals
 	// Different colors for thead + totals etc? | functioning delete cross in last cell
-
-	const portfolioHeader = getPortfolioHeader(item);
-	const portfolioItem = getPortfolioItem(item);
+	const portfolioHeader = getPortfolioHeader();
+	const portfolioTable = getPortfolioTable();
 	const portfolioFooter = getPortfolioFooter();
 
+	$('.js-welcome-container').remove(); // or empty?
 	$('.js-portfolio-container')
 		.attr('hidden', false)
+		.empty()
 		.append(portfolioHeader)
-		.append(portfolioItem)
+		.append(portfolioTable)
 		.append(portfolioFooter);
 }
 
-function getPortfolioHeader(item) {
-	const portfolioValue = item.value; // sum of all items
-	// const portfolio_percent_change_24h = ;
+// TODO: make all of these functions on the Mongoose model of portfolio + allocation (item value / portfolio value)
+function getPortfolioHeader() {
+	let portfolioValue = 0;
+	let portfolioValue24HrsAgo = 0;
+	// let portfolioValue7DaysAgo = 0;
+
+	PORTFOLIO.forEach(item => {
+		portfolioValue += item.value;
+		portfolioValue24HrsAgo += item.value_24_hrs_ago;
+		// portfolioValue7DaysAgo += item.value_7_days_ago;
+	});
+
+	const portfolio24HrChange = +(
+		portfolioValue - portfolioValue24HrsAgo
+	).toFixed(2);
+	const portfolio24HrPercentChange = +(
+		(portfolioValue - portfolioValue24HrsAgo) /
+		portfolioValue24HrsAgo *
+		100
+	).toFixed(2);
+	portfolioValue = +portfolioValue.toFixed(2);
+	globalPortfolioValue = portfolioValue;
+	// const portfolio7DayChange = portfolioValue - portfolioValue7DaysAgo;
+	// const portfolio7DayPercentChange = portfolio7DayChange / 100;
+
+	const gainOrLoss24Hrs = portfolio24HrPercentChange > 0 ? 'gain' : 'loss';
 
 	const portfolioHeader = `
-		<div class="row">
-			<ul class="portfolio-menu">
+		<div class="row darkest">
+			<ul class="portfolio-menu portfolio-header">
 				<li class="u-pull-left">My Portfolio</li>
 				<li class="u-pull-right">
 					<a class="portfolio-link share-portfolio">
@@ -95,33 +160,54 @@ function getPortfolioHeader(item) {
 				</li>
 			</ul>
 		</div>
-		<div class="row">
+		<div class="row darker portfolio-overview">
 			<div class="three columns text-left">
 				<strong>PORTFOLIO VALUE</strong>
-				<p>$${portfolioValue}</p>
+				<p class="large-text">$${portfolioValue}</p>
 			</div>
 			<div class="three columns text-left">
 				<strong>24 HOURS</strong>
-				<p>$X <small>X%</small></p>
+				<p class="${gainOrLoss24Hrs} large-text">$${portfolio24HrChange} <small>(${portfolio24HrPercentChange}%)</small></p>
 			</div>
-			<div class="three columns text-left">
-				<strong>7 DAYS</strong>
-				<p>$X <small>X%</small></p>
-			</div>
-			<div class="three columns">
-				<button class="button-primary">Save Portfolio</button>
+			<div class="six columns">
+				<button class="button-primary u-pull-right">Save Portfolio</button>
 			</div>
 		</div>`;
 
 	return portfolioHeader;
+	// TODO: Add other time periods?
+	// <div class="three columns text-left">
+	// 	<strong>7 DAYS</strong>
+	// 	<p>$X <small>X%</small></p>
+	// </div>
 }
 
-function getPortfolioItem(item) {
-	const portfolioItem = `
+function getPortfolioTable() {
+	let tableRowsHtmlString = '';
+	PORTFOLIO.forEach(item => {
+		const gainOrLoss = item.percent_change_24h > 0 ? 'gain' : 'loss';
+		const allocationPct = +(
+			item.value /
+			globalPortfolioValue *
+			100
+		).toFixed(2);
+		tableRowsHtmlString += `
+		<tr>
+		<td><span class="leftmost-cell">${item.name} (${item.symbol})</span></td>
+		<td>$${item.price_usd}</td>
+		<td class="${gainOrLoss}">${item.percent_change_24h}%</td>
+		<td>${item.amount}</td>
+		<td>$${item.value}</td>
+		<td>${allocationPct}%</td>
+		<td><span class="rightmost-cell">X</span></td>
+		</tr>`;
+	});
+
+	return `
 		<table class="u-full-width">
-		  <thead>
+		  <thead class="darkest">
 		    <tr>
-		      <th>Coin</th>
+		      <th><span class="leftmost-cell">Coin</span></th>
 		      <th>Price</th>
 		      <th>24h % chg</th>
 		      <th>Amount</th>
@@ -131,25 +217,15 @@ function getPortfolioItem(item) {
 		    </tr>
 		  </thead>
 		  <tbody>
-		    <tr>
-		      <td>${item.name} (${item.symbol})</td>
-		      <td>$${item.price_usd}</td>
-		      <td>${item.percent_change_24h}%</td>
-		      <td>${item.amount}</td>
-		      <td>$${item.value}</td>
-		      <td>100%</td>
-		      <td>X</td>
-		    </tr>
+			${tableRowsHtmlString}
 		  </tbody>
-		</table>`;
-
-	return portfolioItem;
+		 </table>`;
 }
 
 function getPortfolioFooter() {
 	return `
-		<div class="row portfolio-footer">
-			<ul class="portfolio-menu">
+		<div class="row portfolio-footer darkest">
+			<ul class="portfolio-menu portfolio-footer-menu">
 				<li class="u-pull-left li-space">
 					<a class="portfolio-link add-portfolio-item">
 						<i class="fas fa-plus"></i><span> Add</span>
@@ -164,7 +240,7 @@ function getPortfolioFooter() {
 		</div>`;
 }
 
-function handleAddPortfolioItem() {
+function handleAddPortfolioItemClick() {
 	$('main').on('click', '.add-portfolio-item', function() {
 		const newItemForm = getNewItemForm();
 
@@ -176,8 +252,8 @@ function handleAddPortfolioItem() {
 
 function getNewItemForm() {
 	return `
-	<form>
-		<div class="row text-left">
+	<form class="js-add-coin-form">
+		<div class="row portfolio-footer text-left darkest">
 			<div class="six columns">
 				<input type="search" class="coin-search" placeholder="Coin name" required />
 				<input type="number" class="coin-amount" placeholder="Amount" min="0" step="any" required />
@@ -192,6 +268,6 @@ function getNewItemForm() {
 
 $(function() {
 	populateSearchOptions();
-	handleAddPortfolio();
-	handleAddPortfolioItem();
+	handleNewCoinSubmit();
+	handleAddPortfolioItemClick();
 });

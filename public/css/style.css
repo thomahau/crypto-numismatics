@@ -1,7 +1,15 @@
 body {
-	background-color: #151e25;
+	background-color: #19232b;
 	color: white;
 	text-align: center;
+}
+
+.darker {
+	background-color: #151e25;
+}
+
+.darkest {
+	background-color: #09141d;
 }
 
 .container {
@@ -12,10 +20,20 @@ h1 {
 	font-size: 3.6rem;
 }
 
-.add-coin-form {
+.starter-inputs {
 	max-width: 60%;
 	margin-left: auto;
 	margin-right: auto;
+}
+
+input[type='number'] {
+	-moz-appearance: textfield;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
 }
 
 @media only screen and (max-width: 640px) {
@@ -24,8 +42,33 @@ h1 {
 	}
 }
 
+.js-portfolio-container .row {
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
 .portfolio-menu {
 	list-style: none;
+}
+
+.portfolio-header,
+.portfolio-overview,
+.js-add-coin-form .portfolio-footer,
+.portfolio-footer-menu {
+	padding-top: 15px;
+}
+
+.leftmost-cell {
+	margin-left: 20px;
+}
+
+.rightmost-cell {
+	margin-right: 5px;
+}
+
+.portfolio-footer {
+	margin-top: -20px;
+	padding-bottom: 5px;
 }
 
 .portfolio-link {
@@ -49,66 +92,21 @@ h1 {
 	color: #33c3f0;
 }
 
-/*
-main {
-	max-width: 1200px;
-	padding-left: 24px;
-	padding-right: 24px;
-	margin: 200px auto 0 auto;
+.large-text {
+	font-size: 2.4rem;
 }
 
-.primary {
-	background-color: #5dceb3;
-	color: white;
+.gain {
+	color: green;
 }
 
-.add-coin-form {
-	max-width: 520px;
-	margin-left: auto;
-	margin-right: auto;
+.loss {
+	color: red;
 }
-
-.flex-grid {
-	display: block;
-}
-
-.flex-grid .col {
-	width: 100%;
-	margin: 0 0 5px 0;
-}
-
-.btn {
-	width: 166px;
-}
-
-input[type='number'] {
-	-moz-appearance: textfield;
-}
-
-input[type='number']::-webkit-inner-spin-button,
-input[type='number']::-webkit-outer-spin-button {
-	-webkit-appearance: none;
-	margin: 0;
-}
-
-@media only screen and (min-width: 640px) {
-	.flex-grid {
-		display: flex;
-	}
-
-	.col {
-		flex: 1;
-	}
-
-	.btn {
-		width: 80%;
-		height: 100%;
-	}
-}*/
 
 /* Styling for autocomplete widget */
 .ui-menu {
-	max-height: 40vh;
+	max-height: 30vh;
 	overflow-y: auto;
 	overflow-x: hidden;
 	text-align: left;

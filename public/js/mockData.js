@@ -3,58 +3,58 @@
 const mockData = [
 	{
 		symbol: 'BTC',
-		price_usd: '7375.46',
-		percent_change_24h: '5.9'
+		price_usd: 7375.46,
+		percent_change_24h: 5.9
 	},
 	{
 		symbol: 'ETH',
-		price_usd: '398.542',
-		percent_change_24h: '3.87'
+		price_usd: 398.542,
+		percent_change_24h: 3.87
 	},
 	{
 		symbol: 'XRP',
 		price_usd: '0.518102',
-		percent_change_24h: '6.11'
+		percent_change_24h: 6.11
 	},
 	{
 		symbol: 'BCH',
-		price_usd: '695.076',
-		percent_change_24h: '4.94'
+		price_usd: 695.076,
+		percent_change_24h: 4.94
 	},
 	{
 		symbol: 'LTC',
-		price_usd: '122.952',
-		percent_change_24h: '3.94'
+		price_usd: 122.952,
+		percent_change_24h: 3.94
 	},
 	{
 		symbol: 'EOS',
-		price_usd: '6.04517',
-		percent_change_24h: '6.27'
+		price_usd: 6.04517,
+		percent_change_24h: 6.27
 	},
 	{
 		symbol: 'XLM',
-		price_usd: '0.234705',
-		percent_change_24h: '11.53'
+		price_usd: 0.234705,
+		percent_change_24h: 11.53
 	},
 	{
 		symbol: 'ADA',
-		price_usd: '0.164195',
-		percent_change_24h: '8.93'
+		price_usd: 0.164195,
+		percent_change_24h: 8.93
 	},
 	{
 		symbol: 'NEO',
-		price_usd: '51.5201',
-		percent_change_24h: '7.93'
+		price_usd: 51.5201,
+		percent_change_24h: 7.93
 	},
 	{
 		symbol: 'MIOTA',
-		price_usd: '1.07764',
-		percent_change_24h: '4.63'
+		price_usd: 1.07764,
+		percent_change_24h: 4.63
 	},
 	{
 		symbol: 'XMR',
-		price_usd: '185.675',
-		percent_change_24h: '4.48'
+		price_usd: 185.675,
+		percent_change_24h: 4.48
 	},
 	{
 		symbol: 'DASH',
@@ -68,8 +68,8 @@ const mockData = [
 	},
 	{
 		symbol: 'USDT',
-		price_usd: '0.999032',
-		percent_change_24h: '-0.3'
+		price_usd: 0.999032,
+		percent_change_24h: -0.3
 	},
 	{
 		symbol: 'XEM',
