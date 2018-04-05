@@ -72,11 +72,6 @@ function addToPortfolio(item) {
 		portfolioItem.amount = item.amount;
 	}
 
-	portfolioItem.value = portfolioItem.amount * portfolioItem.price_usd;
-	portfolioItem.value_24_hrs_ago =
-		portfolioItem.amount * portfolioItem.price_usd_24_hrs_ago;
-	// item.value_7_days_ago = item.amount * item.price_usd_7_days_ago;
-
 	PORTFOLIO.push(portfolioItem);
 	PORTFOLIO = [...new Set(PORTFOLIO)];
 	renderPortfolio();
@@ -124,6 +119,9 @@ function getPortfolioHeader() {
 	// let portfolioValue7DaysAgo = 0;
 
 	PORTFOLIO.forEach(item => {
+		item.value = +(item.amount * item.price_usd).toFixed(2);
+		item.value_24_hrs_ago = item.amount * item.price_usd_24_hrs_ago;
+		// item.value_7_days_ago = item.amount * item.price_usd_7_days_ago;
 		portfolioValue += item.value;
 		portfolioValue24HrsAgo += item.value_24_hrs_ago;
 		// portfolioValue7DaysAgo += item.value_7_days_ago;
@@ -146,7 +144,7 @@ function getPortfolioHeader() {
 
 	const portfolioHeader = `
 		<div class="row darkest">
-			<ul class="portfolio-menu portfolio-header">
+			<ul class="nav-list portfolio-header">
 				<li class="u-pull-left">My Portfolio</li>
 				<li class="u-pull-right">
 					<a class="portfolio-link share-portfolio">
@@ -193,13 +191,13 @@ function getPortfolioTable() {
 		).toFixed(2);
 		tableRowsHtmlString += `
 		<tr>
-		<td><span class="leftmost-cell">${item.name} (${item.symbol})</span></td>
+		<td><span class="leftmost-cell">${item.name}</span></td>
 		<td>$${item.price_usd}</td>
 		<td class="${gainOrLoss}">${item.percent_change_24h}%</td>
 		<td>${item.amount}</td>
 		<td>$${item.value}</td>
 		<td>${allocationPct}%</td>
-		<td><span class="rightmost-cell">X</span></td>
+		<td><a class="portfolio-link delete-holding rightmost-cell">x</a></td>
 		</tr>`;
 	});
 
@@ -209,14 +207,14 @@ function getPortfolioTable() {
 		    <tr>
 		      <th><span class="leftmost-cell">Coin</span></th>
 		      <th>Price</th>
-		      <th>24h % chg</th>
+		      <th>24h change</th>
 		      <th>Amount</th>
 		      <th>Value</th>
 		      <th>Allocation</th>
 		      <th></th>
 		    </tr>
 		  </thead>
-		  <tbody>
+		  <tbody class="darker">
 			${tableRowsHtmlString}
 		  </tbody>
 		 </table>`;
@@ -225,14 +223,14 @@ function getPortfolioTable() {
 function getPortfolioFooter() {
 	return `
 		<div class="row portfolio-footer darkest">
-			<ul class="portfolio-menu portfolio-footer-menu">
+			<ul class="nav-list portfolio-footer-menu">
 				<li class="u-pull-left li-space">
-					<a class="portfolio-link add-portfolio-item">
+					<a class="portfolio-link js-add-portfolio-item">
 						<i class="fas fa-plus"></i><span> Add</span>
 					</a>
 				</li>
 				<li class="u-pull-left">
-					<a class="portfolio-link edit-portfolio-holdings">
+					<a class="portfolio-link js-edit-portfolio">
 						<i class="fas fa-edit"></i><span> Edit</span>
 					</a>
 				</li>
@@ -241,7 +239,7 @@ function getPortfolioFooter() {
 }
 
 function handleAddPortfolioItemClick() {
-	$('main').on('click', '.add-portfolio-item', function() {
+	$('main').on('click', '.js-add-portfolio-item', function() {
 		const newItemForm = getNewItemForm();
 
 		$('.portfolio-footer').remove();
@@ -260,14 +258,94 @@ function getNewItemForm() {
 			</div>
 			<div class="four columns">
 				<button type="submit" class="button">Add coin</button>
-				<a class="button">Cancel</a>
+				<a class="button cancel-addition-btn" role="button">Cancel</a>
 			</div>
 		</div>
 	</form>`;
+}
+
+function handleCancelAdditionBtn() {
+	$('main').on('click', '.cancel-addition-btn', function() {
+		const portfolioFooter = getPortfolioFooter();
+
+		$('.js-add-coin-form').remove();
+		$('.js-portfolio-container').append(portfolioFooter);
+	});
+}
+
+function handleEditPortfolioModal() {
+	$('main').on('click', '.js-edit-portfolio', function() {
+		const editPortfolioForm = getEditPortfolioForm();
+
+		$('.modal').attr('hidden', false);
+		$('.js-edit-form-container').html(editPortfolioForm);
+	});
+
+	$('.modal').on('click', '.cancel-edit-btn', function() {
+		$('.modal').attr('hidden', true);
+	});
+
+	$('body').click(function(event) {
+		if ($(event.target).hasClass('modal')) {
+			$('.modal').attr('hidden', true);
+		}
+	});
+}
+
+function getEditPortfolioForm() {
+	let holdingsHtmlString = '';
+	PORTFOLIO.forEach(item => {
+		holdingsHtmlString += `
+		<div class="row">
+			<div class="three columns">
+				<label for="${item.symbol}">${item.name}</label>
+			</div>
+			<div class="nine columns">
+				<input class="number" name="${item.symbol}" value=${
+			item.amount
+		} min="0" step="any" />
+				<a class="button delete-holding" role="button">Delete</a>
+			</div>
+		</div>`;
+	});
+
+	return `
+		<form class="edit-portfolio-form">
+		  ${holdingsHtmlString}
+		  <div class="row">
+			<button type="submit" class="button-primary">Update</button>
+			<a class="button cancel-edit-btn" role="button">Cancel</a>
+		</div>`;
+}
+
+function handleEditPortfolioSubmit() {
+	$('.modal').on('submit', '.edit-portfolio-form', function(event) {
+		event.preventDefault();
+		const $inputs = $('.edit-portfolio-form :input.number');
+		const submittedValues = {};
+
+		$inputs.each(function() {
+			submittedValues[this.name] = $(this).val();
+		});
+
+		Object.keys(submittedValues).forEach(coin => {
+			const indexOfItem = PORTFOLIO.findIndex(i => i.symbol === coin);
+			PORTFOLIO[indexOfItem].amount = parseFloat(
+				submittedValues[coin],
+				10
+			);
+		});
+
+		renderPortfolio();
+		$('.modal').attr('hidden', true);
+	});
 }
 
 $(function() {
 	populateSearchOptions();
 	handleNewCoinSubmit();
 	handleAddPortfolioItemClick();
+	handleCancelAdditionBtn();
+	handleEditPortfolioModal();
+	handleEditPortfolioSubmit();
 });
