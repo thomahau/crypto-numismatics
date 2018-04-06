@@ -97,8 +97,6 @@ function addPastPrices(item) {
 }
 
 function renderPortfolio() {
-	// TODO: Add colors for gain/loss | Add allocation formula | format decimals
-	// Different colors for thead + totals etc? | functioning delete cross in last cell
 	const portfolioHeader = getPortfolioHeader();
 	const portfolioTable = getPortfolioTable();
 	const portfolioFooter = getPortfolioFooter();
@@ -141,9 +139,7 @@ function getPortfolioHeader() {
 	// const portfolio7DayPercentChange = portfolio7DayChange / 100;
 
 	const gainOrLoss24Hrs = portfolio24HrPercentChange > 0 ? 'gain' : 'loss';
-	// <a class="portfolio-link portfolio-settings">
-	// 		<i class="fas fa-cog"></i><span> Settings</span>
-	// 	</a>
+
 	const portfolioHeader = `
 		<div class="row darkest">
 			<ul class="nav-list portfolio-header">
@@ -220,7 +216,7 @@ function getPortfolioTable() {
 		    <tr>
 		      <th><span class="leftmost-cell">Coin</span></th>
 		      <th>Price</th>
-		      <th>24h change</th>
+		      <th>24 hr change</th>
 		      <th>Amount</th>
 		      <th>Value</th>
 		      <th>Allocation</th>

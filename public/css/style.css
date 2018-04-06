@@ -120,7 +120,7 @@ main .button:hover {
 
 /* Autocomplete widget */
 .ui-menu {
-	max-height: 30vh;
+	max-height: 31vh;
 	overflow-y: auto;
 	overflow-x: hidden;
 	text-align: left;
