@@ -214,6 +214,13 @@ main .button:hover {
 
 .dropdown-content a:hover {
 	background-color: #333;
+	color: #0fa0ce;
+}
+
+.dropdown-content .disabled:hover {
+	background-color: #222;
+	color: #777;
+	cursor: not-allowed;
 }
 
 .show {

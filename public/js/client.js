@@ -159,11 +159,11 @@ function getPortfolioHeader() {
 							<i class="fas fa-cog"></i><span> Settings</span>
 						</a>
 						<div class="dropdown-content">
-							<a class="">Edit holdings</a>
-							<a class="">Add holding</a>
-							<a class="">Edit currency</a>
-							<a class="">Rename portfolio</a>
-							<a class="">Delete portfolio</a>
+							<a class="js-edit-portfolio">Edit holdings</a>
+							<a class="js-add-portfolio-item">Add holding</a>
+							<a class="disabled">Edit currency</a>
+							<a class="disabled">Rename portfolio</a>
+							<a class="disabled">Delete portfolio</a>
 						</div>
 					</div>
 				</li>
@@ -255,6 +255,19 @@ function handleSettingsDropdown() {
 	$('main').on('click', '.js-drop-btn', function() {
 		$('.dropdown-content').toggleClass('show');
 	});
+
+	$('body').click(function(event) {
+		if (
+			!$(event.target)
+				.parent()
+				.hasClass('js-drop-btn')
+		) {
+			const openDropdowns = $('.dropdown-content').length;
+			if (openDropdowns > 0) {
+				$('.dropdown-content').removeClass('show');
+			}
+		}
+	});
 }
 
 function handleAddPortfolioItemClick() {
@@ -342,7 +355,7 @@ function getEditPortfolioForm() {
 function handleEditPortfolioSubmit() {
 	$('.modal').on('submit', '.edit-portfolio-form', function(event) {
 		event.preventDefault();
-		const $inputs = $('.edit-portfolio-form :input.number');
+		const $inputs = $('.edit-portfolio-form input[type="number"]');
 		const submittedValues = {};
 
 		$inputs.each(function() {
