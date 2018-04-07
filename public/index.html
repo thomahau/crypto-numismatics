@@ -13,10 +13,25 @@
 	<link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
+	<header class="u-full-width darkest" role="banner">
+		<nav class="container" role="navigation">
+			<a class="u-pull-left" href="/">
+				<i class="far fa-copyright fa-flip-horizontal"></i> Crypto Numismatics
+			</a>
+			<a class="u-pull-right">
+				<i class="fas fa-user-plus"></i><span class="nav-text"> Register</span>
+			</a>
+			<a class="u-pull-right li-space">
+				<i class="fas fa-sign-in-alt"></i><span class="nav-text"> Login</span>
+			</a>
+		</nav>
+	</header>
+
 	<main role="main">
-		<div class="container js-welcome-container">
+		<div class="container welcome-container">
 			<div class="row">
 				<h1>Crypto Numismatics</h1>
+				<p class="intro-text">Use this simple portfolio tracker to get an overview of your cryptocurrency holdings. To get started, enter your first coin below. If you'd like to save your portfolio, registering is free and anonymous. Been here before? Log in to access your portfolio.</p>
 			</div>
 			<form class="js-add-coin-form">
 				<div class="row starter-inputs">
@@ -32,7 +47,7 @@
 				</div>
 			</form>
 		</div>
-		<div class="container js-portfolio-container" aria-live="polite" hidden></div>
+		<div class="container portfolio-container" aria-live="polite" hidden></div>
 	</main>
 
 	<div class="modal" hidden>

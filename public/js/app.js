@@ -101,8 +101,8 @@ function renderPortfolio() {
 	const portfolioTable = getPortfolioTable();
 	const portfolioFooter = getPortfolioFooter();
 
-	$('.js-welcome-container').remove(); // or empty?
-	$('.js-portfolio-container')
+	$('.welcome-container').remove(); // or empty?
+	$('.portfolio-container')
 		.attr('hidden', false)
 		.empty()
 		.append(portfolioHeader)
@@ -146,7 +146,7 @@ function getPortfolioHeader() {
 				<li class="u-pull-left">My Portfolio</li>
 				<li class="u-pull-right">
 					<a class="portfolio-link share-portfolio">
-						<i class="fas fa-share-square"></i><span> Share</span>
+						<i class="fas fa-share-square"></i> Share
 					</a>
 				</li>
 				<li class="u-pull-right li-space">
@@ -235,12 +235,12 @@ function getPortfolioFooter() {
 			<ul class="nav-list portfolio-footer-menu">
 				<li class="u-pull-left li-space">
 					<a class="portfolio-link js-add-portfolio-item">
-						<i class="fas fa-plus"></i><span> Add</span>
+						<i class="fas fa-plus"></i> Add
 					</a>
 				</li>
 				<li class="u-pull-left">
 					<a class="portfolio-link js-edit-portfolio">
-						<i class="fas fa-edit"></i><span> Edit</span>
+						<i class="fas fa-edit"></i> Edit
 					</a>
 				</li>
 			</ul>
@@ -271,7 +271,7 @@ function handleAddPortfolioItemClick() {
 		const newItemForm = getNewItemForm();
 
 		$('.portfolio-footer').remove();
-		$('.js-portfolio-container').append(newItemForm);
+		$('.portfolio-container').append(newItemForm);
 		populateSearchOptions();
 	});
 }
@@ -297,7 +297,7 @@ function handleCancelAdditionBtn() {
 		const portfolioFooter = getPortfolioFooter();
 
 		$('.js-add-coin-form').remove();
-		$('.js-portfolio-container').append(portfolioFooter);
+		$('.portfolio-container').append(portfolioFooter);
 	});
 }
 

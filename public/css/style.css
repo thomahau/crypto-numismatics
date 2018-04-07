@@ -2,9 +2,20 @@ body {
 	background-color: #19232b;
 }
 
+header {
+	height: 50px;
+	position: absolute;
+	top: 0;
+}
+
 main {
 	color: white;
 	text-align: center;
+}
+
+.intro-text {
+	margin-left: 20px;
+	text-align: left;
 }
 
 .darker {
@@ -15,7 +26,11 @@ main {
 	background-color: #09141d;
 }
 
-.container {
+.welcome-container {
+	margin-top: 200px;
+}
+
+.portfolio-container {
 	margin-top: 100px;
 }
 
@@ -43,9 +58,13 @@ input[type='number']::-webkit-outer-spin-button {
 	main .button-primary {
 		width: 100%;
 	}
+
+	.nav-text {
+		display: none;
+	}
 }
 
-.js-portfolio-container .row {
+.portfolio-container .row {
 	padding-left: 20px;
 	padding-right: 20px;
 }
@@ -54,6 +73,7 @@ input[type='number']::-webkit-outer-spin-button {
 	list-style: none;
 }
 
+header,
 .portfolio-header,
 .portfolio-overview,
 .js-add-coin-form .portfolio-footer,
@@ -74,9 +94,11 @@ input[type='number']::-webkit-outer-spin-button {
 	padding-bottom: 5px;
 }
 
+nav a,
 .portfolio-link {
 	color: white;
 	cursor: pointer;
+	text-decoration: none;
 }
 
 .li-space {
