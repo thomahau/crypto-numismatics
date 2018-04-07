@@ -1,5 +1,4 @@
 'use strict';
-
 const COINS = [
 	'Bitcoin (BTC)',
 	'Ethereum (ETH)',

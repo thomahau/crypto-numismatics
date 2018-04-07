@@ -1,11 +1,4 @@
 'use strict';
-
-// const PORTFOLIO = {
-// 	items: [],
-// 	value: 0,
-// 	value_24_hrs_ago: 0
-// };
-
 let PORTFOLIO = [];
 let globalPortfolioValue = 0;
 
