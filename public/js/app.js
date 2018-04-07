@@ -8,6 +8,12 @@ function populateSearchOptions() {
 	});
 }
 
+function handleRegisterDropdown() {
+	$('.js-register-drop-btn').click(function() {
+		$('.dropdown-register').toggleClass('show');
+	});
+}
+
 function handleNewCoinSubmit() {
 	$('main').on('submit', '.js-add-coin-form', function(event) {
 		event.preventDefault();
@@ -373,6 +379,7 @@ function handleDeletePortfolioItem() {
 
 $(function() {
 	populateSearchOptions();
+	handleRegisterDropdown();
 	handleNewCoinSubmit();
 	handleSettingsDropdown();
 	handleAddPortfolioItemClick();
