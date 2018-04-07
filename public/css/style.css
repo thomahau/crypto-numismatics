@@ -1,0 +1,250 @@
+body {
+	background-color: #19232b;
+}
+
+header {
+	height: 50px;
+	position: absolute;
+	top: 0;
+}
+
+main {
+	color: white;
+	text-align: center;
+}
+
+.intro-text {
+	margin-left: 20px;
+	text-align: left;
+}
+
+.darker {
+	background-color: #151e25;
+}
+
+.darkest {
+	background-color: #09141d;
+}
+
+.welcome-container {
+	margin-top: 200px;
+}
+
+.portfolio-container {
+	margin-top: 100px;
+}
+
+h1 {
+	font-size: 3.6rem;
+}
+
+.starter-inputs {
+	max-width: 60%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+input[type='number'] {
+	-moz-appearance: textfield;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+@media only screen and (max-width: 640px) {
+	main .button-primary {
+		width: 100%;
+	}
+
+	.nav-text {
+		display: none;
+	}
+}
+
+.portfolio-container .row {
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+.nav-list {
+	list-style: none;
+}
+
+header,
+.portfolio-header,
+.portfolio-overview,
+.js-add-coin-form .portfolio-footer,
+.portfolio-footer-menu {
+	padding-top: 15px;
+}
+
+.leftmost-cell {
+	margin-left: 20px;
+}
+
+.rightmost-cell {
+	margin-right: 5px;
+}
+
+.portfolio-footer {
+	margin-top: -20px;
+	padding-bottom: 5px;
+}
+
+nav a,
+.portfolio-link {
+	color: white;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.li-space {
+	margin-right: 20px;
+}
+
+.text-left {
+	text-align: left;
+}
+
+main .button {
+	color: white;
+}
+
+main .button:hover {
+	color: #33c3f0;
+}
+
+.large-text {
+	font-size: 2.4rem;
+}
+
+.gain {
+	color: green;
+}
+
+.loss {
+	color: red;
+}
+
+.delete {
+	color: #999;
+	cursor: pointer;
+	font-size: 2rem;
+}
+
+.delete:hover,
+.delete:focus {
+	color: white;
+}
+
+/* Autocomplete widget */
+.ui-menu {
+	max-height: 31vh;
+	overflow-y: auto;
+	overflow-x: hidden;
+	text-align: left;
+}
+
+.ui-widget-content .ui-state-active {
+	border: 1px solid #222222;
+	background-color: #33c3f0;
+}
+
+/* Modal */
+.modal {
+	position: fixed;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-header {
+	background-color: #151e25;
+	color: white;
+}
+
+.modal-header h3 {
+	padding: 10px 15px;
+	font-size: 2rem;
+}
+
+.modal-body {
+	padding: 0 15px;
+}
+
+.modal-content {
+	position: relative;
+	background-color: #fefefe;
+	margin: 5% auto;
+	padding: 0;
+	border: 1px solid #888;
+	width: 40%;
+}
+
+.modal label {
+	height: 38px;
+	padding-top: 6px;
+}
+
+.modal .delete-holding {
+	background-color: red;
+	color: white;
+}
+
+@media only screen and (max-width: 640px) {
+	.modal-content {
+		width: 100%;
+	}
+
+	.modal label {
+		height: 16px;
+		padding-bottom: 5px;
+	}
+}
+
+/*Dropdown*/
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+.dropdown-content {
+	display: none;
+	position: absolute;
+	left: -10px;
+	top: 30px;
+	background-color: #666;
+	min-width: 160px;
+	text-align: left;
+	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+	z-index: 1;
+	cursor: pointer;
+}
+
+.dropdown-content a {
+	color: white;
+	padding: 10px 15px;
+	text-decoration: none;
+	display: block;
+}
+
+.dropdown-content a:hover {
+	background-color: #333;
+	color: #0fa0ce;
+}
+
+.dropdown-content .disabled:hover {
+	background-color: #222;
+	color: #777;
+	cursor: not-allowed;
+}
+
+.show {
+	display: block;
+}
