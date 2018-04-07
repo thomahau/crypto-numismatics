@@ -143,9 +143,8 @@ function getPortfolioHeader() {
 	const portfolioHeader = `
 		<div class="row darkest">
 			<ul class="nav-list portfolio-header">
-				<li class="u-pull-left">My Portfolio</li>
 				<li class="u-pull-right">
-					<a class="portfolio-link share-portfolio">
+					<a class="portfolio-link share-portfolio disabled">
 						<i class="fas fa-share-square"></i> Share
 					</a>
 				</li>
@@ -158,8 +157,6 @@ function getPortfolioHeader() {
 							<a class="js-edit-portfolio">Edit holdings</a>
 							<a class="js-add-portfolio-item">Add holding</a>
 							<a class="disabled">Edit currency</a>
-							<a class="disabled">Rename portfolio</a>
-							<a class="disabled">Delete portfolio</a>
 						</div>
 					</div>
 				</li>

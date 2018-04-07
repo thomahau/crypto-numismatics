@@ -239,6 +239,7 @@ main .button:hover {
 	color: #0fa0ce;
 }
 
+.disabled:hover,
 .dropdown-content .disabled:hover {
 	background-color: #222;
 	color: #777;
