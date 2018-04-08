@@ -8,9 +8,31 @@ function populateSearchOptions() {
 	});
 }
 
-function handleRegisterDropdown() {
-	$('.js-register-drop-btn').click(function() {
-		$('.dropdown-register').toggleClass('show');
+function handleModals() {
+	$('body').click(function(event) {
+		if ($(event.target).hasClass('modal')) {
+			$('.modal').attr('hidden', true);
+		}
+	});
+
+	$('.modal').on('click', '.close', function() {
+		$('.modal').attr('hidden', true);
+	});
+
+	handleRegisterModal();
+	handleLoginModal();
+	handleEditPortfolioModal();
+}
+
+function handleRegisterModal() {
+	$('.js-register').click(function() {
+		$('.js-register-modal').attr('hidden', false);
+	});
+}
+
+function handleLoginModal() {
+	$('.js-login').click(function() {
+		$('.js-login-modal').attr('hidden', false);
 	});
 }
 
@@ -301,18 +323,12 @@ function handleEditPortfolioModal() {
 	$('main').on('click', '.js-edit-portfolio', function() {
 		const editPortfolioForm = getEditPortfolioForm();
 
-		$('.modal').attr('hidden', false);
+		$('.edit-holdings-modal').attr('hidden', false);
 		$('.js-edit-form-container').html(editPortfolioForm);
 	});
 
-	$('.modal').on('click', '.cancel-edit-btn', function() {
-		$('.modal').attr('hidden', true);
-	});
-
-	$('body').click(function(event) {
-		if ($(event.target).hasClass('modal')) {
-			$('.modal').attr('hidden', true);
-		}
+	$('.edit-holdings-modal').on('click', '.cancel-edit-btn', function() {
+		$('.edit-holdings-modal').attr('hidden', true);
 	});
 }
 
@@ -379,12 +395,11 @@ function handleDeletePortfolioItem() {
 
 $(function() {
 	populateSearchOptions();
-	handleRegisterDropdown();
+	handleModals();
 	handleNewCoinSubmit();
 	handleSettingsDropdown();
 	handleAddPortfolioItemClick();
 	handleCancelAdditionBtn();
-	handleEditPortfolioModal();
 	handleEditPortfolioSubmit();
 	handleDeletePortfolioItem();
 });

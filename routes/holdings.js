@@ -8,6 +8,7 @@ const jsonParser = bodyParser.json();
 const Holding = models.Holding;
 
 router.get('/', (req, res) => {
+	// Holding.find({user: req.user})
 	Holding.find()
 		.then(holdings => {
 			res.json({
@@ -20,7 +21,7 @@ router.get('/', (req, res) => {
 		});
 });
 
-router.post('/', (req, res) => {
+router.post('/', jsonParser, (req, res) => {
 	const requiredFields = ['symbol', 'name', 'amount'];
 
 	for (let i = 0; i < requiredFields.length; i++) {
@@ -36,6 +37,7 @@ router.post('/', (req, res) => {
 		symbol: req.body.symbol,
 		name: req.body.name,
 		amount: req.body.amount
+		// user: req.user
 	})
 		.then(holding => res.status(201).json(holding.serialize()))
 		.catch(err => {
@@ -44,7 +46,7 @@ router.post('/', (req, res) => {
 		});
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', jsonParser, (req, res) => {
 	if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
 		const message =
 			`Request path id (${req.params.id}) and request body id ` +

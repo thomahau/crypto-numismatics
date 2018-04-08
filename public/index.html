@@ -18,16 +18,10 @@
 			<a class="u-pull-left" href="/">
 				<i class="far fa-copyright fa-flip-horizontal"></i> Crypto Numismatics
 			</a>
-			<div class="dropdown u-pull-right">
-				<a class="js-register-drop-btn">
-					<i class="fas fa-user-plus"></i><span class="nav-text"> Register</span>
-				</a>
-				<div class="dropdown-register">
-					<p>One</p>
-					<p>Two</p>
-				</div>
-			</div>
-			<a class="u-pull-right li-space">
+			<a class="js-register u-pull-right">
+				<i class="fas fa-user-plus"></i><span class="nav-text"> Register</span>
+			</a>
+			<a class="js-login u-pull-right li-space">
 				<i class="fas fa-sign-in-alt"></i><span class="nav-text"> Login</span>
 			</a>
 		</nav>
@@ -56,10 +50,51 @@
 		<div class="container portfolio-container" aria-live="polite" hidden></div>
 	</main>
 
-	<div class="modal" hidden>
+	<div class="modal js-register-modal" hidden>
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3>Register</h3>
+				<a class="u-pull-right close">x</a>
+			</div>
+			<div class="modal-body">
+				<form class="register-form" action="/users" method="POST">
+					<label for="register-username">Username</label>
+					<input type="text" name="username" id="register-username" required />
+					<label for="register-password">Password</label>
+					<input type="password" name="password" id="register-password" minlength=10 required />
+					<div class="row">
+						<input type="submit" class="button-primary" value="Register">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal js-login-modal" hidden>
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3>Log In</h3>
+				<a class="u-pull-right close">x</a>
+			</div>
+			<div class="modal-body">
+				<form class="login-form" action="/login" method="POST">
+					<label for="login-username">Username</label>
+					<input type="text" name="username" id="login-username" required />
+					<label for="login-password">Password</label>
+					<input type="password" name="password" id="login-password" required />
+					<div class="row">
+						<input type="submit" class="button-primary" value="Log in">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal edit-holdings-modal" hidden>
 		<div class="modal-content">
 			<div class="modal-header">
 				<h3>Edit Holdings</h3>
+				<a class="u-pull-right close">x</a>
 			</div>
 			<div class="modal-body js-edit-form-container"></div>
 		</div>

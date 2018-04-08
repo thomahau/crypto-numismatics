@@ -13,7 +13,7 @@ const app = express();
 mongoose.Promise = global.Promise;
 
 app.use(express.static('public'));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(morgan('common'));
 // CORS
 app.use(function(req, res, next) {
@@ -36,6 +36,14 @@ const {router: holdingsRouter} = require('./routes/holdings');
 app.use('/users', usersRouter);
 app.use('/auth', authRouter);
 app.use('/holdings', holdingsRouter);
+
+// const jwtAuth = passport.authenticate('jwt', {session: false});
+// // A protected endpoint which needs a valid JWT to access it
+// app.get('/api/protected', jwtAuth, (req, res) => {
+//   return res.json({
+//     data: 'rosebud'
+//   });
+// });
 
 app.use('*', (req, res) => {
 	res.status(404).json({message: 'Not Found'});

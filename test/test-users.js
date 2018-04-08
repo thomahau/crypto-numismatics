@@ -239,42 +239,42 @@ describe('Users endpoints', function() {
       });
     });
 
-    describe('GET', function() {
-      it('should return an empty array initially', function() {
-        return chai
-          .request(app)
-          .get('/users')
-          .then(res => {
-            expect(res).to.have.status(200);
-            expect(res.body).to.be.an('array');
-            expect(res.body).to.have.length(0);
-          });
-      });
+    // describe('GET', function() {
+    //   it('should return an empty array initially', function() {
+    //     return chai
+    //       .request(app)
+    //       .get('/users')
+    //       .then(res => {
+    //         expect(res).to.have.status(200);
+    //         expect(res.body).to.be.an('array');
+    //         expect(res.body).to.have.length(0);
+    //       });
+    //   });
 
-      it('should return an array of users', function() {
-        return User.create(
-          {
-            username,
-            password
-          },
-          {
-            username: usernameB,
-            password: passwordB
-          }
-        )
-          .then(() => chai.request(app).get('/users'))
-          .then(res => {
-            expect(res).to.have.status(200);
-            expect(res.body).to.be.an('array');
-            expect(res.body).to.have.length(2);
-            expect(res.body[0]).to.deep.equal({
-              username
-            });
-            expect(res.body[1]).to.deep.equal({
-              username: usernameB
-            });
-          });
-      });
-    });
+    //   it('should return an array of users', function() {
+    //     return User.create(
+    //       {
+    //         username,
+    //         password
+    //       },
+    //       {
+    //         username: usernameB,
+    //         password: passwordB
+    //       }
+    //     )
+    //       .then(() => chai.request(app).get('/users'))
+    //       .then(res => {
+    //         expect(res).to.have.status(200);
+    //         expect(res.body).to.be.an('array');
+    //         expect(res.body).to.have.length(2);
+    //         expect(res.body[0]).to.deep.equal({
+    //           username
+    //         });
+    //         expect(res.body[1]).to.deep.equal({
+    //           username: usernameB
+    //         });
+    //       });
+    //   });
+    // });
   });
 });
