@@ -140,6 +140,39 @@ main .button:hover {
 	color: white;
 }
 
+table {
+	border-collapse: collapse;
+}
+
+@media only screen and (max-width: 640px) {
+	table thead {
+		border: none;
+		clip: rect(0 0 0 0);
+		height: 1px;
+		margin: -1px;
+		overflow: hidden;
+		padding: 0;
+		position: absolute;
+		width: 1px;
+	}
+
+	table tr {
+		border-bottom: 3px solid #ddd;
+		display: block;
+	}
+
+	table td {
+		border-bottom: 1px solid #ddd;
+		display: block;
+		text-align: right;
+	}
+
+	table td::before {
+		content: attr(data-label);
+		float: left;
+	}
+}
+
 /* Autocomplete widget */
 .ui-menu {
 	max-height: 31vh;

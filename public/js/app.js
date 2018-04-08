@@ -216,13 +216,17 @@ function getPortfolioTable() {
 		).toFixed(2);
 		tableRowsHtmlString += `
 		<tr>
-		<td><span class="leftmost-cell">${item.name}</span></td>
-		<td>$${item.price_usd}</td>
-		<td class="${gainOrLoss}">${item.percent_change_24h}%</td>
-		<td>${item.amount}</td>
-		<td>$${item.value}</td>
-		<td>${allocationPct}%</td>
-		<td><a class="portfolio-link delete-holding rightmost-cell" data-coin="${
+		<td data-label="&nbsp;&nbsp;&nbsp;&nbsp;Coin"><span class="leftmost-cell">${
+			item.name
+		}</span></td>
+		<td data-label="Price">$${item.price_usd}</td>
+		<td class="${gainOrLoss}" data-label="24 hr change">${
+			item.percent_change_24h
+		}%</td>
+		<td data-label="Amount">${item.amount}</td>
+		<td data-label="Value">$${item.value}</td>
+		<td data-label="Allocation">${allocationPct}%</td>
+		<td data-label="Delete"><a class="portfolio-link delete-holding rightmost-cell" data-coin="${
 			item.symbol
 		}">x</a></td>
 		</tr>`;
