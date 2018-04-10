@@ -1,11 +1,38 @@
 'use strict';
-let PORTFOLIO = [];
+let PORTFOLIO = {
+	holdings: []
+};
 let globalPortfolioValue = 0;
 
 function populateSearchOptions() {
 	$('.coin-search').autocomplete({
 		source: COINS
 	});
+}
+
+function getPortfolio() {
+	if (isLoggedIn()) {
+		getPortfolioHoldings();
+	}
+}
+
+function getPortfolioHoldings() {
+	const token = localStorage.getItem('token');
+	$.ajax({
+		url: 'holdings',
+		method: 'GET',
+		beforeSend: function(xhr) {
+			xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+		},
+		crossDomain: true,
+		contentType: 'application/json',
+		success: setPortfolioHoldings,
+		error: errorLogin
+	});
+}
+
+function setPortfolioHoldings(res) {
+	PORTFOLIO.holdings = res.holdings;
 }
 
 function handleModals() {
@@ -84,7 +111,7 @@ function addToPortfolio(item) {
 	addPastPrices(portfolioItem);
 
 	if (alreadyInPortfolio(portfolioItem)) {
-		const existingPortfolioItem = PORTFOLIO.filter(
+		const existingPortfolioItem = PORTFOLIO.holdings.filter(
 			el => el.symbol === portfolioItem.symbol
 		)[0];
 
@@ -93,15 +120,15 @@ function addToPortfolio(item) {
 		portfolioItem.amount = item.amount;
 	}
 
-	PORTFOLIO.push(portfolioItem);
-	PORTFOLIO = [...new Set(PORTFOLIO)];
+	PORTFOLIO.holdings.push(portfolioItem);
+	PORTFOLIO.holdings = [...new Set(PORTFOLIO.holdings)];
 	renderPortfolio();
 }
 
 function alreadyInPortfolio(newItem) {
 	let existsInPortfolio = false;
 
-	PORTFOLIO.forEach(item => {
+	PORTFOLIO.holdings.forEach(item => {
 		if (newItem.symbol === item.symbol) {
 			existsInPortfolio = true;
 			return existsInPortfolio;
@@ -137,7 +164,7 @@ function getPortfolioHeader() {
 	let portfolioValue24HrsAgo = 0;
 	// let portfolioValue7DaysAgo = 0;
 
-	PORTFOLIO.forEach(item => {
+	PORTFOLIO.holdings.forEach(item => {
 		item.value = +(item.amount * item.price_usd).toFixed(2);
 		item.value_24_hrs_ago = item.amount * item.price_usd_24_hrs_ago;
 		// item.value_7_days_ago = item.amount * item.price_usd_7_days_ago;
@@ -207,7 +234,7 @@ function getPortfolioHeader() {
 
 function getPortfolioTable() {
 	let tableRowsHtmlString = '';
-	PORTFOLIO.forEach(item => {
+	PORTFOLIO.holdings.forEach(item => {
 		const gainOrLoss = item.percent_change_24h > 0 ? 'gain' : 'loss';
 		const allocationPct = +(
 			item.value /
@@ -338,7 +365,7 @@ function handleEditPortfolioModal() {
 
 function getEditPortfolioForm() {
 	let holdingsHtmlString = '';
-	PORTFOLIO.forEach(item => {
+	PORTFOLIO.holdings.forEach(item => {
 		holdingsHtmlString += `
 		<div class="row">
 			<div class="three columns">
@@ -375,8 +402,10 @@ function handleEditPortfolioSubmit() {
 		});
 
 		Object.keys(submittedValues).forEach(coin => {
-			const indexOfItem = PORTFOLIO.findIndex(i => i.symbol === coin);
-			PORTFOLIO[indexOfItem].amount = parseFloat(
+			const indexOfItem = PORTFOLIO.holdings.findIndex(
+				i => i.symbol === coin
+			);
+			PORTFOLIO.holdings[indexOfItem].amount = parseFloat(
 				submittedValues[coin],
 				10
 			);
@@ -390,15 +419,55 @@ function handleEditPortfolioSubmit() {
 function handleDeletePortfolioItem() {
 	$('body').on('click', '.delete-holding', function(event) {
 		const coinSymbol = $(this).data('coin');
-		const indexOfItem = PORTFOLIO.findIndex(i => i.symbol === coinSymbol);
-		PORTFOLIO.splice(indexOfItem, 1);
+		const indexOfItem = PORTFOLIO.holdings.findIndex(
+			i => i.symbol === coinSymbol
+		);
+		PORTFOLIO.holdings.splice(indexOfItem, 1);
 		renderPortfolio();
 		$('.modal').attr('hidden', true);
 	});
 }
 
+function handleLogin() {
+	$('.login-form').submit(function(event) {
+		event.preventDefault();
+		const credentials = {
+			username: $(this)
+				.find('#login-username')
+				.val(),
+			password: $(this)
+				.find('#login-password')
+				.val()
+		};
+		$('.modal').attr('hidden', true);
+		$.ajax({
+			url: 'auth/login',
+			method: 'POST',
+			data: JSON.stringify(credentials),
+			crossDomain: true,
+			contentType: 'application/json',
+			success: successfulLogin,
+			error: errorLogin
+		});
+	});
+}
+
+function successfulLogin(res) {
+	localStorage.setItem('token', res.authToken);
+	getPortfolio();
+}
+
+function errorLogin() {
+	console.log('fail');
+}
+
+function isLoggedIn() {
+	return localStorage.getItem('token');
+}
+
 $(function() {
 	populateSearchOptions();
+	handleLogin();
 	handleModals();
 	handleNewCoinSubmit();
 	handleSettingsDropdown();

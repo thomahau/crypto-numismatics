@@ -16,8 +16,7 @@ HoldingSchema.methods.serialize = function() {
 		id: this._id,
 		symbol: this.symbol,
 		name: this.name,
-		amount: this.amount,
-		user: this.user
+		amount: this.amount
 	};
 };
 

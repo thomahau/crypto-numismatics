@@ -184,8 +184,7 @@ describe('Protected holdings API resource', function() {
 							'id',
 							'symbol',
 							'name',
-							'amount',
-							'user'
+							'amount'
 						);
 					});
 					resHolding = res.body.holdings[0];
@@ -217,8 +216,7 @@ describe('Protected holdings API resource', function() {
 						'id',
 						'symbol',
 						'name',
-						'amount',
-						'user'
+						'amount'
 					);
 					expect(res.body.id).to.not.be.null;
 					expect(res.body.symbol).to.equal(newHolding.symbol);
