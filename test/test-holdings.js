@@ -2,12 +2,15 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 const {app, runServer, closeServer} = require('../server');
-const {TEST_DATABASE_URL} = require('../config');
+const {JWT_SECRET, TEST_DATABASE_URL} = require('../config');
 const models = require('../models');
 
-const Holding = mongoose.model('Holding');
+const User = models.User;
+const Holding = models.Holding;
 const expect = chai.expect;
+let userId;
 
 chai.use(chaiHttp);
 
@@ -18,7 +21,6 @@ function seedPortfolioData() {
 	for (let i = 0; i <= 5; i++) {
 		seedData.push(generateHoldingData());
 	}
-
 	return Holding.insertMany(seedData);
 }
 
@@ -39,7 +41,8 @@ function generateHoldingData() {
 	return {
 		symbol: coin.symbol,
 		name: coin.name,
-		amount: amount
+		amount: amount,
+		user: userId
 	};
 }
 
@@ -48,13 +51,36 @@ function tearDownDb() {
 	return mongoose.connection.dropDatabase();
 }
 
-describe('holdings API resource', function() {
+describe('Protected holdings API resource', function() {
+	const username = 'exampleUser';
+	const password = 'examplePassword';
+	const token = jwt.sign(
+		{
+			user: {
+				username
+			}
+		},
+		JWT_SECRET,
+		{
+			algorithm: 'HS256',
+			subject: username,
+			expiresIn: '30d'
+		}
+	);
+
 	before(function() {
 		return runServer(TEST_DATABASE_URL);
 	});
 
 	beforeEach(function() {
-		return seedPortfolioData();
+		return User.hashPassword(password)
+			.then(password => {
+				return User.create({username, password});
+			})
+			.then(user => {
+				userId = user._id;
+				return seedPortfolioData();
+			});
 	});
 
 	afterEach(function() {
@@ -65,12 +91,70 @@ describe('holdings API resource', function() {
 		return closeServer();
 	});
 
+	describe('Protection', function() {
+		it('Should reject requests with no credentials', function() {
+			return chai
+				.request(app)
+				.get('/holdings')
+				.then(res => {
+					expect(res).to.have.status(401);
+				});
+		});
+
+		it('Should reject requests with an invalid token', function() {
+			const incorrectToken = jwt.sign(
+				{
+					user: username
+				},
+				'wrongSecret',
+				{
+					algorithm: 'HS256',
+					subject: username,
+					expiresIn: '30d'
+				}
+			);
+
+			return chai
+				.request(app)
+				.get('/holdings')
+				.set('Authorization', `Bearer ${incorrectToken}`)
+				.then(res => {
+					expect(res).to.have.status(401);
+				});
+		});
+
+		it('Should reject requests with an expired token', function() {
+			const expiredToken = jwt.sign(
+				{
+					user: {
+						username
+					},
+					exp: Math.floor(Date.now() / 1000) - 10 // Expired ten seconds ago
+				},
+				JWT_SECRET,
+				{
+					algorithm: 'HS256',
+					subject: username
+				}
+			);
+
+			return chai
+				.request(app)
+				.get('/holdings')
+				.set('authorization', `Bearer ${expiredToken}`)
+				.then(res => {
+					expect(res).to.have.status(401);
+				});
+		});
+	});
+
 	describe('GET endpoint', function() {
-		it('should return all existing holdings', function() {
+		it('should return all existing holdings for current user', function() {
 			let res;
 			return chai
 				.request(app)
 				.get('/holdings')
+				.set('authorization', `Bearer ${token}`)
 				.then(_res => {
 					res = _res;
 					expect(res).to.have.status(200);
@@ -87,6 +171,7 @@ describe('holdings API resource', function() {
 			return chai
 				.request(app)
 				.get('/holdings')
+				.set('authorization', `Bearer ${token}`)
 				.then(res => {
 					expect(res).to.have.status(200);
 					expect(res).to.be.json;
@@ -99,7 +184,8 @@ describe('holdings API resource', function() {
 							'id',
 							'symbol',
 							'name',
-							'amount'
+							'amount',
+							'user'
 						);
 					});
 					resHolding = res.body.holdings[0];
@@ -121,6 +207,7 @@ describe('holdings API resource', function() {
 			return chai
 				.request(app)
 				.post('/holdings')
+				.set('authorization', `Bearer ${token}`)
 				.send(newHolding)
 				.then(res => {
 					expect(res).to.have.status(201);
@@ -130,7 +217,8 @@ describe('holdings API resource', function() {
 						'id',
 						'symbol',
 						'name',
-						'amount'
+						'amount',
+						'user'
 					);
 					expect(res.body.id).to.not.be.null;
 					expect(res.body.symbol).to.equal(newHolding.symbol);
@@ -157,6 +245,7 @@ describe('holdings API resource', function() {
 					return chai
 						.request(app)
 						.put(`/holdings/${holding.id}`)
+						.set('authorization', `Bearer ${token}`)
 						.send(updateData);
 				})
 				.then(res => {
@@ -176,7 +265,10 @@ describe('holdings API resource', function() {
 			return Holding.findOne()
 				.then(_holding => {
 					holding = _holding;
-					return chai.request(app).delete(`/holdings/${holding.id}`);
+					return chai
+						.request(app)
+						.delete(`/holdings/${holding.id}`)
+						.set('authorization', `Bearer ${token}`);
 				})
 				.then(res => {
 					expect(res).to.have.status(204);
