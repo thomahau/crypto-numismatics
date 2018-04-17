@@ -3,10 +3,11 @@
 const CRYPTOCOMPARE_ENDPOINT = 'https://min-api.cryptocompare.com/data/';
 const APP_NAME = 'crypto_numismatics';
 
-let PORTFOLIO = {
-	holdings: []
-};
-let globalPortfolioValue = 0;
+let portfolioValue = 0;
+
+// let PORTFOLIO = {
+// 	holdings: []
+// };
 
 function getAuthHeaders() {
 	const token = localStorage.getItem('token');
@@ -192,14 +193,15 @@ function getPortfolioData(holdings) {
 				amendedHoldings.forEach(holding => {
 					if (item === holding.symbol) {
 						holding.price = data.RAW[item].USD.PRICE;
-						holding.change_24_hr = data.RAW[item].USD.CHANGE24HOUR;
-						holding.change_pct_24_hr = data.RAW[
-							item
-						].USD.CHANGEPCT24HOUR.toFixed(2);
+						holding.change_24_hr = round(
+							data.RAW[item].USD.CHANGE24HOUR
+						);
+						holding.change_pct_24_hr = round(
+							data.RAW[item].USD.CHANGEPCT24HOUR
+						);
 						holding.price_24_hrs_ago =
 							holding.price - holding.change_24_hr;
-						holding.value =
-							holding.price * holding.amount.toFixed(2);
+						holding.value = holding.price * holding.amount;
 						holding.value_24_hrs_ago =
 							holding.price_24_hrs_ago * holding.amount;
 					}
@@ -212,6 +214,12 @@ function getPortfolioData(holdings) {
 		);
 }
 
+function round(value, decimals = 2) {
+	return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals).toFixed(
+		decimals
+	);
+}
+
 function renderPortfolio() {
 	getHoldings()
 		.then(data => {
@@ -220,7 +228,7 @@ function renderPortfolio() {
 		.then(portfolioData => {
 			const p1 = getPortfolioHeader(portfolioData);
 			const p2 = getPortfolioTable(portfolioData);
-			const p3 = getPortfolioFooter(portfolioData);
+			const p3 = getPortfolioFooter();
 
 			return Promise.all([p1, p2, p3]);
 		})
@@ -235,39 +243,22 @@ function renderPortfolio() {
 				.append(portfolioTable)
 				.append(portfolioFooter);
 		});
-	// const portfolioHeader = getPortfolioHeader();
-	// const portfolioTable = getPortfolioTable();
-	// const portfolioFooter = getPortfolioFooter();
-
-	// $('.welcome-container').remove();
-	// $('.portfolio-container')
-	// 	.attr('hidden', false)
-	// 	.empty()
-	// 	.append(portfolioHeader)
-	// 	.append(portfolioTable)
-	// 	.append(portfolioFooter);
 }
 
 function getPortfolioHeader(amendedHoldings) {
-	let portfolioValue = 0;
 	let portfolioValue24HrsAgo = 0;
 
 	amendedHoldings.forEach(item => {
 		portfolioValue += item.value;
 		portfolioValue24HrsAgo += item.value_24_hrs_ago;
 	});
-	portfolioValue = +portfolioValue.toFixed(2);
-	globalPortfolioValue = portfolioValue;
 
-	const portfolio24HrChange = +(
-		portfolioValue - portfolioValue24HrsAgo
-	).toFixed(2);
-	const portfolio24HrPercentChange = +(
-		(portfolioValue - portfolioValue24HrsAgo) /
-		portfolioValue24HrsAgo *
-		100
-	).toFixed(2);
+	const portfolio24HrChange = round(portfolioValue - portfolioValue24HrsAgo);
+	const portfolio24HrPercentChange = round(
+		(portfolioValue - portfolioValue24HrsAgo) / portfolioValue24HrsAgo * 100
+	);
 	const gainOrLoss24Hrs = portfolio24HrPercentChange > 0 ? 'gain' : 'loss';
+	portfolioValue = round(portfolioValue);
 
 	const portfolioHeader = `
 		<div class="row darkest">
@@ -325,11 +316,7 @@ function getPortfolioTable(amendedHoldings) {
 
 	amendedHoldings.forEach(item => {
 		const gainOrLoss = item.change_pct_24_hr > 0 ? 'gain' : 'loss';
-		const allocationPct = +(
-			item.value /
-			globalPortfolioValue *
-			100
-		).toFixed(2);
+		const allocationPct = round(item.value / portfolioValue * 100);
 		tableRowsHtmlString += `
 		<tr>
 		<td data-label="&nbsp;&nbsp;&nbsp;&nbsp;Coin"><span class="leftmost-cell">${
@@ -366,52 +353,6 @@ function getPortfolioTable(amendedHoldings) {
 		  </tbody>
 		 </table>`;
 }
-
-// function getPortfolioTable() {
-// 	let tableRowsHtmlString = '';
-// 	PORTFOLIO.holdings.forEach(item => {
-// 		const gainOrLoss = item.percent_change_24h > 0 ? 'gain' : 'loss';
-// 		const allocationPct = +(
-// 			item.value /
-// 			globalPortfolioValue *
-// 			100
-// 		).toFixed(2);
-// 		tableRowsHtmlString += `
-// 		<tr>
-// 		<td data-label="&nbsp;&nbsp;&nbsp;&nbsp;Coin"><span class="leftmost-cell">${
-// 			item.name
-// 		}</span></td>
-// 		<td data-label="Price">$${item.price_usd}</td>
-// 		<td class="${gainOrLoss}" data-label="24 hr change">${
-// 			item.percent_change_24h
-// 		}%</td>
-// 		<td data-label="Amount">${item.amount}</td>
-// 		<td data-label="Value">$${item.value}</td>
-// 		<td data-label="Allocation">${allocationPct}%</td>
-// 		<td data-label="Delete"><a class="portfolio-link delete-holding rightmost-cell" data-coin="${
-// 			item.symbol
-// 		}">x</a></td>
-// 		</tr>`;
-// 	});
-
-// 	return `
-// 		<table class="u-full-width">
-// 		  <thead class="darkest">
-// 		    <tr>
-// 		      <th><span class="leftmost-cell">Coin</span></th>
-// 		      <th>Price</th>
-// 		      <th>24 hr change</th>
-// 		      <th>Amount</th>
-// 		      <th>Value</th>
-// 		      <th>Allocation</th>
-// 		      <th></th>
-// 		    </tr>
-// 		  </thead>
-// 		  <tbody class="darker">
-// 			${tableRowsHtmlString}
-// 		  </tbody>
-// 		 </table>`;
-// }
 
 function getPortfolioFooter() {
 	return `
@@ -487,10 +428,14 @@ function handleCancelAdditionBtn() {
 
 function handleEditPortfolioModal() {
 	$('main').on('click', '.js-edit-portfolio', function() {
-		const editPortfolioForm = getEditPortfolioForm();
-
-		$('.edit-holdings-modal').attr('hidden', false);
-		$('.js-edit-form-container').html(editPortfolioForm);
+		getHoldings()
+			.then(data => {
+				return getEditPortfolioForm(data.holdings);
+			})
+			.then(editPortfolioForm => {
+				$('.edit-holdings-modal').attr('hidden', false);
+				$('.js-edit-form-container').html(editPortfolioForm);
+			});
 	});
 
 	$('.edit-holdings-modal').on('click', '.cancel-edit-btn', function() {
@@ -498,9 +443,10 @@ function handleEditPortfolioModal() {
 	});
 }
 
-function getEditPortfolioForm() {
+function getEditPortfolioForm(holdings) {
 	let holdingsHtmlString = '';
-	PORTFOLIO.holdings.forEach(item => {
+
+	holdings.forEach(item => {
 		holdingsHtmlString += `
 		<div class="row">
 			<div class="three columns">
@@ -518,12 +464,12 @@ function getEditPortfolioForm() {
 	});
 
 	return `
-		<form class="edit-portfolio-form">
-		  ${holdingsHtmlString}
-		  <div class="row">
-			<button type="submit" class="button-primary">Update</button>
-			<a class="button cancel-edit-btn" role="button">Cancel</a>
-		</div>`;
+	<form class="edit-portfolio-form">
+	  ${holdingsHtmlString}
+	  <div class="row">
+		<button type="submit" class="button-primary">Update</button>
+		<a class="button cancel-edit-btn" role="button">Cancel</a>
+	</div>`;
 }
 
 function handleEditPortfolioSubmit() {
