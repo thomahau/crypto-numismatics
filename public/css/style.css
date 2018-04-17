@@ -56,6 +56,7 @@ input[type='number']::-webkit-outer-spin-button {
 }
 
 @media only screen and (max-width: 640px) {
+	.portfolio-container,
 	main .button-primary {
 		width: 100%;
 	}
@@ -176,10 +177,11 @@ table {
 
 /* Autocomplete widget */
 .ui-menu {
-	max-height: 31vh;
+	max-height: 30vh;
 	overflow-y: auto;
 	overflow-x: hidden;
 	text-align: left;
+	font-size: 1.5rem;
 }
 
 .ui-widget-content .ui-state-active {

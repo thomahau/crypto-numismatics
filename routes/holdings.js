@@ -40,12 +40,18 @@ router.post('/', jwtAuth, jsonParser, (req, res) => {
 
 	User.findOne({username: req.user.username})
 		.then(user => {
-			return Holding.create({
-				symbol: req.body.symbol,
-				name: req.body.name,
-				amount: req.body.amount,
-				user: user
-			});
+			return Holding.findOneAndUpdate(
+				{symbol: req.body.symbol, user: user},
+				{
+					symbol: req.body.symbol,
+					name: req.body.name,
+					$inc: {
+						amount: req.body.amount
+					},
+					user: user
+				},
+				{upsert: true, new: true, runValidators: true}
+			);
 		})
 		.then(holding => res.status(201).json(holding.serialize()))
 		.catch(err => {

@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="description" content="Cryptocurrency portfolio tracker">
 	<title>Crypto Numismatics</title>
-	<link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+	<link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,400" rel="stylesheet">
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/black-tie/jquery-ui.css">
 	<link rel="stylesheet" href="css/normalize.css">
 	<link rel="stylesheet" href="css/skeleton.css">
@@ -19,21 +19,21 @@
 				<i class="far fa-copyright fa-flip-horizontal"></i> Crypto Numismatics
 			</a>
 			<a class="js-register u-pull-right">
-				<i class="fas fa-user-plus"></i><span class="nav-text"> Register</span>
+				<i class="fas fa-user-plus"></i><span class="nav-text"> Sign up</span>
 			</a>
 			<a class="js-login u-pull-right li-space">
-				<i class="fas fa-sign-in-alt"></i><span class="nav-text"> Login</span>
+				<i class="fas fa-sign-in-alt"></i><span class="nav-text"> Log in</span>
 			</a>
 		</nav>
 	</header>
 
 	<main role="main">
-		<div class="container welcome-container">
-			<div class="row">
+		<div class="container welcome-container" hidden>
+			<!-- <div class="row">
 				<h1>Crypto Numismatics</h1>
 				<p class="intro-text">Use this simple portfolio tracker to get an overview of your cryptocurrency holdings. To get started, enter your first coin below. If you would like to save your portfolio, registering is free and anonymous. Been here before? Log in to access your portfolio.</p>
 			</div>
-			<!-- <form class="js-add-coin-form">
+			<form class="js-add-coin-form">
 				<div class="row starter-inputs">
 					<div class="five columns">
 						<input class="u-full-width coin-search" type="search" id="coin" placeholder="e.g. Bitcoin (BTC)" required />
@@ -53,17 +53,19 @@
 	<div class="modal js-register-modal" hidden>
 		<div class="modal-content">
 			<div class="modal-header">
-				<h3>Register</h3>
+				<h3>Create your account</h3>
 				<a class="u-pull-right close">x</a>
 			</div>
 			<div class="modal-body">
 				<form class="register-form" action="/users" method="POST">
 					<label for="register-username">Username</label>
-					<input type="text" name="username" id="register-username" required />
+					<input type="text" name="username" id="register-username" required autofocus>
 					<label for="register-password">Password</label>
-					<input type="password" name="password" id="register-password" minlength=10 required />
+					<input type="password" name="password" id="register-password" minlength=8 required>
+					<label for="register-password-confirm">Confirm password</label>
+					<input type="password" name="passwordconfirm" id="register-password-confirm" minlength=8 required>
 					<div class="row">
-						<input type="submit" class="button-primary" value="Register">
+						<input type="submit" class="button-primary" value="Create account">
 					</div>
 				</form>
 			</div>
@@ -73,15 +75,15 @@
 	<div class="modal js-login-modal" hidden>
 		<div class="modal-content">
 			<div class="modal-header">
-				<h3>Log In</h3>
+				<h3>Log in</h3>
 				<a class="u-pull-right close">x</a>
 			</div>
 			<div class="modal-body">
 				<form class="login-form">
 					<label for="login-username">Username</label>
-					<input type="text" name="username" id="login-username" required />
+					<input type="text" name="username" id="login-username" required autofocus>
 					<label for="login-password">Password</label>
-					<input type="password" name="password" id="login-password" required />
+					<input type="password" name="password" id="login-password" required>
 					<div class="row login-help" aria-live="assertive" hidden></div>
 					<div class="row">
 						<input type="submit" class="button-primary" value="Log in">
@@ -94,7 +96,7 @@
 	<div class="modal edit-holdings-modal" hidden>
 		<div class="modal-content">
 			<div class="modal-header">
-				<h3>Edit Holdings</h3>
+				<h3>Edit holdings</h3>
 				<a class="u-pull-right close">x</a>
 			</div>
 			<div class="modal-body js-edit-form-container"></div>
@@ -105,7 +107,6 @@
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js"></script>
 	<script src="js/coinlist.js"></script>
-	<script src="js/mockData.js"></script>
 	<script src="js/app.js"></script>
 </body>
 </html>

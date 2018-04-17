@@ -9,24 +9,108 @@ let globalPortfolioValue = 0;
 // 	holdings: []
 // };
 
-function getAuthHeaders() {
-	const token = localStorage.getItem('token');
-
-	return {
-		'Content-Type': 'application/json',
-		Authorization: `Bearer ${token}`
-	};
-}
-
 function populateSearchOptions() {
 	$('.coin-search').autocomplete({
 		source: COINS
 	});
 }
 
-// function isLoggedIn() {
-// 	return localStorage.getItem('token');
-// }
+function checkIfLoggedIn() {
+	if (localStorage.getItem('token') && localStorage.getItem('username')) {
+		const username = localStorage.getItem('username');
+		const userHtml = getUserHtml(username);
+
+		$('.js-login, .js-register').remove();
+		$('nav').append(userHtml);
+		renderPortfolio();
+	} else {
+		const welcomeMessage = getWelcomeMessage();
+
+		$('.welcome-container')
+			.attr('hidden', false)
+			.html(welcomeMessage);
+	}
+}
+
+function getWelcomeMessage() {
+	return `
+	<div class="row">
+		<h1>Cryptocurrency portfolio tracker</h1>
+		<p>Crypto Numismatics provides a simple, user-friendly overview of your digital currency holdings. Signing up is free and anonymous.</p>
+	</div>`;
+}
+
+function handleLogin() {
+	$('.login-form').submit(function(event) {
+		event.preventDefault();
+		const credentials = {
+			username: $('#login-username').val(),
+			password: $('#login-password').val()
+		};
+
+		login(credentials)
+			.then(data => {
+				localStorage.setItem('username', data.username);
+				localStorage.setItem('token', data.authToken);
+				$('.modal').attr('hidden', true);
+				checkIfLoggedIn();
+			})
+			.catch(err => {
+				const loginHelpMsg = getLoginHelpMsg(err);
+
+				$('#login-username, #login-password').val('');
+				$('.login-help')
+					.attr('hidden', false)
+					.html(loginHelpMsg);
+			});
+	});
+}
+
+function login(data) {
+	return fetch('auth/login', {
+		method: 'POST',
+		body: JSON.stringify(data),
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	}).then(res => {
+		if (res.ok) {
+			return res.json();
+		}
+		throw new Error('Invalid username or password');
+	});
+}
+
+function getUserHtml(username) {
+	return `
+	<a class="js-logout u-pull-right">
+		<i class="fas fa-sign-out-alt"></i><span class="nav-text"> Log out</span>
+	</a>
+	<p class="u-pull-right li-space">
+		${username}
+	</p>`;
+}
+
+function getLoginHelpMsg(err) {
+	return `
+	<span class="loss">${err}</span>`;
+}
+
+function handleLogout() {
+	$('header').on('click', '.js-logout', function() {
+		localStorage.removeItem('username');
+		localStorage.removeItem('token');
+		location.reload();
+	});
+}
+
+function getAuthHeaders() {
+	const token = localStorage.getItem('token');
+	return {
+		'Content-Type': 'application/json',
+		Authorization: `Bearer ${token}`
+	};
+}
 
 function handleModals() {
 	$('body').click(function(event) {
@@ -53,16 +137,6 @@ function handleRegisterModal() {
 function handleLoginModal() {
 	$('.js-login').click(function() {
 		$('.js-login-modal').attr('hidden', false);
-	});
-}
-
-function getHoldings() {
-	return fetch('holdings', {
-		headers: getAuthHeaders()
-	}).then(res => {
-		if (res.ok) {
-			return res.json();
-		}
 	});
 }
 
@@ -110,6 +184,16 @@ function isValidInput(input) {
 	return validInput;
 }
 
+function getHoldings() {
+	return fetch('holdings', {
+		headers: getAuthHeaders()
+	}).then(res => {
+		if (res.ok) {
+			return res.json();
+		}
+	});
+}
+
 function addHolding(data) {
 	return fetch('holdings', {
 		method: 'POST',
@@ -144,17 +228,17 @@ function addHolding(data) {
 // 	renderPortfolio();
 // }
 
-function alreadyInPortfolio(newItem) {
-	let existsInPortfolio = false;
+// function alreadyInPortfolio(newItem) {
+// 	let existsInPortfolio = false;
 
-	PORTFOLIO.holdings.forEach(item => {
-		if (newItem.symbol === item.symbol) {
-			existsInPortfolio = true;
-			return existsInPortfolio;
-		}
-	});
-	return existsInPortfolio;
-}
+// 	PORTFOLIO.holdings.forEach(item => {
+// 		if (newItem.symbol === item.symbol) {
+// 			existsInPortfolio = true;
+// 			return existsInPortfolio;
+// 		}
+// 	});
+// 	return existsInPortfolio;
+// }
 
 // function addPastPrices(item) {
 // 	const divider = (100 + item.percent_change_24h) / 100;
@@ -205,9 +289,10 @@ function getPortfolioData(holdings) {
 }
 
 function round(value, decimals = 2) {
-	return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals).toFixed(
-		decimals
-	);
+	return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals)
+		.toFixed(decimals)
+		.toString()
+		.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 function renderPortfolio() {
@@ -225,7 +310,9 @@ function renderPortfolio() {
 		.then(values => {
 			const [portfolioHeader, portfolioTable, portfolioFooter] = values;
 
-			$('.welcome-container').remove();
+			$('.welcome-container')
+				.attr('hidden', true)
+				.empty();
 			$('.portfolio-container')
 				.attr('hidden', false)
 				.empty()
@@ -249,15 +336,15 @@ function getPortfolioHeader(amendedHoldings) {
 		(portfolioValue - portfolioValue24HrsAgo) / portfolioValue24HrsAgo * 100
 	);
 	const gainOrLoss24Hrs = portfolio24HrPercentChange > 0 ? 'gain' : 'loss';
-	portfolioValue = round(portfolioValue);
 	globalPortfolioValue = portfolioValue;
+	portfolioValue = round(portfolioValue);
 
 	return `
 		<div class="row darkest">
 			<ul class="nav-list portfolio-header">
 				<li class="u-pull-right">
 					<a class="portfolio-link share-portfolio disabled">
-						<i class="fas fa-share-square"></i> Share
+						<i class="fas fa-share-square"></i><span> Share</span>
 					</a>
 				</li>
 				<li class="u-pull-right li-space">
@@ -283,11 +370,12 @@ function getPortfolioHeader(amendedHoldings) {
 				<strong>24 HOURS</strong>
 				<p class="${gainOrLoss24Hrs} large-text">$${portfolio24HrChange} <small>(${portfolio24HrPercentChange}%)</small></p>
 			</div>
-			<div class="six columns">
-				<button class="button-primary u-pull-right">Save Portfolio</button>
-			</div>
 		</div>`;
 }
+
+// <div class="six columns">
+// 	<button class="button-primary u-pull-right">Save Portfolio</button>
+// </div>
 
 // TODO: Add other time periods?
 // <div class="three columns text-left">
@@ -307,6 +395,9 @@ function getPortfolioTable(amendedHoldings) {
 	amendedHoldings.forEach(item => {
 		const gainOrLoss = item.change_pct_24_hr > 0 ? 'gain' : 'loss';
 		const allocationPct = round(item.value / globalPortfolioValue * 100);
+
+		item.price = round(item.price);
+		item.value = round(item.value);
 		tableRowsHtmlString += `
 		<tr>
 		<td data-label="&nbsp;&nbsp;&nbsp;&nbsp;Coin"><span class="leftmost-cell">${
@@ -400,7 +491,7 @@ function getNewItemForm() {
 				<input type="number" class="coin-amount" placeholder="Amount" min="0" step="any" required />
 			</div>
 			<div class="four columns">
-				<button type="submit" class="button">Add coin</button>
+				<button type="submit" class="button-primary">Add coin</button>
 				<a class="button cancel-addition-btn" role="button">Cancel</a>
 			</div>
 		</div>
@@ -440,10 +531,10 @@ function getEditPortfolioForm(holdings) {
 		holdingsHtmlString += `
 		<div class="row">
 			<div class="three columns">
-				<label for="${item.symbol}">${item.name}</label>
+				<label for="${item.id}">${item.name}</label>
 			</div>
 			<div class="nine columns">
-				<input type="number" name="${item.symbol}" value=${
+				<input type="number" name="${item.id}" value=${
 			item.amount
 		} min="0" step="any" />
 				<a class="button delete-holding" role="button" data-coin="${item.id}">Delete</a>
@@ -464,25 +555,38 @@ function handleEditPortfolioSubmit() {
 	$('.modal').on('submit', '.edit-portfolio-form', function(event) {
 		event.preventDefault();
 		const $inputs = $('.edit-portfolio-form input[type="number"]');
-		const submittedValues = {};
+		const submittedValues = [];
 
 		$inputs.each(function() {
-			submittedValues[this.name] = $(this).val();
+			submittedValues.push({
+				id: this.name,
+				amount: parseFloat($(this).val(), 10)
+			});
 		});
 
-		Object.keys(submittedValues).forEach(coin => {
-			const indexOfItem = PORTFOLIO.holdings.findIndex(
-				i => i.symbol === coin
-			);
-			PORTFOLIO.holdings[indexOfItem].amount = parseFloat(
-				submittedValues[coin],
-				10
-			);
+		const updates = submittedValues.map(item => {
+			return updateHolding(item);
 		});
 
-		renderPortfolio();
-		$('.modal').attr('hidden', true);
+		Promise.all(updates).then(values => {
+			renderPortfolio();
+			$('.modal').attr('hidden', true);
+		});
 	});
+}
+
+function updateHolding(data) {
+	return fetch(`holdings/${data.id}`, {
+		method: 'PUT',
+		headers: getAuthHeaders(),
+		body: JSON.stringify(data)
+	})
+		.then(res => {
+			if (res.ok) {
+				return;
+			}
+		})
+		.catch(err => console.error(err));
 }
 
 function handleDeletePortfolioItem() {
@@ -509,89 +613,12 @@ function deleteHolding(id) {
 	});
 }
 
-// function handleDeletePortfolioItem() {
-// 	$('body').on('click', '.delete-holding', function(event) {
-// 		const coinSymbol = $(this).data('coin');
-// 		const indexOfItem = PORTFOLIO.holdings.findIndex(
-// 			i => i.symbol === coinSymbol
-// 		);
-// 		PORTFOLIO.holdings.splice(indexOfItem, 1);
-// 		renderPortfolio();
-// 		$('.modal').attr('hidden', true);
-// 	});
-// }
-
-function handleLogin() {
-	$('.login-form').submit(function(event) {
-		event.preventDefault();
-		const credentials = {
-			username: $('#login-username').val(),
-			password: $('#login-password').val()
-		};
-
-		login(credentials)
-			.then(data => {
-				const userHtml = getUserHtml(data.username);
-
-				localStorage.setItem('token', data.authToken);
-				$('.modal').attr('hidden', true);
-				$('.js-login, .js-register').remove();
-				$('nav').append(userHtml);
-				renderPortfolio();
-			})
-			.catch(err => {
-				const loginHelpMsg = getLoginHelpMsg(err);
-
-				$('#login-username, #login-password').val('');
-				$('.login-help')
-					.attr('hidden', false)
-					.html(loginHelpMsg);
-			});
-	});
-}
-
-function login(data) {
-	return fetch('auth/login', {
-		method: 'POST',
-		body: JSON.stringify(data),
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	}).then(res => {
-		if (res.ok) {
-			return res.json();
-		}
-		throw new Error('Invalid username or password');
-	});
-}
-
-function getUserHtml(username) {
-	return `
-	<a class="js-logout u-pull-right">
-		<i class="fas fa-sign-out-alt"></i><span class="nav-text"> Log out</span>
-	</a>
-	<p class="u-pull-right li-space">
-		${username}
-	</p>`;
-}
-
-function getLoginHelpMsg(err) {
-	return `
-	<span class="loss">${err}</span>`;
-}
-
-function handleLogout() {
-	$('header').on('click', '.js-logout', function() {
-		localStorage.removeItem('token');
-		location.reload();
-	});
-}
-
 $(function() {
-	populateSearchOptions();
-	handleModals();
+	// populateSearchOptions();
+	checkIfLoggedIn();
 	handleLogin();
 	handleLogout();
+	handleModals();
 	handleNewCoinSubmit();
 	handleSettingsDropdown();
 	handleAddPortfolioItemClick();
