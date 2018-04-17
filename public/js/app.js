@@ -3,7 +3,7 @@
 const CRYPTOCOMPARE_ENDPOINT = 'https://min-api.cryptocompare.com/data/';
 const APP_NAME = 'crypto_numismatics';
 
-let portfolioValue = 0;
+let globalPortfolioValue = 0;
 
 // let PORTFOLIO = {
 // 	holdings: []
@@ -24,18 +24,8 @@ function populateSearchOptions() {
 	});
 }
 
-// function getPortfolio() {
-// 	if (isLoggedIn()) {
-// 		getPortfolioHoldings();
-// 	}
-// }
-
 // function isLoggedIn() {
 // 	return localStorage.getItem('token');
-// }
-
-// function setPortfolioHoldings(res) {
-// 	PORTFOLIO.holdings = res.holdings;
 // }
 
 function handleModals() {
@@ -246,6 +236,7 @@ function renderPortfolio() {
 }
 
 function getPortfolioHeader(amendedHoldings) {
+	let portfolioValue = 0;
 	let portfolioValue24HrsAgo = 0;
 
 	amendedHoldings.forEach(item => {
@@ -259,8 +250,9 @@ function getPortfolioHeader(amendedHoldings) {
 	);
 	const gainOrLoss24Hrs = portfolio24HrPercentChange > 0 ? 'gain' : 'loss';
 	portfolioValue = round(portfolioValue);
+	globalPortfolioValue = portfolioValue;
 
-	const portfolioHeader = `
+	return `
 		<div class="row darkest">
 			<ul class="nav-list portfolio-header">
 				<li class="u-pull-right">
@@ -295,8 +287,6 @@ function getPortfolioHeader(amendedHoldings) {
 				<button class="button-primary u-pull-right">Save Portfolio</button>
 			</div>
 		</div>`;
-
-	return portfolioHeader;
 }
 
 // TODO: Add other time periods?
@@ -316,7 +306,7 @@ function getPortfolioTable(amendedHoldings) {
 
 	amendedHoldings.forEach(item => {
 		const gainOrLoss = item.change_pct_24_hr > 0 ? 'gain' : 'loss';
-		const allocationPct = round(item.value / portfolioValue * 100);
+		const allocationPct = round(item.value / globalPortfolioValue * 100);
 		tableRowsHtmlString += `
 		<tr>
 		<td data-label="&nbsp;&nbsp;&nbsp;&nbsp;Coin"><span class="leftmost-cell">${
@@ -330,7 +320,7 @@ function getPortfolioTable(amendedHoldings) {
 		<td data-label="Value">$${item.value}</td>
 		<td data-label="Allocation">${allocationPct}%</td>
 		<td data-label="Delete"><a class="portfolio-link delete-holding rightmost-cell" data-coin="${
-			item.symbol
+			item.id
 		}">x</a></td>
 		</tr>`;
 	});
@@ -456,9 +446,7 @@ function getEditPortfolioForm(holdings) {
 				<input type="number" name="${item.symbol}" value=${
 			item.amount
 		} min="0" step="any" />
-				<a class="button delete-holding" role="button" data-coin="${
-					item.symbol
-				}">Delete</a>
+				<a class="button delete-holding" role="button" data-coin="${item.id}">Delete</a>
 			</div>
 		</div>`;
 	});
@@ -499,15 +487,39 @@ function handleEditPortfolioSubmit() {
 
 function handleDeletePortfolioItem() {
 	$('body').on('click', '.delete-holding', function(event) {
-		const coinSymbol = $(this).data('coin');
-		const indexOfItem = PORTFOLIO.holdings.findIndex(
-			i => i.symbol === coinSymbol
-		);
-		PORTFOLIO.holdings.splice(indexOfItem, 1);
-		renderPortfolio();
-		$('.modal').attr('hidden', true);
+		const id = $(this).data('coin');
+
+		deleteHolding(id)
+			.then(() => {
+				renderPortfolio();
+				$('.modal').attr('hidden', true);
+			})
+			.catch(err => console.error(err));
 	});
 }
+
+function deleteHolding(id) {
+	return fetch(`holdings/${id}`, {
+		method: 'DELETE',
+		headers: getAuthHeaders()
+	}).then(res => {
+		if (res.ok) {
+			return;
+		}
+	});
+}
+
+// function handleDeletePortfolioItem() {
+// 	$('body').on('click', '.delete-holding', function(event) {
+// 		const coinSymbol = $(this).data('coin');
+// 		const indexOfItem = PORTFOLIO.holdings.findIndex(
+// 			i => i.symbol === coinSymbol
+// 		);
+// 		PORTFOLIO.holdings.splice(indexOfItem, 1);
+// 		renderPortfolio();
+// 		$('.modal').attr('hidden', true);
+// 	});
+// }
 
 function handleLogin() {
 	$('.login-form').submit(function(event) {
