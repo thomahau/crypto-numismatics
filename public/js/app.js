@@ -193,11 +193,13 @@ function getPortfolioData(holdings) {
 					if (item === holding.symbol) {
 						holding.price = data.RAW[item].USD.PRICE;
 						holding.change_24_hr = data.RAW[item].USD.CHANGE24HOUR;
-						holding.change_pct_24_hr =
-							data.RAW[item].USD.CHANGEPCT24HOUR;
+						holding.change_pct_24_hr = data.RAW[
+							item
+						].USD.CHANGEPCT24HOUR.toFixed(2);
 						holding.price_24_hrs_ago =
 							holding.price - holding.change_24_hr;
-						holding.value = holding.price * holding.amount;
+						holding.value =
+							holding.price * holding.amount.toFixed(2);
 						holding.value_24_hrs_ago =
 							holding.price_24_hrs_ago * holding.amount;
 					}
@@ -255,6 +257,7 @@ function getPortfolioHeader(amendedHoldings) {
 		portfolioValue24HrsAgo += item.value_24_hrs_ago;
 	});
 	portfolioValue = +portfolioValue.toFixed(2);
+	globalPortfolioValue = portfolioValue;
 
 	const portfolio24HrChange = +(
 		portfolioValue - portfolioValue24HrsAgo
@@ -317,10 +320,11 @@ function getPortfolioHeader(amendedHoldings) {
 // const portfolio7DayChange = portfolioValue - portfolioValue7DaysAgo;
 // const portfolio7DayPercentChange = portfolio7DayChange / 100;
 
-function getPortfolioTable() {
+function getPortfolioTable(amendedHoldings) {
 	let tableRowsHtmlString = '';
-	PORTFOLIO.holdings.forEach(item => {
-		const gainOrLoss = item.percent_change_24h > 0 ? 'gain' : 'loss';
+
+	amendedHoldings.forEach(item => {
+		const gainOrLoss = item.change_pct_24_hr > 0 ? 'gain' : 'loss';
 		const allocationPct = +(
 			item.value /
 			globalPortfolioValue *
@@ -331,9 +335,9 @@ function getPortfolioTable() {
 		<td data-label="&nbsp;&nbsp;&nbsp;&nbsp;Coin"><span class="leftmost-cell">${
 			item.name
 		}</span></td>
-		<td data-label="Price">$${item.price_usd}</td>
+		<td data-label="Price">$${item.price}</td>
 		<td class="${gainOrLoss}" data-label="24 hr change">${
-			item.percent_change_24h
+			item.change_pct_24_hr
 		}%</td>
 		<td data-label="Amount">${item.amount}</td>
 		<td data-label="Value">$${item.value}</td>
@@ -362,6 +366,52 @@ function getPortfolioTable() {
 		  </tbody>
 		 </table>`;
 }
+
+// function getPortfolioTable() {
+// 	let tableRowsHtmlString = '';
+// 	PORTFOLIO.holdings.forEach(item => {
+// 		const gainOrLoss = item.percent_change_24h > 0 ? 'gain' : 'loss';
+// 		const allocationPct = +(
+// 			item.value /
+// 			globalPortfolioValue *
+// 			100
+// 		).toFixed(2);
+// 		tableRowsHtmlString += `
+// 		<tr>
+// 		<td data-label="&nbsp;&nbsp;&nbsp;&nbsp;Coin"><span class="leftmost-cell">${
+// 			item.name
+// 		}</span></td>
+// 		<td data-label="Price">$${item.price_usd}</td>
+// 		<td class="${gainOrLoss}" data-label="24 hr change">${
+// 			item.percent_change_24h
+// 		}%</td>
+// 		<td data-label="Amount">${item.amount}</td>
+// 		<td data-label="Value">$${item.value}</td>
+// 		<td data-label="Allocation">${allocationPct}%</td>
+// 		<td data-label="Delete"><a class="portfolio-link delete-holding rightmost-cell" data-coin="${
+// 			item.symbol
+// 		}">x</a></td>
+// 		</tr>`;
+// 	});
+
+// 	return `
+// 		<table class="u-full-width">
+// 		  <thead class="darkest">
+// 		    <tr>
+// 		      <th><span class="leftmost-cell">Coin</span></th>
+// 		      <th>Price</th>
+// 		      <th>24 hr change</th>
+// 		      <th>Amount</th>
+// 		      <th>Value</th>
+// 		      <th>Allocation</th>
+// 		      <th></th>
+// 		    </tr>
+// 		  </thead>
+// 		  <tbody class="darker">
+// 			${tableRowsHtmlString}
+// 		  </tbody>
+// 		 </table>`;
+// }
 
 function getPortfolioFooter() {
 	return `
