@@ -83,6 +83,17 @@ header,
 	padding-top: 15px;
 }
 
+.start-btn {
+	margin-top: 15px;
+}
+
+.search-help {
+	line-height: 1.5rem;
+	margin-top: -9px;
+	margin-bottom: 5px;
+	color: red;
+}
+
 .leftmost-cell {
 	margin-left: 20px;
 }
@@ -146,8 +157,20 @@ table {
 	border-collapse: collapse;
 }
 
+th,
+td {
+	text-align: right;
+}
+
+th:first-child,
+th:last-child,
+td:first-child,
+td:last-child {
+	text-align: left;
+}
+
 @media only screen and (max-width: 640px) {
-	table thead {
+	thead {
 		border: none;
 		clip: rect(0 0 0 0);
 		height: 1px;
@@ -158,18 +181,28 @@ table {
 		width: 1px;
 	}
 
-	table tr {
+	tr {
 		border-bottom: 3px solid #ddd;
 		display: block;
 	}
 
-	table td {
+	td {
 		border-bottom: 1px solid #ddd;
 		display: block;
 		text-align: right;
+		clear: both;
 	}
 
-	table td::before {
+	td:first-child {
+		text-align: right;
+	}
+
+	td:last-child {
+		text-align: right;
+		padding-right: 10px;
+	}
+
+	td::before {
 		content: attr(data-label);
 		float: left;
 	}

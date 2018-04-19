@@ -56,14 +56,15 @@
 				<h3>Create your account</h3>
 				<a class="u-pull-right close">x</a>
 			</div>
-			<div class="modal-body">
-				<form class="register-form" action="/users" method="POST">
+			<div class="modal-body register-modal-body">
+				<form class="register-form">
 					<label for="register-username">Username</label>
 					<input type="text" name="username" id="register-username" required autofocus>
 					<label for="register-password">Password</label>
 					<input type="password" name="password" id="register-password" minlength=8 required>
 					<label for="register-password-confirm">Confirm password</label>
 					<input type="password" name="passwordconfirm" id="register-password-confirm" minlength=8 required>
+					<div class="row register-help" aria-live="assertive" hidden></div>
 					<div class="row">
 						<input type="submit" class="button-primary" value="Create account">
 					</div>

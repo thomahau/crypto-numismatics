@@ -14,8 +14,7 @@ chai.use(chaiHttp);
 describe('Users endpoints', function() {
 	const username = 'exampleUser';
 	const password = 'examplePass';
-	const usernameB = 'exampleUserB';
-	const passwordB = 'examplePassB';
+	const passwordconfirm = 'examplePass';
 
 	before(function() {
 		return runServer(TEST_DATABASE_URL);
@@ -38,7 +37,8 @@ describe('Users endpoints', function() {
 					.request(app)
 					.post('/users')
 					.send({
-						password
+						password,
+						passwordconfirm
 					})
 					.then(res => {
 						expect(res).to.have.status(422);
@@ -69,7 +69,8 @@ describe('Users endpoints', function() {
 					.post('/users')
 					.send({
 						username: 1234,
-						password
+						password,
+						passwordconfirm
 					})
 					.then(res => {
 						expect(res).to.have.status(422);
@@ -87,7 +88,8 @@ describe('Users endpoints', function() {
 					.post('/users')
 					.send({
 						username,
-						password: 1234
+						password: 1234,
+						passwordconfirm: 1234
 					})
 					.then(res => {
 						expect(res).to.have.status(422);
@@ -105,7 +107,8 @@ describe('Users endpoints', function() {
 					.post('/users')
 					.send({
 						username: ` ${username} `,
-						password
+						password,
+						passwordconfirm
 					})
 					.then(res => {
 						expect(res).to.have.status(422);
@@ -123,7 +126,8 @@ describe('Users endpoints', function() {
 					.post('/users')
 					.send({
 						username,
-						password: ` ${password} `
+						password: ` ${password} `,
+						passwordconfirm: ` ${password} `
 					})
 					.then(res => {
 						expect(res).to.have.status(422);
@@ -141,7 +145,8 @@ describe('Users endpoints', function() {
 					.post('/users')
 					.send({
 						username: '',
-						password
+						password,
+						passwordconfirm
 					})
 					.then(res => {
 						expect(res).to.have.status(422);
@@ -159,7 +164,8 @@ describe('Users endpoints', function() {
 					.post('/users')
 					.send({
 						username,
-						password: '1234567'
+						password: '1234567',
+						passwordconfirm: '1234567'
 					})
 					.then(res => {
 						expect(res).to.have.status(422);
@@ -177,13 +183,33 @@ describe('Users endpoints', function() {
 					.post('/users')
 					.send({
 						username,
-						password: new Array(73).fill('a').join('')
+						password: new Array(73).fill('a').join(''),
+						passwordconfirm: new Array(73).fill('a').join('')
 					})
 					.then(res => {
 						expect(res).to.have.status(422);
 						expect(res.body.reason).to.equal('ValidationError');
 						expect(res.body.message).to.equal(
 							'Must be at most 72 characters long'
+						);
+						expect(res.body.location).to.equal('password');
+					});
+			});
+
+			it('should reject users with password not matching password-confirm', function() {
+				return chai
+					.request(app)
+					.post('/users')
+					.send({
+						username,
+						password,
+						passwordconfirm: 'somethingelse'
+					})
+					.then(res => {
+						expect(res).to.have.status(422);
+						expect(res.body.reason).to.equal('ValidationError');
+						expect(res.body.message).to.equal(
+							'Passwords must match'
 						);
 						expect(res.body.location).to.equal('password');
 					});
@@ -201,7 +227,8 @@ describe('Users endpoints', function() {
 							.post('/users')
 							.send({
 								username,
-								password
+								password,
+								passwordconfirm
 							})
 					)
 					.then(res => {
@@ -220,7 +247,8 @@ describe('Users endpoints', function() {
 					.post('/users')
 					.send({
 						username,
-						password
+						password,
+						passwordconfirm
 					})
 					.then(res => {
 						expect(res).to.have.status(201);
@@ -240,43 +268,5 @@ describe('Users endpoints', function() {
 					});
 			});
 		});
-
-		// describe('GET', function() {
-		//   it('should return an empty array initially', function() {
-		//     return chai
-		//       .request(app)
-		//       .get('/users')
-		//       .then(res => {
-		//         expect(res).to.have.status(200);
-		//         expect(res.body).to.be.an('array');
-		//         expect(res.body).to.have.length(0);
-		//       });
-		//   });
-
-		//   it('should return an array of users', function() {
-		//     return User.create(
-		//       {
-		//         username,
-		//         password
-		//       },
-		//       {
-		//         username: usernameB,
-		//         password: passwordB
-		//       }
-		//     )
-		//       .then(() => chai.request(app).get('/users'))
-		//       .then(res => {
-		//         expect(res).to.have.status(200);
-		//         expect(res.body).to.be.an('array');
-		//         expect(res.body).to.have.length(2);
-		//         expect(res.body[0]).to.deep.equal({
-		//           username
-		//         });
-		//         expect(res.body[1]).to.deep.equal({
-		//           username: usernameB
-		//         });
-		//       });
-		//   });
-		// });
 	});
 });

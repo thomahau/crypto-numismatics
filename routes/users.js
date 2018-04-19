@@ -8,7 +8,7 @@ const jsonParser = bodyParser.json();
 const User = models.User;
 
 router.post('/', jsonParser, (req, res) => {
-  const requiredFields = ['username', 'password'];
+  const requiredFields = ['username', 'password', 'passwordconfirm'];
   const missingField = requiredFields.find(field => !(field in req.body));
 
   if (missingField) {
@@ -20,7 +20,7 @@ router.post('/', jsonParser, (req, res) => {
     });
   }
 
-  const stringFields = ['username', 'password'];
+  const stringFields = ['username', 'password', 'passwordconfirm'];
   const nonStringField = stringFields.find(
     field => field in req.body && typeof req.body[field] !== 'string'
   );
@@ -34,7 +34,7 @@ router.post('/', jsonParser, (req, res) => {
     });
   }
 
-  const explicityTrimmedFields = ['username', 'password'];
+  const explicityTrimmedFields = ['username', 'password', 'passwordconfirm'];
   const nonTrimmedField = explicityTrimmedFields.find(
     field => req.body[field].trim() !== req.body[field]
   );
@@ -53,6 +53,10 @@ router.post('/', jsonParser, (req, res) => {
       min: 1
     },
     password: {
+      min: 8,
+      max: 72
+    },
+    passwordconfirm: {
       min: 8,
       max: 72
     }
@@ -79,7 +83,16 @@ router.post('/', jsonParser, (req, res) => {
     });
   }
 
-  let {username, password} = req.body;
+  let {username, password, passwordconfirm} = req.body;
+
+  if (password !== passwordconfirm) {
+    return res.status(422).json({
+      code: 422,
+      reason: 'ValidationError',
+      message: 'Passwords must match',
+      location: 'password'
+    });
+  }
 
   return User.find({username})
     .count()

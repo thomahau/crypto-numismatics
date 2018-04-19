@@ -10,7 +10,7 @@ const models = require('../models');
 const User = models.User;
 const Holding = models.Holding;
 const expect = chai.expect;
-let userId;
+let user;
 
 chai.use(chaiHttp);
 
@@ -35,14 +35,13 @@ function getRandomCoin() {
 	return coins[Math.floor(Math.random() * coins.length)];
 }
 
-function generateHoldingData() {
-	const coin = getRandomCoin();
+function generateHoldingData(coin = getRandomCoin()) {
 	const amount = Math.floor(Math.random() * 50);
 	return {
 		symbol: coin.symbol,
 		name: coin.name,
 		amount: amount,
-		user: userId
+		user: user
 	};
 }
 
@@ -77,8 +76,8 @@ describe('Protected holdings API resource', function() {
 			.then(password => {
 				return User.create({username, password});
 			})
-			.then(user => {
-				userId = user._id;
+			.then(_user => {
+				user = _user;
 				return seedPortfolioData();
 			});
 	});
@@ -150,7 +149,21 @@ describe('Protected holdings API resource', function() {
 
 	describe('GET endpoint', function() {
 		it('should return all existing holdings for current user', function() {
+			const token = jwt.sign(
+				{
+					user: {
+						username
+					}
+				},
+				JWT_SECRET,
+				{
+					algorithm: 'HS256',
+					subject: username,
+					expiresIn: '30d'
+				}
+			);
 			let res;
+
 			return chai
 				.request(app)
 				.get('/holdings')
@@ -201,7 +214,10 @@ describe('Protected holdings API resource', function() {
 
 	describe('POST endpoint', function() {
 		it('should add a new holding', function() {
-			const newHolding = generateHoldingData();
+			const newHolding = generateHoldingData({
+				symbol: 'EOS',
+				name: 'EOS'
+			});
 
 			return chai
 				.request(app)
