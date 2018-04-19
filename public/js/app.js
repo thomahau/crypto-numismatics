@@ -572,7 +572,7 @@ function handleCancelAdditionBtn() {
 	$('main').on('click', '.cancel-addition-btn', function() {
 		const portfolioFooter = getPortfolioFooter(globalPortfolioValue);
 
-		$('.js-add-coin-form').remove();
+		$('.js-add-coin-form, .portfolio-footer').remove();
 		$('.portfolio-container').append(portfolioFooter);
 	});
 }
