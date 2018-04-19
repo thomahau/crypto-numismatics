@@ -28,25 +28,7 @@
 	</header>
 
 	<main role="main">
-		<div class="container welcome-container" hidden>
-			<!-- <div class="row">
-				<h1>Crypto Numismatics</h1>
-				<p class="intro-text">Use this simple portfolio tracker to get an overview of your cryptocurrency holdings. To get started, enter your first coin below. If you would like to save your portfolio, registering is free and anonymous. Been here before? Log in to access your portfolio.</p>
-			</div>
-			<form class="js-add-coin-form">
-				<div class="row starter-inputs">
-					<div class="five columns">
-						<input class="u-full-width coin-search" type="search" id="coin" placeholder="e.g. Bitcoin (BTC)" required />
-					</div>
-					<div class="five columns">
-						<input class="u-full-width coin-amount" type="number" id="amount" placeholder="Amount" min="0" step="any" required />
-					</div>
-					<div class="two columns">
-						<button type="submit" class="button-primary">Add coin</button>
-					</div>
-				</div>
-			</form> -->
-		</div>
+		<div class="container welcome-container" hidden></div>
 		<div class="container portfolio-container" aria-live="polite" hidden></div>
 	</main>
 
@@ -101,6 +83,28 @@
 				<a class="u-pull-right close">x</a>
 			</div>
 			<div class="modal-body js-edit-form-container"></div>
+		</div>
+	</div>
+
+	<div class="modal edit-currency-modal" hidden>
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3>Edit currency</h3>
+				<a class="u-pull-right close">x</a>
+			</div>
+			<div class="modal-body">
+				<form class="edit-currency-form">
+					<select class="currency-select">
+						<option value="USD">US Dollar (USD)</option>
+						<option value="EUR">Euro (EUR)</option>
+						<option value="GBP">British Pound Sterling (GBP)</option>
+					</select>
+					<div class="row">
+						<button type="submit" class="button-primary">Update</button>
+						<a class="button cancel-edit-btn" role="button">Cancel</a>
+					</div>
+				</form>
+			</div>
 		</div>
 	</div>
 

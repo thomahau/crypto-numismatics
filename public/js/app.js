@@ -49,6 +49,7 @@ function handleSignup() {
 			.then(user => {
 				const signupSuccessMsg = getSignupSuccessMsg(user.username);
 
+				localStorage.setItem('currency', 'USD');
 				$('.register-modal-body').html(signupSuccessMsg);
 				handleFirstLogin(credentials);
 			})
@@ -106,6 +107,7 @@ function handleFirstLogin(data) {
 		login(credentials).then(data => {
 			localStorage.setItem('username', data.username);
 			localStorage.setItem('token', data.authToken);
+
 			$('.modal').attr('hidden', true);
 			checkIfLoggedIn();
 		});
@@ -124,6 +126,7 @@ function handleLogin() {
 			.then(data => {
 				localStorage.setItem('username', data.username);
 				localStorage.setItem('token', data.authToken);
+
 				$('.modal').attr('hidden', true);
 				checkIfLoggedIn();
 			})
@@ -192,6 +195,10 @@ function handleModals() {
 	});
 
 	$('.modal').on('click', '.close', function() {
+		$('.modal').attr('hidden', true);
+	});
+
+	$('.modal').on('click', '.cancel-edit-btn', function() {
 		$('.modal').attr('hidden', true);
 	});
 
@@ -279,11 +286,11 @@ function addHolding(data) {
 
 function getPortfolioData(holdings) {
 	let amendedHoldings = holdings;
+	const currency = localStorage.getItem('currency');
 	const symbols = holdings.map(item => item.symbol).join();
-	// TODO: Alternative currency
 	const url =
 		CRYPTOCOMPARE_ENDPOINT +
-		`pricemultifull?fsyms=${symbols}&tsyms=USD&extraParams=${APP_NAME}`;
+		`pricemultifull?fsyms=${symbols}&tsyms=${currency}&extraParams=${APP_NAME}`;
 
 	return fetch(url)
 		.then(res => {
@@ -296,12 +303,12 @@ function getPortfolioData(holdings) {
 			Object.keys(data.RAW).forEach(item => {
 				amendedHoldings.forEach(holding => {
 					if (item === holding.symbol) {
-						holding.price = data.RAW[item].USD.PRICE;
+						holding.price = data.RAW[item][currency].PRICE;
 						holding.change_24_hr = round(
-							data.RAW[item].USD.CHANGE24HOUR
+							data.RAW[item][currency].CHANGE24HOUR
 						);
 						holding.change_pct_24_hr = round(
-							data.RAW[item].USD.CHANGEPCT24HOUR
+							data.RAW[item][currency].CHANGEPCT24HOUR
 						);
 						holding.price_24_hrs_ago =
 							holding.price - holding.change_24_hr;
@@ -313,7 +320,7 @@ function getPortfolioData(holdings) {
 			});
 			return amendedHoldings;
 		})
-		.catch(err => console.log('No holdings to show'));
+		.catch(err => console.error('No holdings to show'));
 }
 
 function round(value, decimals = 2) {
@@ -331,7 +338,7 @@ function renderPortfolio() {
 		.then(portfolioData => {
 			const p1 = getPortfolioHeader(portfolioData);
 			const p2 = getPortfolioTable(portfolioData);
-			const p3 = getPortfolioFooter(portfolioData);
+			const p3 = getPortfolioFooter(globalPortfolioValue);
 
 			return Promise.all([p1, p2, p3]);
 		})
@@ -347,10 +354,18 @@ function renderPortfolio() {
 				.append(portfolioHeader)
 				.append(portfolioTable)
 				.append(portfolioFooter);
+
+			handleNewCoinSubmit();
+			handleAddPortfolioItemClick();
+			handleCancelAdditionBtn();
+			handleDeletePortfolioItem();
+			handleSettingsDropdown();
+			handleEditCurrency();
 		});
 }
 
 function getPortfolioHeader(amendedHoldings) {
+	const symbol = getCurrencySymbol();
 	let portfolioValue = 0;
 	let portfolioValue24HrsAgo = 0;
 
@@ -367,8 +382,8 @@ function getPortfolioHeader(amendedHoldings) {
 	);
 	const gainOrLoss24Hrs = portfolio24HrPercentChange > 0 ? 'gain' : 'loss';
 	const portfolio24HrPerformanceHtml = `
-	<strong>24 HOURS</strong>
-	<p class="${gainOrLoss24Hrs} large-text">$${portfolio24HrChange} <small>(${portfolio24HrPercentChange}%)</small></p>`;
+	<strong>24 HOUR CHANGE</strong>
+	<p class="${gainOrLoss24Hrs} large-text">${symbol}${portfolio24HrChange} <small>(${portfolio24HrPercentChange}%)</small></p>`;
 	const helpText = '<p>Your portfolio is currently empty.</p>';
 	const helpOrPerformance =
 		typeof amendedHoldings === 'undefined'
@@ -394,7 +409,7 @@ function getPortfolioHeader(amendedHoldings) {
 						<div class="dropdown-content">
 							<a class="js-edit-portfolio">Edit holdings</a>
 							<a class="js-add-portfolio-item">Add holding</a>
-							<a class="disabled">Edit currency</a>
+							<a class="js-edit-currency">Edit currency</a>
 						</div>
 					</div>
 				</li>
@@ -403,7 +418,7 @@ function getPortfolioHeader(amendedHoldings) {
 		<div class="row darker portfolio-overview">
 			<div class="three columns text-left">
 				<strong>PORTFOLIO VALUE</strong>
-				<p class="large-text">$${portfolioValue}</p>
+				<p class="large-text">${symbol}${portfolioValue}</p>
 			</div>
 			<div class="six columns text-left">
 				${helpOrPerformance}
@@ -416,7 +431,9 @@ function getPortfolioHeader(amendedHoldings) {
 // </div>
 
 function getPortfolioTable(amendedHoldings) {
+	const symbol = getCurrencySymbol();
 	let tableRowsHtmlString = '';
+
 	if (typeof amendedHoldings !== 'undefined') {
 		amendedHoldings.forEach(item => {
 			const gainOrLoss = item.change_pct_24_hr > 0 ? 'gain' : 'loss';
@@ -431,12 +448,12 @@ function getPortfolioTable(amendedHoldings) {
 		<td data-label="&nbsp;&nbsp;&nbsp;&nbsp;Coin"><span class="leftmost-cell">${
 			item.name
 		}</span></td>
-		<td data-label="Price">$${item.price}</td>
+		<td data-label="Price">${symbol}${item.price}</td>
 		<td class="${gainOrLoss}" data-label="24 hr change">${
 				item.change_pct_24_hr
 			}%</td>
 		<td data-label="Amount">${item.amount}</td>
-		<td data-label="Value">$${item.value}</td>
+		<td data-label="Value">${symbol}${item.value}</td>
 		<td data-label="Allocation">${allocationPct}%</td>
 		<td data-label="Delete"><a class="portfolio-link delete-holding rightmost-cell" data-coin="${
 			item.id
@@ -464,8 +481,20 @@ function getPortfolioTable(amendedHoldings) {
 		 </table>`;
 }
 
-function getPortfolioFooter(amendedHoldings) {
-	if (typeof amendedHoldings === 'undefined') {
+function getCurrencySymbol() {
+	const currency = localStorage.getItem('currency');
+
+	if (currency === 'USD') {
+		return '$';
+	} else if (currency === 'EUR') {
+		return '€';
+	} else if (currency === 'GBP') {
+		return '£';
+	}
+}
+
+function getPortfolioFooter(globalPortfolioValue) {
+	if (!globalPortfolioValue) {
 		return `
 		<div class="row portfolio-footer darkest">
 			<button class="button-primary u-pull-left js-add-portfolio-item start-btn">Get started</button>
@@ -537,7 +566,7 @@ function getNewItemForm() {
 
 function handleCancelAdditionBtn() {
 	$('main').on('click', '.cancel-addition-btn', function() {
-		const portfolioFooter = getPortfolioFooter(true);
+		const portfolioFooter = getPortfolioFooter(globalPortfolioValue);
 
 		$('.js-add-coin-form').remove();
 		$('.portfolio-container').append(portfolioFooter);
@@ -553,11 +582,8 @@ function handleEditPortfolioModal() {
 			.then(editPortfolioForm => {
 				$('.edit-holdings-modal').attr('hidden', false);
 				$('.js-edit-form-container').html(editPortfolioForm);
+				handleEditPortfolioSubmit();
 			});
-	});
-
-	$('.edit-holdings-modal').on('click', '.cancel-edit-btn', function() {
-		$('.edit-holdings-modal').attr('hidden', true);
 	});
 }
 
@@ -653,16 +679,31 @@ function deleteHolding(id) {
 	});
 }
 
+function handleEditCurrency() {
+	$('main').on('click', '.js-edit-currency', function() {
+		$('.currency-select').val(localStorage.getItem('currency'));
+		$('.edit-currency-modal').attr('hidden', false);
+		handleEditCurrencySubmit();
+	});
+}
+
+function handleEditCurrencySubmit() {
+	$('.edit-currency-form').submit(function(event) {
+		event.preventDefault();
+		const currency = $(this)
+			.find('.currency-select')
+			.val();
+
+		localStorage.setItem('currency', currency);
+		renderPortfolio();
+		$('.modal').attr('hidden', true);
+	});
+}
+
 $(function() {
 	checkIfLoggedIn();
+	handleModals();
 	handleSignup();
 	handleLogin();
 	handleLogout();
-	handleModals();
-	handleNewCoinSubmit();
-	handleSettingsDropdown();
-	handleAddPortfolioItemClick();
-	handleCancelAdditionBtn();
-	handleEditPortfolioSubmit();
-	handleDeletePortfolioItem();
 });
