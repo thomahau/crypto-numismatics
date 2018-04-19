@@ -290,7 +290,7 @@ function getPortfolioData(holdings) {
 	const symbols = holdings.map(item => item.symbol).join();
 	const url =
 		CRYPTOCOMPARE_ENDPOINT +
-		`pricemultifull?fsyms=${symbols}&tsyms=${currency}&extraParams=${APP_NAME}`;
+		`pricemultifull?fsyms=${symbols}&tsyms=${currency},BTC&extraParams=${APP_NAME}`;
 
 	return fetch(url)
 		.then(res => {
@@ -304,6 +304,7 @@ function getPortfolioData(holdings) {
 				amendedHoldings.forEach(holding => {
 					if (item === holding.symbol) {
 						holding.price = data.RAW[item][currency].PRICE;
+						holding.price_btc = data.RAW[item].BTC.PRICE;
 						holding.change_24_hr = round(
 							data.RAW[item][currency].CHANGE24HOUR
 						);
@@ -313,6 +314,7 @@ function getPortfolioData(holdings) {
 						holding.price_24_hrs_ago =
 							holding.price - holding.change_24_hr;
 						holding.value = holding.price * holding.amount;
+						holding.value_btc = holding.price_btc * holding.amount;
 						holding.value_24_hrs_ago =
 							holding.price_24_hrs_ago * holding.amount;
 					}
@@ -367,11 +369,13 @@ function renderPortfolio() {
 function getPortfolioHeader(amendedHoldings) {
 	const symbol = getCurrencySymbol();
 	let portfolioValue = 0;
+	let portfolioValueBTC = 0;
 	let portfolioValue24HrsAgo = 0;
 
 	if (typeof amendedHoldings !== 'undefined') {
 		amendedHoldings.forEach(item => {
 			portfolioValue += item.value;
+			portfolioValueBTC += item.value_btc;
 			portfolioValue24HrsAgo += item.value_24_hrs_ago;
 		});
 	}
@@ -392,6 +396,7 @@ function getPortfolioHeader(amendedHoldings) {
 
 	globalPortfolioValue = portfolioValue;
 	portfolioValue = round(portfolioValue);
+	portfolioValueBTC = round(portfolioValueBTC, 3);
 
 	return `
 		<div class="row darkest">
@@ -416,9 +421,9 @@ function getPortfolioHeader(amendedHoldings) {
 			</ul>
 		</div>
 		<div class="row darker portfolio-overview">
-			<div class="three columns text-left">
+			<div class="four columns text-left">
 				<strong>PORTFOLIO VALUE</strong>
-				<p class="large-text">${symbol}${portfolioValue}</p>
+				<p class="large-text">${symbol}${portfolioValue}  <small>(฿${portfolioValueBTC})</small></p>
 			</div>
 			<div class="six columns text-left">
 				${helpOrPerformance}
