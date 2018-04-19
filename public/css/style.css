@@ -6,6 +6,7 @@ header {
 	height: 50px;
 	position: absolute;
 	top: 0;
+	color: white;
 }
 
 main {
@@ -55,6 +56,7 @@ input[type='number']::-webkit-outer-spin-button {
 }
 
 @media only screen and (max-width: 640px) {
+	.portfolio-container,
 	main .button-primary {
 		width: 100%;
 	}
@@ -79,6 +81,17 @@ header,
 .js-add-coin-form .portfolio-footer,
 .portfolio-footer-menu {
 	padding-top: 15px;
+}
+
+.start-btn {
+	margin-top: 15px;
+}
+
+.search-help {
+	line-height: 1.5rem;
+	margin-top: -9px;
+	margin-bottom: 5px;
+	color: red;
 }
 
 .leftmost-cell {
@@ -140,12 +153,68 @@ main .button:hover {
 	color: white;
 }
 
+table {
+	border-collapse: collapse;
+}
+
+th,
+td {
+	text-align: right;
+}
+
+th:first-child,
+th:last-child,
+td:first-child,
+td:last-child {
+	text-align: left;
+}
+
+@media only screen and (max-width: 640px) {
+	thead {
+		border: none;
+		clip: rect(0 0 0 0);
+		height: 1px;
+		margin: -1px;
+		overflow: hidden;
+		padding: 0;
+		position: absolute;
+		width: 1px;
+	}
+
+	tr {
+		border-bottom: 3px solid #ddd;
+		display: block;
+	}
+
+	td {
+		border-bottom: 1px solid #ddd;
+		display: block;
+		text-align: right;
+		clear: both;
+	}
+
+	td:first-child {
+		text-align: right;
+	}
+
+	td:last-child {
+		text-align: right;
+		padding-right: 10px;
+	}
+
+	td::before {
+		content: attr(data-label);
+		float: left;
+	}
+}
+
 /* Autocomplete widget */
 .ui-menu {
-	max-height: 31vh;
+	max-height: 30vh;
 	overflow-y: auto;
 	overflow-x: hidden;
 	text-align: left;
+	font-size: 1.5rem;
 }
 
 .ui-widget-content .ui-state-active {
@@ -174,6 +243,15 @@ main .button:hover {
 	font-size: 2rem;
 }
 
+.close {
+	position: relative;
+	top: -65px;
+	right: 10px;
+	color: white;
+	font-size: 1.75rem;
+	cursor: pointer;
+}
+
 .modal-body {
 	padding: 0 15px;
 }
@@ -187,12 +265,12 @@ main .button:hover {
 	width: 40%;
 }
 
-.modal label {
+.edit-holdings-modal label {
 	height: 38px;
 	padding-top: 6px;
 }
 
-.modal .delete-holding {
+.edit-holdings-modal .delete-holding {
 	background-color: red;
 	color: white;
 }
@@ -239,6 +317,7 @@ main .button:hover {
 	color: #0fa0ce;
 }
 
+.disabled:hover,
 .dropdown-content .disabled:hover {
 	background-color: #222;
 	color: #777;
