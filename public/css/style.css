@@ -169,6 +169,11 @@ td:last-child {
 	text-align: left;
 }
 
+.sortable-header {
+	color: white;
+	cursor: pointer;
+}
+
 @media only screen and (max-width: 640px) {
 	thead {
 		border: none;

@@ -362,6 +362,7 @@ function renderPortfolio() {
 			handleCancelAdditionBtn();
 			handleDeletePortfolioItem();
 			handleEditCurrency();
+			handleTableSorting();
 		});
 }
 
@@ -470,12 +471,24 @@ function getPortfolioTable(amendedHoldings) {
 		<table class="u-full-width">
 		  <thead class="darkest">
 		    <tr>
-		      <th><span class="leftmost-cell">Coin</span></th>
-		      <th>Price</th>
-		      <th>24 hr change</th>
-		      <th>Amount</th>
-		      <th>Value</th>
-		      <th>Allocation</th>
+		      <th>
+		      	<a class="sortable-header leftmost-cell" data-sort="0">Coin</a>
+		      </th>
+		      <th>
+		      	<a class="sortable-header" data-sort="1">Price</a>
+		      </th>
+		      <th>
+		      	<a class="sortable-header" data-sort="2">24 hr change</a>
+		      </th>
+		      <th>
+		      	<a class="sortable-header" data-sort="3">Amount</a>
+		      </th>
+		      <th>
+		      	<a class="sortable-header" data-sort="4">Value</a>
+		      </th>
+		      <th>
+		      	<a class="sortable-header" data-sort="5">Allocation</a>
+		      </th>
 		      <th></th>
 		    </tr>
 		  </thead>
@@ -702,6 +715,85 @@ function handleEditCurrencySubmit() {
 		renderPortfolio();
 		$('.modal').attr('hidden', true);
 	});
+}
+
+function handleTableSorting() {
+	$('main').on('click', '.sortable-header', function(event) {
+		const sortParameter = $(this).data('sort');
+		const sortDirection = $(this).find('span').length ? 'asc' : 'desc';
+		const directionIcon = getDirectionIcon(sortDirection);
+
+		$('.direction-icon').remove();
+		$(this).append(directionIcon);
+		sortTable(sortParameter, sortDirection);
+	});
+}
+
+function getDirectionIcon(direction) {
+	const stub = direction === 'asc' ? 'up' : 'down';
+	return `
+	<span class="direction-icon">
+		<i class="fas fa-caret-${stub}"></i>
+	</span>`;
+}
+
+function sortTable(param, dir) {
+	const $table = $('table');
+	let switching = true,
+		switchcount = 0,
+		shouldSwitch;
+
+	while (switching) {
+		let rows = $table.find('tr');
+		let i;
+		switching = false;
+
+		for (i = 1; i < rows.length - 1; i++) {
+			shouldSwitch = false;
+			let x = rows[i].getElementsByTagName('td')[param];
+			let y = rows[i + 1].getElementsByTagName('td')[param];
+			let xValue = checkIfNumerical(
+				x.firstElementChild
+					? x.firstElementChild.textContent
+					: x.textContent
+			);
+			let yValue = checkIfNumerical(
+				y.firstElementChild
+					? y.firstElementChild.textContent
+					: y.textContent
+			);
+
+			if (dir === 'asc') {
+				if (xValue > yValue) {
+					shouldSwitch = true;
+					break;
+				}
+			} else if (dir === 'desc') {
+				if (xValue < yValue) {
+					shouldSwitch = true;
+					break;
+				}
+			}
+		}
+
+		if (shouldSwitch) {
+			rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+			switching = true;
+			switchcount++;
+		} else {
+			if (switchcount === 0 && dir === 'asc') {
+				dir = 'desc';
+				switching = true;
+			}
+		}
+	}
+}
+
+function checkIfNumerical(s) {
+	if (/^\d*\.?\d+%?$/.test(s)) {
+		return parseFloat(s, 10);
+	}
+	return s;
 }
 
 $(function() {
