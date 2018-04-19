@@ -361,7 +361,6 @@ function renderPortfolio() {
 			handleAddPortfolioItemClick();
 			handleCancelAdditionBtn();
 			handleDeletePortfolioItem();
-			handleSettingsDropdown();
 			handleEditCurrency();
 		});
 }
@@ -711,4 +710,5 @@ $(function() {
 	handleSignup();
 	handleLogin();
 	handleLogout();
+	handleSettingsDropdown();
 });
