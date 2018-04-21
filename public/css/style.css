@@ -32,7 +32,7 @@ main {
 }
 
 .portfolio-container {
-	margin-top: 100px;
+	margin-top: 70px;
 }
 
 h1 {
@@ -81,6 +81,7 @@ header,
 .js-add-coin-form .portfolio-footer,
 .portfolio-footer-menu {
 	padding-top: 15px;
+	padding-bottom: 15px;
 }
 
 .start-btn {
@@ -173,6 +174,12 @@ td:last-child {
 	color: white;
 	cursor: pointer;
 }
+
+/*.chart-container {
+	position: relative;
+	height: 240px;
+	width: 240px;
+}*/
 
 @media only screen and (max-width: 640px) {
 	thead {

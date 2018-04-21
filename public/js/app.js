@@ -1,8 +1,8 @@
 'use strict';
-// const COINMARKETCAP_ENDPOINT = 'https://api.coinmarketcap.com/v1/';
+const COINMARKETCAP_ENDPOINT = 'https://api.coinmarketcap.com/v1/';
 const CRYPTOCOMPARE_ENDPOINT = 'https://min-api.cryptocompare.com/data/';
 const APP_NAME = 'crypto_numismatics';
-
+let tickerData;
 let globalPortfolioValue = 0;
 
 function populateSearchOptions() {
@@ -36,6 +36,18 @@ function getWelcomeMessage() {
 	</div>`;
 }
 
+function getTickerData(currency) {
+	const url =
+		COINMARKETCAP_ENDPOINT + `ticker/?limit=500&convert=${currency}`;
+
+	return fetch(url).then(res => {
+		if (res.ok) {
+			return res.json();
+		}
+		throw new Error('Network response was not ok.');
+	});
+}
+
 function handleSignup() {
 	$('.register-form').submit(function(event) {
 		event.preventDefault();
@@ -49,7 +61,6 @@ function handleSignup() {
 			.then(user => {
 				const signupSuccessMsg = getSignupSuccessMsg(user.username);
 
-				localStorage.setItem('currency', 'USD');
 				$('.register-modal-body').html(signupSuccessMsg);
 				handleFirstLogin(credentials);
 			})
@@ -107,6 +118,7 @@ function handleFirstLogin(data) {
 		login(credentials).then(data => {
 			localStorage.setItem('username', data.username);
 			localStorage.setItem('token', data.authToken);
+			localStorage.setItem('currency', 'USD');
 
 			$('.modal').attr('hidden', true);
 			checkIfLoggedIn();
@@ -124,11 +136,18 @@ function handleLogin() {
 
 		login(credentials)
 			.then(data => {
+				const currency = localStorage.getItem('currency');
 				localStorage.setItem('username', data.username);
 				localStorage.setItem('token', data.authToken);
 
-				$('.modal').attr('hidden', true);
-				checkIfLoggedIn();
+				getTickerData(currency)
+					.then(data => {
+						tickerData = data;
+
+						$('.modal').attr('hidden', true);
+						checkIfLoggedIn();
+					})
+					.catch(err => console.error(err));
 			})
 			.catch(err => {
 				const loginHelpMsg = getLoginHelpMsg(err);
@@ -284,47 +303,6 @@ function addHolding(data) {
 	});
 }
 
-function getPortfolioData(holdings) {
-	let amendedHoldings = holdings;
-	const currency = localStorage.getItem('currency');
-	const symbols = holdings.map(item => item.symbol).join();
-	const url =
-		CRYPTOCOMPARE_ENDPOINT +
-		`pricemultifull?fsyms=${symbols}&tsyms=${currency},BTC&extraParams=${APP_NAME}`;
-
-	return fetch(url)
-		.then(res => {
-			if (res.ok) {
-				return res.json();
-			}
-			throw new Error('Network response was not ok.');
-		})
-		.then(data => {
-			Object.keys(data.RAW).forEach(item => {
-				amendedHoldings.forEach(holding => {
-					if (item === holding.symbol) {
-						holding.price = data.RAW[item][currency].PRICE;
-						holding.price_btc = data.RAW[item].BTC.PRICE;
-						holding.change_24_hr = round(
-							data.RAW[item][currency].CHANGE24HOUR
-						);
-						holding.change_pct_24_hr = round(
-							data.RAW[item][currency].CHANGEPCT24HOUR
-						);
-						holding.price_24_hrs_ago =
-							holding.price - holding.change_24_hr;
-						holding.value = holding.price * holding.amount;
-						holding.value_btc = holding.price_btc * holding.amount;
-						holding.value_24_hrs_ago =
-							holding.price_24_hrs_ago * holding.amount;
-					}
-				});
-			});
-			return amendedHoldings;
-		})
-		.catch(err => console.error('No holdings to show'));
-}
-
 function round(value, decimals = 2) {
 	return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals)
 		.toFixed(decimals)
@@ -332,15 +310,40 @@ function round(value, decimals = 2) {
 		.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
+function populateHoldings(holdings) {
+	const currency = localStorage.getItem('currency').toLowerCase();
+	let populatedHoldings = [];
+
+	holdings.forEach(holding => {
+		const tickerObj = tickerData.filter(
+			element => element.symbol === holding.symbol
+		)[0];
+		const populatedHolding = {
+			id: holding.id,
+			symbol: holding.symbol,
+			name: holding.name, // coin.name
+			amount: holding.amount,
+			price: parseFloat(tickerObj[`price_${currency}`]),
+			value: holding.amount * parseFloat(tickerObj[`price_${currency}`]),
+			percent_change_24h: parseFloat(tickerObj.percent_change_24h),
+			percent_change_7d: parseFloat(tickerObj.percent_change_7d)
+		};
+		populatedHoldings.push(populatedHolding);
+	});
+	return populatedHoldings;
+}
+
 function renderPortfolio() {
+	let populatedHoldings;
 	getHoldings()
 		.then(data => {
-			return getPortfolioData(data.holdings);
+			return populateHoldings(data.holdings);
 		})
-		.then(portfolioData => {
-			const p1 = getPortfolioHeader(portfolioData);
-			const p2 = getPortfolioTable(portfolioData);
-			const p3 = getPortfolioFooter(globalPortfolioValue);
+		.then(_populatedHoldings => {
+			populatedHoldings = _populatedHoldings;
+			const p1 = getPortfolioHeader(populatedHoldings);
+			const p2 = getPortfolioTable(populatedHoldings);
+			const p3 = getPortfolioFooter(populatedHoldings);
 
 			return Promise.all([p1, p2, p3]);
 		})
@@ -357,46 +360,38 @@ function renderPortfolio() {
 				.append(portfolioTable)
 				.append(portfolioFooter);
 
+			if (populatedHoldings.length) {
+				renderChart(populatedHoldings);
+			} else {
+				$('#chart-container').attr('hidden', true);
+			}
+
 			handleNewCoinSubmit();
 			handleAddPortfolioItemClick();
-			handleCancelAdditionBtn();
+			handleCancelAdditionBtn(populatedHoldings);
 			handleDeletePortfolioItem();
 			handleEditCurrency();
 			handleTableSorting();
 		});
 }
 
-function getPortfolioHeader(amendedHoldings) {
+function getPortfolioHeader(populatedHoldings) {
 	const symbol = getCurrencySymbol();
-	let portfolioValue = 0;
-	let portfolioValueBTC = 0;
-	let portfolioValue24HrsAgo = 0;
+	let helpOrPerformance = '<p>Your portfolio is currently empty.</p>';
+	let portfolioData = {
+		total: 0,
+		totalBTC: 0
+	};
 
-	if (typeof amendedHoldings !== 'undefined') {
-		amendedHoldings.forEach(item => {
-			portfolioValue += item.value;
-			portfolioValueBTC += item.value_btc;
-			portfolioValue24HrsAgo += item.value_24_hrs_ago;
-		});
+	if (populatedHoldings.length) {
+		portfolioData = getPortfolioData(populatedHoldings);
+		populatedHoldings.map(
+			holding =>
+				(holding.allocation = 100 / portfolioData.total * holding.value)
+		);
+		portfolioData.total = round(portfolioData.total);
+		helpOrPerformance = getPortfolioPerformance(portfolioData, symbol);
 	}
-
-	const portfolio24HrChange = round(portfolioValue - portfolioValue24HrsAgo);
-	const portfolio24HrPercentChange = round(
-		(portfolioValue - portfolioValue24HrsAgo) / portfolioValue24HrsAgo * 100
-	);
-	const gainOrLoss24Hrs = portfolio24HrPercentChange > 0 ? 'gain' : 'loss';
-	const portfolio24HrPerformanceHtml = `
-	<strong>24 HOUR CHANGE</strong>
-	<p class="${gainOrLoss24Hrs} large-text">${symbol}${portfolio24HrChange} <small>(${portfolio24HrPercentChange}%)</small></p>`;
-	const helpText = '<p>Your portfolio is currently empty.</p>';
-	const helpOrPerformance =
-		typeof amendedHoldings === 'undefined'
-			? helpText
-			: portfolio24HrPerformanceHtml;
-
-	globalPortfolioValue = portfolioValue;
-	portfolioValue = round(portfolioValue);
-	portfolioValueBTC = round(portfolioValueBTC, 3);
 
 	return `
 		<div class="row darkest">
@@ -421,47 +416,204 @@ function getPortfolioHeader(amendedHoldings) {
 			</ul>
 		</div>
 		<div class="row darker portfolio-overview">
-			<div class="four columns text-left">
+			<div class="three columns text-left">
 				<strong>PORTFOLIO VALUE</strong>
-				<p class="large-text">${symbol}${portfolioValue}  <small>(฿${portfolioValueBTC})</small></p>
+				<p class="large-text">${symbol}${portfolioData.total}  <small>(₿${
+		portfolioData.totalBTC
+	})</small></p>
 			</div>
-			<div class="six columns text-left">
+			<div class="five columns text-left">
 				${helpOrPerformance}
+			</div>
+			<div class="three columns chart-container u-full-width">
+				<canvas id="allocation-chart" hidden></canvas>
 			</div>
 		</div>`;
 }
 
-// <div class="six columns">
-// 	<button class="button-primary u-pull-right">Save Portfolio</button>
-// </div>
+function getPortfolioData(populatedHoldings) {
+	const total = populatedHoldings.reduce((sum, holding) => {
+		return sum + holding.value;
+	}, 0);
+	const total24HrsAgo = populatedHoldings.reduce((sum, holding) => {
+		return sum + getPastValue(holding.value, holding.percent_change_24h);
+	}, 0);
+	const change24Hrs = total - total24HrsAgo;
+	const change24HrsPct = 100 * (total / total24HrsAgo - 1);
+	const total7DaysAgo = populatedHoldings.reduce((sum, holding) => {
+		return sum + getPastValue(holding.value, holding.percent_change_7d);
+	}, 0);
+	const change7Days = total - total7DaysAgo;
+	const change7DaysPct = 100 * (total / total7DaysAgo - 1);
+	const totalBTC = getBTCValue(total);
 
-function getPortfolioTable(amendedHoldings) {
+	globalPortfolioValue = total;
+	return {
+		total: total,
+		totalBTC: round(totalBTC, 3),
+		change24Hrs: round(change24Hrs),
+		change24HrsPct: round(change24HrsPct),
+		change7Days: round(change7Days),
+		change7DaysPct: round(change7DaysPct)
+	};
+}
+
+function getPastValue(value, pctChange) {
+	return value / (1 + pctChange / 100);
+}
+
+function getBTCValue(value) {
+	const currency = localStorage.getItem('currency').toLowerCase();
+	const btcObj = tickerData.find(element => element.symbol === 'BTC');
+
+	return value / btcObj[`price_${currency}`];
+}
+
+function getPortfolioPerformance(data, symbol) {
+	const gainOrLoss24Hrs = data.change24HrsPct > 0 ? 'gain' : 'loss';
+	const gainOrLoss7Days = data.change7DaysPct > 0 ? 'gain' : 'loss';
+
+	return `
+	<strong>24 HOURS</strong>
+	<p class="${gainOrLoss24Hrs} large-text">${symbol}${data.change24Hrs} <small>(${
+		data.change24HrsPct
+	}%)</small></p>
+	<strong>7 DAYS</strong>
+	<p class="${gainOrLoss7Days} large-text">${symbol}${data.change7Days} <small>(${
+		data.change7DaysPct
+	}%)</small></p>`;
+}
+
+function renderChart(populatedHoldings) {
+	$('#chart-container').attr('hidden', false);
+	const sortedHoldings = populatedHoldings.sort((a, b) => {
+		return b.allocation - a.allocation;
+	});
+	const ctx = document.getElementById('allocation-chart').getContext('2d');
+	const chart = new Chart(ctx, {
+		type: 'pie',
+		data: {
+			labels: getChartLabels(sortedHoldings),
+			datasets: [
+				{
+					label: 'Holdings',
+					data: getChartData(sortedHoldings),
+					backgroundColor: getChartColors(),
+					borderColor: '#fff',
+					borderWidth: 2
+				}
+			]
+		},
+		options: {
+			legend: {
+				display: false
+			},
+			animation: {
+				duration: 0
+			},
+			tooltips: {
+				callbacks: {
+					label: function(tooltipItem, data) {
+						return (
+							data.labels[tooltipItem.index] +
+							': ' +
+							round(
+								data.datasets[tooltipItem.datasetIndex].data[
+									tooltipItem.index
+								]
+							) +
+							'%'
+						);
+					}
+				}
+			}
+		}
+	});
+}
+
+function getChartLabels(sortedHoldings) {
+	return sortedHoldings.map(holding => holding.name);
+}
+
+function getChartData(sortedHoldings) {
+	return sortedHoldings.map(holding => holding.allocation);
+}
+
+function getChartColors() {
+	return [
+		'#4D4D4D',
+		'#5DA5DA',
+		'#FAA43A',
+		'#60BD68',
+		'#F17CB0',
+		'#B2912F',
+		'#B276B2',
+		'#DECF3F',
+		'#F15854'
+	];
+	// return [
+	// 	'#8dd3c7',
+	// 	'#ffffb3',
+	// 	'#bebada',
+	// 	'#fb8072',
+	// 	'#80b1d3',
+	// 	'#fdb462',
+	// 	'#b3de69',
+	// 	'#fccde5',
+	// 	'#d9d9d9',
+	// 	'#bc80bd'
+	// ];
+	// return [
+	// 	'#072A49',
+	// 	'#108A9F',
+	// 	'#431833',
+	// 	'#B7C721',
+	// 	'#F0CC2C',
+	// 	'#FC9314',
+	// 	'#DC4709',
+	// 	'#537F78',
+	// 	'#B8D7CA',
+	// 	'#FAF0D3',
+	// 	'#333333',
+	// 	'#BB6A46',
+	// 	'#543140',
+	// 	'#A0DEB5',
+	// 	'#D6C22D'
+	// ];
+}
+
+function getPortfolioTable(populatedHoldings) {
 	const symbol = getCurrencySymbol();
 	let tableRowsHtmlString = '';
 
-	if (typeof amendedHoldings !== 'undefined') {
-		amendedHoldings.forEach(item => {
-			const gainOrLoss = item.change_pct_24_hr > 0 ? 'gain' : 'loss';
-			const allocationPct = round(
-				item.value / globalPortfolioValue * 100
-			);
+	if (populatedHoldings.length) {
+		populatedHoldings.forEach(holding => {
+			const gainOrLoss24Hrs =
+				holding.percent_change_24h > 0 ? 'gain' : 'loss';
+			const gainOrLoss7Days =
+				holding.percent_change_7d > 0 ? 'gain' : 'loss';
 
-			item.price = round(item.price);
-			item.value = round(item.value);
+			const price = round(holding.price);
+			const value = round(holding.value);
+			const allocation = round(holding.allocation);
+
 			tableRowsHtmlString += `
 		<tr>
 		<td data-label="&nbsp;&nbsp;&nbsp;&nbsp;Coin"><span class="leftmost-cell">${
-			item.name
+			holding.name
 		}</span></td>
-		<td data-label="Price">${symbol}${item.price}</td>
-		<td class="${gainOrLoss}" data-label="24 hr change">${
-				item.change_pct_24_hr
+		<td data-label="Price">${symbol}${price}</td>
+		<td class="${gainOrLoss24Hrs}" data-label="24 hrs">${
+				holding.percent_change_24h
 			}%</td>
-		<td data-label="Amount">${item.amount}</td>
-		<td data-label="Value">${symbol}${item.value}</td>
-		<td data-label="Allocation">${allocationPct}%</td>
+		<td class="${gainOrLoss7Days}" data-label="7 days">${
+				holding.percent_change_7d
+			}%</td>
+		<td data-label="Amount">${holding.amount}</td>
+		<td data-label="Value">${symbol}${value}</td>
+		<td data-label="Allocation">${allocation}%</td>
 		<td data-label="Delete"><a class="portfolio-link delete-holding rightmost-cell" data-coin="${
-			item.id
+			holding.id
 		}">x</a></td>
 		</tr>`;
 		});
@@ -472,22 +624,25 @@ function getPortfolioTable(amendedHoldings) {
 		  <thead class="darkest">
 		    <tr>
 		      <th>
-		      	<a class="sortable-header leftmost-cell" data-sort="0">Coin</a>
+		      	<a class="sortable-header leftmost-cell" data-sort="0">Name</a>
 		      </th>
 		      <th>
 		      	<a class="sortable-header" data-sort="1">Price</a>
 		      </th>
 		      <th>
-		      	<a class="sortable-header" data-sort="2">24 hr change</a>
+		      	<a class="sortable-header" data-sort="2">24 hrs</a>
 		      </th>
 		      <th>
-		      	<a class="sortable-header" data-sort="3">Amount</a>
+		      	<a class="sortable-header" data-sort="3">7 days</a>
 		      </th>
 		      <th>
-		      	<a class="sortable-header" data-sort="4">Value</a>
+		      	<a class="sortable-header" data-sort="4">Amount</a>
 		      </th>
 		      <th>
-		      	<a class="sortable-header" data-sort="5">Allocation</a>
+		      	<a class="sortable-header" data-sort="5">Value</a>
+		      </th>
+		      <th>
+		      	<a class="sortable-header" data-sort="6">Allocation</a>
 		      </th>
 		      <th></th>
 		    </tr>
@@ -510,8 +665,8 @@ function getCurrencySymbol() {
 	}
 }
 
-function getPortfolioFooter(globalPortfolioValue) {
-	if (!globalPortfolioValue) {
+function getPortfolioFooter(populatedHoldings) {
+	if (!populatedHoldings.length) {
 		return `
 		<div class="row portfolio-footer darkest">
 			<button class="button-primary u-pull-left js-add-portfolio-item start-btn">Get started</button>
@@ -581,9 +736,9 @@ function getNewItemForm() {
 	</form>`;
 }
 
-function handleCancelAdditionBtn() {
+function handleCancelAdditionBtn(populatedHoldings) {
 	$('main').on('click', '.cancel-addition-btn', function() {
-		const portfolioFooter = getPortfolioFooter(globalPortfolioValue);
+		const portfolioFooter = getPortfolioFooter(populatedHoldings);
 
 		$('.js-add-coin-form, .portfolio-footer').remove();
 		$('.portfolio-container').append(portfolioFooter);
