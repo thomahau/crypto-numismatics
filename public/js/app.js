@@ -1,7 +1,5 @@
 'use strict';
 const COINMARKETCAP_ENDPOINT = 'https://api.coinmarketcap.com/v1/';
-const CRYPTOCOMPARE_ENDPOINT = 'https://min-api.cryptocompare.com/data/';
-const APP_NAME = 'crypto_numismatics';
 let tickerData;
 let globalPortfolioValue = 0;
 
@@ -854,29 +852,18 @@ function handleEditCurrencySubmit() {
 
 function handleTableSorting() {
 	$('main').on('click', '.sortable-header', function(event) {
-		const sortParameter = $(this).data('sort');
-		const sortDirection = $(this).find('span').length ? 'asc' : 'desc';
-		const directionIcon = getDirectionIcon(sortDirection);
+		const $header = $(this);
+		const sortParameter = $header.data('sort');
 
-		$('.direction-icon').remove();
-		$(this).append(directionIcon);
-		sortTable(sortParameter, sortDirection);
-		// sortTable(sortParameter);
+		sortTable(sortParameter, $header);
 	});
 }
 
-function getDirectionIcon(direction) {
-	const stub = direction === 'asc' ? 'up' : 'down';
-	return `
-	<span class="direction-icon">
-		<i class="fas fa-caret-${stub}"></i>
-	</span>`;
-}
-
-function sortTable(param, dir) {
+function sortTable(param, $header) {
 	const $table = $('table');
 	let switching = true,
 		switchcount = 0,
+		dir = 'desc',
 		shouldSwitch;
 
 	while (switching) {
@@ -899,13 +886,13 @@ function sortTable(param, dir) {
 					: y.textContent
 			);
 
-			if (dir === 'asc') {
-				if (xValue > yValue) {
+			if (dir === 'desc') {
+				if (xValue < yValue) {
 					shouldSwitch = true;
 					break;
 				}
-			} else if (dir === 'desc') {
-				if (xValue < yValue) {
+			} else if (dir === 'asc') {
+				if (xValue > yValue) {
 					shouldSwitch = true;
 					break;
 				}
@@ -913,12 +900,16 @@ function sortTable(param, dir) {
 		}
 
 		if (shouldSwitch) {
+			const directionIcon = getDirectionIcon(dir);
+
+			$('.direction-icon').remove();
+			$header.append(directionIcon);
 			rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
 			switching = true;
 			switchcount++;
 		} else {
-			if (switchcount === 0 && dir === 'asc') {
-				dir = 'desc';
+			if (switchcount === 0 && dir === 'desc') {
+				dir = 'asc';
 				switching = true;
 			}
 		}
@@ -926,10 +917,18 @@ function sortTable(param, dir) {
 }
 
 function checkIfNumerical(s) {
-	if (/^\d*\.?\d+%?$/.test(s)) {
-		return parseFloat(s, 10);
+	if (/^\$?\d*,?\d*\.?\d+%?$/.test(s)) {
+		return parseFloat(s.replace(/[\$€£,]/g, ''), 10);
 	}
-	return s;
+	return s.toLowerCase();
+}
+
+function getDirectionIcon(direction) {
+	const stub = direction === 'desc' ? 'down' : 'up';
+	return `
+	<span class="direction-icon">
+		<i class="fas fa-caret-${stub}"></i>
+	</span>`;
 }
 
 $(function() {
