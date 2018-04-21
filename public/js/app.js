@@ -115,14 +115,22 @@ function handleFirstLogin(data) {
 	};
 
 	$('.modal').on('click', '.first-login', function() {
-		login(credentials).then(data => {
-			localStorage.setItem('username', data.username);
-			localStorage.setItem('token', data.authToken);
-			localStorage.setItem('currency', 'USD');
+		login(credentials)
+			.then(data => {
+				localStorage.setItem('username', data.username);
+				localStorage.setItem('token', data.authToken);
+				localStorage.setItem('currency', 'USD');
 
-			$('.modal').attr('hidden', true);
-			checkIfLoggedIn();
-		});
+				return getTickerData('USD');
+			})
+			.then(data => {
+				tickerData = data;
+				console.log(tickerData.length);
+
+				$('.modal').attr('hidden', true);
+				checkIfLoggedIn();
+			})
+			.catch(err => console.error(err));
 	});
 }
 
@@ -241,12 +249,8 @@ function handleLoginModal() {
 function handleNewCoinSubmit() {
 	$('main').on('submit', '.js-add-coin-form', function(event) {
 		event.preventDefault();
-		const inputAmount = $(this)
-			.find('.coin-amount')
-			.val();
-		const inputCoin = $(this)
-			.find('.coin-search')
-			.val();
+		const inputAmount = $('.coin-amount').val();
+		const inputCoin = $('.coin-search').val();
 
 		if (isValidInput(inputCoin)) {
 			const coinElements = inputCoin.split('(');
@@ -255,16 +259,17 @@ function handleNewCoinSubmit() {
 				name: coinElements[0].slice(0, -1),
 				amount: parseFloat(inputAmount, 10)
 			};
+			$('.search-help').attr('hidden', true);
+			$('.coin-amount, .coin-search').val('');
 
 			addHolding(newHolding)
 				.then(holding => {
+					console.log(holding);
 					renderPortfolio();
 				})
 				.catch(err => console.error(err));
 		} else {
-			$('.search-help')
-				.attr('hidden', false)
-				.html('Invalid input');
+			$('.search-help').attr('hidden', false);
 		}
 	});
 }
@@ -500,7 +505,7 @@ function renderChart(populatedHoldings) {
 					data: getChartData(sortedHoldings),
 					backgroundColor: getChartColors(),
 					borderColor: '#fff',
-					borderWidth: 2
+					borderWidth: 1
 				}
 			]
 		},
@@ -549,37 +554,11 @@ function getChartColors() {
 		'#B2912F',
 		'#B276B2',
 		'#DECF3F',
-		'#F15854'
+		'#F15854',
+		'#072A49',
+		'#108A9F',
+		'#431833'
 	];
-	// return [
-	// 	'#8dd3c7',
-	// 	'#ffffb3',
-	// 	'#bebada',
-	// 	'#fb8072',
-	// 	'#80b1d3',
-	// 	'#fdb462',
-	// 	'#b3de69',
-	// 	'#fccde5',
-	// 	'#d9d9d9',
-	// 	'#bc80bd'
-	// ];
-	// return [
-	// 	'#072A49',
-	// 	'#108A9F',
-	// 	'#431833',
-	// 	'#B7C721',
-	// 	'#F0CC2C',
-	// 	'#FC9314',
-	// 	'#DC4709',
-	// 	'#537F78',
-	// 	'#B8D7CA',
-	// 	'#FAF0D3',
-	// 	'#333333',
-	// 	'#BB6A46',
-	// 	'#543140',
-	// 	'#A0DEB5',
-	// 	'#D6C22D'
-	// ];
 }
 
 function getPortfolioTable(populatedHoldings) {
@@ -726,7 +705,7 @@ function getNewItemForm() {
 			<div class="six columns">
 				<input type="search" class="coin-search" placeholder="Coin name" required />
 				<input type="number" class="coin-amount" placeholder="Amount" min="0" step="any" required />
-				<p class="search-help" aria-live="assertive" hidden></p>
+				<p class="search-help" aria-live="assertive" hidden>Invalid input</p>
 			</div>
 			<div class="four columns">
 				<button type="submit" class="button-primary">Add coin</button>
