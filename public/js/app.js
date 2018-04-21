@@ -248,6 +248,7 @@ function handleLoginModal() {
 
 function handleNewCoinSubmit() {
 	$('main').on('submit', '.js-add-coin-form', function(event) {
+		$('.search-help').attr('hidden', true);
 		event.preventDefault();
 		const inputAmount = $('.coin-amount').val();
 		const inputCoin = $('.coin-search').val();
@@ -259,7 +260,6 @@ function handleNewCoinSubmit() {
 				name: coinElements[0].slice(0, -1),
 				amount: parseFloat(inputAmount, 10)
 			};
-			$('.search-help').attr('hidden', true);
 			$('.coin-amount, .coin-search').val('');
 
 			addHolding(newHolding)
@@ -340,6 +340,7 @@ function populateHoldings(holdings) {
 
 function renderPortfolio() {
 	let populatedHoldings;
+
 	getHoldings()
 		.then(data => {
 			return populateHoldings(data.holdings);
@@ -860,6 +861,7 @@ function handleTableSorting() {
 		$('.direction-icon').remove();
 		$(this).append(directionIcon);
 		sortTable(sortParameter, sortDirection);
+		// sortTable(sortParameter);
 	});
 }
 
