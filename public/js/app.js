@@ -4,8 +4,12 @@ let tickerData;
 let globalPortfolioValue = 0;
 
 function populateSearchOptions() {
+	const availableCoins = tickerData.map(tickerObj => {
+		return `${tickerObj.name} (${tickerObj.symbol})`;
+	});
+
 	$('.coin-search').autocomplete({
-		source: COINS
+		source: availableCoins
 	});
 }
 
@@ -145,7 +149,6 @@ function handleLogin() {
 				const currency = localStorage.getItem('currency');
 				localStorage.setItem('username', data.username);
 				localStorage.setItem('token', data.authToken);
-				localStorage.setItem('currency', 'USD');
 
 				getTickerData(currency)
 					.then(data => {
@@ -255,7 +258,7 @@ function handleNewCoinSubmit() {
 			const coinElements = inputCoin.split('(');
 			const newHolding = {
 				symbol: coinElements[1].slice(0, -1),
-				// name: coinElements[0].slice(0, -1),
+				name: coinElements[0].slice(0, -1),
 				amount: parseFloat(inputAmount, 10)
 			};
 			$('.coin-amount, .coin-search').val('');
@@ -266,7 +269,9 @@ function handleNewCoinSubmit() {
 				})
 				.catch(err => console.error(err));
 		} else {
-			$('.search-help').attr('hidden', false);
+			$('.search-help')
+				.attr('hidden', false)
+				.html('Invalid input');
 		}
 	});
 }
@@ -316,14 +321,14 @@ function populateHoldings(holdings) {
 	const currency = localStorage.getItem('currency').toLowerCase();
 	let populatedHoldings = [];
 
-	holdings.forEach(holding => {
+	holdings.forEach((holding, index) => {
 		const tickerObj = tickerData.filter(
 			element => element.symbol === holding.symbol
 		)[0];
 		const populatedHolding = {
 			id: holding.id,
 			symbol: holding.symbol,
-			name: tickerObj.name,
+			name: holding.name,
 			amount: holding.amount,
 			price: parseFloat(tickerObj[`price_${currency}`]),
 			value: holding.amount * parseFloat(tickerObj[`price_${currency}`]),
@@ -353,7 +358,7 @@ function renderPortfolio() {
 		.then(values => {
 			const [portfolioHeader, portfolioTable, portfolioFooter] = values;
 
-			$('.welcome-container')
+			$('.welcome-container, .search-help')
 				.attr('hidden', true)
 				.empty();
 			$('.portfolio-container')
@@ -703,7 +708,7 @@ function getNewItemForm() {
 			<div class="six columns">
 				<input type="search" class="coin-search" placeholder="Coin name" required />
 				<input type="number" class="coin-amount" placeholder="Amount" min="0" step="any" required />
-				<p class="search-help" aria-live="assertive" hidden>Invalid input</p>
+				<p class="search-help" aria-live="assertive" hidden></p>
 			</div>
 			<div class="four columns">
 				<button type="submit" class="button-primary">Add coin</button>
