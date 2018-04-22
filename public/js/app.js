@@ -16,11 +16,18 @@ function populateSearchOptions() {
 function checkIfLoggedIn() {
 	if (localStorage.getItem('token') && localStorage.getItem('username')) {
 		const username = localStorage.getItem('username');
+		const currency = localStorage.getItem('currency');
 		const userHtml = getUserHtml(username);
 
-		$('.js-login, .js-register').remove();
-		$('nav').append(userHtml);
-		renderPortfolio();
+		getTickerData(currency)
+			.then(data => {
+				tickerData = data;
+
+				$('.js-login, .js-register').remove();
+				$('nav').append(userHtml);
+				renderPortfolio();
+			})
+			.catch(err => console.error(err));
 	} else {
 		const welcomeMessage = getWelcomeMessage();
 
@@ -123,12 +130,6 @@ function handleFirstLogin(data) {
 				localStorage.setItem('token', data.authToken);
 				localStorage.setItem('currency', 'USD');
 
-				return getTickerData('USD');
-			})
-			.then(data => {
-				tickerData = data;
-				console.log(tickerData.length);
-
 				$('.modal').attr('hidden', true);
 				checkIfLoggedIn();
 			})
@@ -150,14 +151,8 @@ function handleLogin() {
 				localStorage.setItem('username', data.username);
 				localStorage.setItem('token', data.authToken);
 
-				getTickerData(currency)
-					.then(data => {
-						tickerData = data;
-
-						$('.modal').attr('hidden', true);
-						checkIfLoggedIn();
-					})
-					.catch(err => console.error(err));
+				$('.modal').attr('hidden', true);
+				checkIfLoggedIn();
 			})
 			.catch(err => {
 				const loginHelpMsg = getLoginHelpMsg(err);
@@ -844,13 +839,17 @@ function handleEditCurrency() {
 function handleEditCurrencySubmit() {
 	$('.edit-currency-form').submit(function(event) {
 		event.preventDefault();
-		const currency = $(this)
-			.find('.currency-select')
-			.val();
-
+		const currency = $('.currency-select').val();
 		localStorage.setItem('currency', currency);
-		renderPortfolio();
-		$('.modal').attr('hidden', true);
+
+		getTickerData(currency)
+			.then(data => {
+				tickerData = data;
+
+				renderPortfolio();
+				$('.modal').attr('hidden', true);
+			})
+			.catch(err => console.error(err));
 	});
 }
 
