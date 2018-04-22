@@ -145,6 +145,7 @@ function handleLogin() {
 				const currency = localStorage.getItem('currency');
 				localStorage.setItem('username', data.username);
 				localStorage.setItem('token', data.authToken);
+				localStorage.setItem('currency', 'USD');
 
 				getTickerData(currency)
 					.then(data => {
@@ -246,7 +247,6 @@ function handleLoginModal() {
 
 function handleNewCoinSubmit() {
 	$('main').on('submit', '.js-add-coin-form', function(event) {
-		$('.search-help').attr('hidden', true);
 		event.preventDefault();
 		const inputAmount = $('.coin-amount').val();
 		const inputCoin = $('.coin-search').val();
@@ -255,14 +255,13 @@ function handleNewCoinSubmit() {
 			const coinElements = inputCoin.split('(');
 			const newHolding = {
 				symbol: coinElements[1].slice(0, -1),
-				name: coinElements[0].slice(0, -1),
+				// name: coinElements[0].slice(0, -1),
 				amount: parseFloat(inputAmount, 10)
 			};
 			$('.coin-amount, .coin-search').val('');
 
 			addHolding(newHolding)
 				.then(holding => {
-					console.log(holding);
 					renderPortfolio();
 				})
 				.catch(err => console.error(err));
@@ -324,7 +323,7 @@ function populateHoldings(holdings) {
 		const populatedHolding = {
 			id: holding.id,
 			symbol: holding.symbol,
-			name: holding.name, // coin.name
+			name: tickerObj.name,
 			amount: holding.amount,
 			price: parseFloat(tickerObj[`price_${currency}`]),
 			value: holding.amount * parseFloat(tickerObj[`price_${currency}`]),
@@ -875,12 +874,12 @@ function sortTable(param, $header) {
 			shouldSwitch = false;
 			let x = rows[i].getElementsByTagName('td')[param];
 			let y = rows[i + 1].getElementsByTagName('td')[param];
-			let xValue = checkIfNumerical(
+			let xValue = formatForSort(
 				x.firstElementChild
 					? x.firstElementChild.textContent
 					: x.textContent
 			);
-			let yValue = checkIfNumerical(
+			let yValue = formatForSort(
 				y.firstElementChild
 					? y.firstElementChild.textContent
 					: y.textContent
@@ -916,8 +915,9 @@ function sortTable(param, $header) {
 	}
 }
 
-function checkIfNumerical(s) {
-	if (/^\$?\d*,?\d*\.?\d+%?$/.test(s)) {
+function formatForSort(s) {
+	// make sure we have clean values to compare in sort function
+	if (/^-?\$?\d*,?\d*\.?\d+%?$/.test(s)) {
 		return parseFloat(s.replace(/[\$€£,]/g, ''), 10);
 	}
 	return s.toLowerCase();

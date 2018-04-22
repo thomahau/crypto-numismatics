@@ -27,8 +27,8 @@ router.get('/', jwtAuth, (req, res) => {
 });
 
 router.post('/', jwtAuth, jsonParser, (req, res) => {
-	const requiredFields = ['symbol', 'name', 'amount'];
-
+	// const requiredFields = ['symbol', 'name', 'amount'];
+	const requiredFields = ['symbol', 'amount'];
 	for (let i = 0; i < requiredFields.length; i++) {
 		const field = requiredFields[i];
 		if (!(field in req.body)) {
@@ -44,7 +44,7 @@ router.post('/', jwtAuth, jsonParser, (req, res) => {
 				{symbol: req.body.symbol, user: user},
 				{
 					symbol: req.body.symbol,
-					name: req.body.name,
+					// name: req.body.name,
 					$inc: {
 						amount: req.body.amount
 					},

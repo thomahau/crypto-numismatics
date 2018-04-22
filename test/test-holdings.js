@@ -25,21 +25,14 @@ function seedPortfolioData() {
 }
 
 function getRandomCoin() {
-	const coins = [
-		{symbol: 'BTC', name: 'Bitcoin'},
-		{symbol: 'ETH', name: 'Ethereum'},
-		{symbol: 'XRP', name: 'Ripple'},
-		{symbol: 'BCH', name: 'Bitcoin Cash'},
-		{symbol: 'LTC', name: 'Litecoin'}
-	];
+	const coins = ['BTC', 'ETH', 'XRP', 'BCH', 'LTC'];
 	return coins[Math.floor(Math.random() * coins.length)];
 }
 
 function generateHoldingData(coin = getRandomCoin()) {
 	const amount = Math.floor(Math.random() * 50);
 	return {
-		symbol: coin.symbol,
-		name: coin.name,
+		symbol: coin,
 		amount: amount,
 		user: user
 	};
@@ -196,7 +189,6 @@ describe('Protected holdings API resource', function() {
 						expect(holding).to.include.keys(
 							'id',
 							'symbol',
-							'name',
 							'amount'
 						);
 					});
@@ -206,7 +198,6 @@ describe('Protected holdings API resource', function() {
 				.then(holding => {
 					expect(resHolding.id).to.equal(holding.id);
 					expect(resHolding.symbol).to.equal(holding.symbol);
-					expect(resHolding.name).to.equal(holding.name);
 					expect(resHolding.amount).to.equal(holding.amount);
 				});
 		});
@@ -214,10 +205,7 @@ describe('Protected holdings API resource', function() {
 
 	describe('POST endpoint', function() {
 		it('should add a new holding', function() {
-			const newHolding = generateHoldingData({
-				symbol: 'EOS',
-				name: 'EOS'
-			});
+			const newHolding = generateHoldingData('EOS');
 
 			return chai
 				.request(app)
@@ -228,20 +216,13 @@ describe('Protected holdings API resource', function() {
 					expect(res).to.have.status(201);
 					expect(res).to.be.json;
 					expect(res.body).to.be.a('object');
-					expect(res.body).to.include.keys(
-						'id',
-						'symbol',
-						'name',
-						'amount'
-					);
+					expect(res.body).to.include.keys('id', 'symbol', 'amount');
 					expect(res.body.id).to.not.be.null;
 					expect(res.body.symbol).to.equal(newHolding.symbol);
-					expect(res.body.name).to.equal(newHolding.name);
 					return Holding.findById(res.body.id);
 				})
 				.then(holding => {
 					expect(holding.symbol).to.equal(newHolding.symbol);
-					expect(holding.name).to.equal(newHolding.name);
 					expect(holding.amount).to.equal(newHolding.amount);
 				});
 		});
