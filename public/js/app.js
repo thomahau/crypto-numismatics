@@ -1,10 +1,11 @@
 'use strict';
 const COINMARKETCAP_ENDPOINT = 'https://api.coinmarketcap.com/v1/';
 let tickerData;
+let availableCoins;
 let globalPortfolioValue = 0;
 
 function populateSearchOptions() {
-	const availableCoins = tickerData.map(tickerObj => {
+	availableCoins = tickerData.map(tickerObj => {
 		return `${tickerObj.name} (${tickerObj.symbol})`;
 	});
 
@@ -250,38 +251,42 @@ function handleNewCoinSubmit() {
 		const inputAmount = $('.coin-amount').val();
 		const inputCoin = $('.coin-search').val();
 
-		if (isValidInput(inputCoin)) {
-			const coinElements = inputCoin.split('(');
-			const newHolding = {
-				symbol: coinElements[1].slice(0, -1),
-				name: coinElements[0].slice(0, -1),
-				amount: parseFloat(inputAmount, 10)
-			};
-			$('.coin-amount, .coin-search').val('');
-
-			addHolding(newHolding)
-				.then(holding => {
-					renderPortfolio();
-				})
-				.catch(err => console.error(err));
-		} else {
-			$('.search-help')
-				.attr('hidden', false)
-				.html('Invalid input');
-		}
+		validateInput(inputCoin)
+			.then(isValid => {
+				const coinElements = inputCoin.split('(');
+				const newHolding = {
+					symbol: coinElements[1].slice(0, -1),
+					name: coinElements[0].slice(0, -1),
+					amount: parseFloat(inputAmount, 10)
+				};
+				return addHolding(newHolding);
+			})
+			.then(holding => {
+				renderPortfolio();
+			})
+			.catch(err => {
+				$('.search-help')
+					.attr('hidden', false)
+					.html(err);
+			});
 	});
 }
 
-function isValidInput(input) {
-	let validInput = false;
-
-	COINS.forEach(coin => {
-		if (input === coin) {
-			validInput = true;
-			return validInput;
+function validateInput(input) {
+	return new Promise((resolve, reject) => {
+		let validInput = false;
+		for (let i = 0; i < availableCoins.length && !validInput; i++) {
+			if (input === availableCoins[i]) {
+				validInput = true;
+				$('.search-help')
+					.attr('hidden', true)
+					.empty();
+				$('.coin-amount, .coin-search').val('');
+				return resolve(validInput);
+			}
 		}
+		setTimeout(() => reject('Invalid input'), 100);
 	});
-	return validInput;
 }
 
 function getHoldings() {
