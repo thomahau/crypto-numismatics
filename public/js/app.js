@@ -46,8 +46,9 @@ function getWelcomeMessage() {
 }
 
 function getTickerData(currency) {
+	// returns current ticker data for top 1000 cryptocurrencies
 	const url =
-		COINMARKETCAP_ENDPOINT + `ticker/?limit=500&convert=${currency}`;
+		COINMARKETCAP_ENDPOINT + `ticker/?limit=1000&convert=${currency}`;
 
 	return fetch(url).then(res => {
 		if (res.ok) {
@@ -337,6 +338,9 @@ function populateHoldings(holdings) {
 
 function renderPortfolio() {
 	let populatedHoldings;
+	$('.welcome-container, .search-help')
+		.attr('hidden', true)
+		.empty();
 
 	getHoldings()
 		.then(data => {
@@ -353,9 +357,6 @@ function renderPortfolio() {
 		.then(values => {
 			const [portfolioHeader, portfolioTable, portfolioFooter] = values;
 
-			$('.welcome-container, .search-help')
-				.attr('hidden', true)
-				.empty();
 			$('.portfolio-container')
 				.attr('hidden', false)
 				.empty()
@@ -421,7 +422,7 @@ function getPortfolioHeader(populatedHoldings) {
 		<div class="row darker portfolio-overview">
 			<div class="three columns text-left">
 				<strong>PORTFOLIO VALUE</strong>
-				<p class="large-text">${symbol}${portfolioData.total}  <small>(₿${
+				<p class="large-text">${symbol}${portfolioData.total} <small>(₿${
 		portfolioData.totalBTC
 	})</small></p>
 			</div>
