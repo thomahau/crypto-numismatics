@@ -15,8 +15,11 @@
 <body>
 	<header class="u-full-width darkest" role="banner">
 		<nav class="container header-container" role="navigation">
-			<a class="u-pull-left" href="/">
-				<i class="far fa-copyright fa-flip-horizontal"></i> Crypto Numismatics
+			<a class="u-pull-left li-space" href="/">
+				<i class="far fa-copyright fa-flip-horizontal"></i><span class="nav-text"> Crypto Numismatics</span>
+			</a>
+			<a class="u-pull-left" href="https://github.com/thomahau/crypto-numismatics">
+				<i class="fab fa-github"></i>
 			</a>
 			<a class="js-register u-pull-right">
 				<i class="fas fa-user-plus"></i><span class="nav-text"> Sign up</span>
@@ -28,8 +31,32 @@
 	</header>
 
 	<main role="main">
-		<div class="container welcome-container" hidden></div>
+		<div class="container welcome-container" hidden>
+			<div class="row">
+				<h1>Cryptocurrency portfolio tracker</h1>
+				<p>Crypto Numismatics provides a simple, user-friendly overview of your digital currency holdings. Signing up is free and anonymous.</p>
+				<button class="button-primary js-register">Create account</button>
+			</div>
+		</div>
 		<div class="container portfolio-container" aria-live="polite" hidden></div>
+		<footer class="darkest u-full-width stats-wrapper" hidden>
+			<div class="container">
+				<div class="row">
+					<div class="four columns">
+						<h2>1500+</h2>
+						<p>Cryptocurrencies tracked</p>
+					</div>
+					<div class="four columns">
+						<h2>3</h2>
+						<p>Fiat currencies supported</p>
+					</div>
+					<div class="four columns">
+						<h2>0</h2>
+						<p>Price to use</p>
+					</div>
+				</div>
+			</div>
+		</footer>
 	</main>
 
 	<div class="modal js-register-modal" hidden>

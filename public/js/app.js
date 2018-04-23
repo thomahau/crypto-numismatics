@@ -30,26 +30,13 @@ function checkIfLoggedIn() {
 			})
 			.catch(err => console.error(err));
 	} else {
-		const welcomeMessage = getWelcomeMessage();
-
-		$('.welcome-container')
-			.attr('hidden', false)
-			.html(welcomeMessage);
+		$('.welcome-container, .stats-wrapper').attr('hidden', false);
 	}
 }
 
-function getWelcomeMessage() {
-	return `
-	<div class="row">
-		<h1>Cryptocurrency portfolio tracker</h1>
-		<p>Crypto Numismatics provides a simple, user-friendly overview of your digital currency holdings. Signing up is free and anonymous.</p>
-	</div>`;
-}
-
 function getTickerData(currency) {
-	// returns current ticker data for top 1000 cryptocurrencies
-	const url =
-		COINMARKETCAP_ENDPOINT + `ticker/?limit=1000&convert=${currency}`;
+	// returns current ticker data for all cryptocurrencies tracked by coinmarketcap.com
+	const url = COINMARKETCAP_ENDPOINT + `ticker/?limit=0&convert=${currency}`;
 
 	return fetch(url).then(res => {
 		if (res.ok) {
@@ -220,11 +207,7 @@ function handleModals() {
 		}
 	});
 
-	$('.modal').on('click', '.close', function() {
-		$('.modal').attr('hidden', true);
-	});
-
-	$('.modal').on('click', '.cancel-edit-btn', function() {
+	$('.modal').on('click', '.close, .cancel-edit-btn', function() {
 		$('.modal').attr('hidden', true);
 	});
 
@@ -343,7 +326,7 @@ function populateHoldings(holdings) {
 
 function renderPortfolio() {
 	let populatedHoldings;
-	$('.welcome-container, .search-help')
+	$('.welcome-container, .search-help, .stats-wrapper')
 		.attr('hidden', true)
 		.empty();
 

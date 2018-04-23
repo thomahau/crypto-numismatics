@@ -29,6 +29,7 @@ main {
 
 .welcome-container {
 	margin-top: 200px;
+	margin-bottom: 20px;
 }
 
 .portfolio-container {
@@ -37,6 +38,25 @@ main {
 
 h1 {
 	font-size: 3.6rem;
+}
+
+.welcome-container .button-primary {
+	margin-top: 15px;
+}
+
+.stats-wrapper {
+	position: absolute;
+	bottom: 0;
+}
+
+.stats-wrapper h2 {
+	font-size: 3rem;
+	margin-top: 10px;
+	margin-bottom: 5px;
+}
+
+.stats-wrapper p {
+	margin-bottom: 15px;
 }
 
 .starter-inputs {
@@ -56,6 +76,10 @@ input[type='number']::-webkit-outer-spin-button {
 }
 
 @media only screen and (max-width: 640px) {
+	.welcome-container {
+		margin-top: 100px;
+	}
+
 	.portfolio-container,
 	main .button-primary {
 		width: 100%;
