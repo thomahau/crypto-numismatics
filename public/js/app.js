@@ -192,14 +192,6 @@ function handleLogout() {
 	});
 }
 
-function getAuthHeaders() {
-	const token = localStorage.getItem('token');
-	return {
-		'Content-Type': 'application/json',
-		Authorization: `Bearer ${token}`
-	};
-}
-
 function handleModals() {
 	$('body').click(function(event) {
 		if ($(event.target).hasClass('modal')) {
@@ -242,7 +234,7 @@ function handleNewCoinSubmit() {
 					name: coinElements[0].slice(0, -1),
 					amount: parseFloat(inputAmount, 10)
 				};
-				return addHolding(newHolding);
+				return Holdings.add(newHolding);
 			})
 			.then(holding => {
 				renderPortfolio();
@@ -269,28 +261,6 @@ function validateInput(input) {
 			}
 		}
 		setTimeout(() => reject('Invalid input'), 100);
-	});
-}
-
-function getHoldings() {
-	return fetch('holdings', {
-		headers: getAuthHeaders()
-	}).then(res => {
-		if (res.ok) {
-			return res.json();
-		}
-	});
-}
-
-function addHolding(data) {
-	return fetch('holdings', {
-		method: 'POST',
-		headers: getAuthHeaders(),
-		body: JSON.stringify(data)
-	}).then(res => {
-		if (res.ok) {
-			return res.json();
-		}
 	});
 }
 
@@ -330,7 +300,7 @@ function renderPortfolio() {
 		.attr('hidden', true)
 		.empty();
 
-	getHoldings()
+	Holdings.get()
 		.then(data => {
 			return populateHoldings(data.holdings);
 		})
@@ -713,7 +683,7 @@ function handleCancelAdditionBtn(populatedHoldings) {
 
 function handleEditPortfolioModal() {
 	$('main').on('click', '.js-edit-portfolio', function() {
-		getHoldings()
+		Holdings.get()
 			.then(data => {
 				return getEditPortfolioForm(data.holdings);
 			})
@@ -767,38 +737,13 @@ function handleEditPortfolioSubmit() {
 
 		const updates = submittedValues.map(item => {
 			if (item.amount === 0) {
-				return deleteHolding(item.id);
+				return Holdings.delete(item.id);
 			}
-			return updateHolding(item);
+			return Holdings.update(item);
 		});
 
-		Promise.all(updates).then(values => {
-			renderPortfolio();
-			$('.modal').attr('hidden', true);
-		});
-	});
-}
-
-function updateHolding(data) {
-	return fetch(`holdings/${data.id}`, {
-		method: 'PUT',
-		headers: getAuthHeaders(),
-		body: JSON.stringify(data)
-	})
-		.then(res => {
-			if (res.ok) {
-				return;
-			}
-		})
-		.catch(err => console.error(err));
-}
-
-function handleDeletePortfolioItem() {
-	$('body').on('click', '.delete-holding', function(event) {
-		const id = $(this).data('coin');
-
-		deleteHolding(id)
-			.then(() => {
+		Promise.all(updates)
+			.then(values => {
 				renderPortfolio();
 				$('.modal').attr('hidden', true);
 			})
@@ -806,14 +751,16 @@ function handleDeletePortfolioItem() {
 	});
 }
 
-function deleteHolding(id) {
-	return fetch(`holdings/${id}`, {
-		method: 'DELETE',
-		headers: getAuthHeaders()
-	}).then(res => {
-		if (res.ok) {
-			return;
-		}
+function handleDeletePortfolioItem() {
+	$('body').on('click', '.delete-holding', function(event) {
+		const id = $(this).data('coin');
+
+		Holdings.delete(id)
+			.then(() => {
+				renderPortfolio();
+				$('.modal').attr('hidden', true);
+			})
+			.catch(err => console.error(err));
 	});
 }
 
