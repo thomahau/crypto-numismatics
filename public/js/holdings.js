@@ -1,14 +1,16 @@
 'use strict';
-const HOLDINGS_URI = 'holdings';
-
-const Holdings = {
-	authHeaders: {
-		'Content-Type': 'application/json',
-		Authorization: `Bearer ${localStorage.getItem('token')}`
+App.Holdings = {
+	URI: 'holdings',
+	getAuthHeaders: function() {
+		const token = localStorage.getItem('token');
+		return {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`
+		};
 	},
 	get: function() {
-		return fetch(HOLDINGS_URI, {
-			headers: this.authHeaders
+		return fetch(this.URI, {
+			headers: this.getAuthHeaders()
 		}).then(res => {
 			if (res.ok) {
 				return res.json();
@@ -16,9 +18,9 @@ const Holdings = {
 		});
 	},
 	add: function(data) {
-		return fetch(HOLDINGS_URI, {
+		return fetch(this.URI, {
 			method: 'POST',
-			headers: this.authHeaders,
+			headers: this.getAuthHeaders(),
 			body: JSON.stringify(data)
 		}).then(res => {
 			if (res.ok) {
@@ -27,9 +29,9 @@ const Holdings = {
 		});
 	},
 	update: function(data) {
-		return fetch(`${HOLDINGS_URI}/${data.id}`, {
+		return fetch(`${this.URI}/${data.id}`, {
 			method: 'PUT',
-			headers: this.authHeaders,
+			headers: this.getAuthHeaders(),
 			body: JSON.stringify(data)
 		}).then(res => {
 			if (res.ok) {
@@ -38,9 +40,9 @@ const Holdings = {
 		});
 	},
 	delete: function(id) {
-		return fetch(`${HOLDINGS_URI}/${id}`, {
+		return fetch(`${this.URI}/${id}`, {
 			method: 'DELETE',
-			headers: this.authHeaders
+			headers: this.getAuthHeaders()
 		}).then(res => {
 			if (res.ok) {
 				return;
@@ -94,11 +96,11 @@ const Holdings = {
 
 		return {
 			total: total,
-			totalBTC: Lib.round(totalBTC, 3),
-			change24Hrs: Lib.round(change24Hrs),
-			change24HrsPct: Lib.round(change24HrsPct),
-			change7Days: Lib.round(change7Days),
-			change7DaysPct: Lib.round(change7DaysPct)
+			totalBTC: App.Lib.round(totalBTC, 3),
+			change24Hrs: App.Lib.round(change24Hrs),
+			change24HrsPct: App.Lib.round(change24HrsPct),
+			change7Days: App.Lib.round(change7Days),
+			change7DaysPct: App.Lib.round(change7DaysPct)
 		};
 	},
 	getPastValue: function(value, pctChange) {

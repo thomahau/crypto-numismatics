@@ -1,5 +1,5 @@
 'use strict';
-const UI = {
+App.UI = {
 	handleModals: function() {
 		$('body').click(function(event) {
 			if ($(event.target).hasClass('modal')) {
@@ -25,9 +25,25 @@ const UI = {
 			$('.js-login-modal').attr('hidden', false);
 		});
 	},
-	renderSignupSuccessMsg: function(username) {
+	renderStartPage: function() {
+		$(
+			'.portfolio-container, .js-username, .js-logout, .js-register-success'
+		).attr('hidden', true);
+		$(
+			'.welcome-container, .stats-wrapper, .js-login, .js-register, .register-form'
+		).attr('hidden', false);
+	},
+	handleSignupSuccess: function(username) {
 		const signupSuccessMsg = this.getSignupSuccessMsg(username);
-		$('.register-modal-body').html(signupSuccessMsg);
+
+		$('.register-form').attr('hidden', true);
+		$('.js-register-success')
+			.attr('hidden', false)
+			.html(signupSuccessMsg);
+		$('.modal').on('click', '.first-login', function() {
+			$('.js-register-modal').attr('hidden', true);
+			$('.js-login-modal').attr('hidden', false);
+		});
 	},
 	getSignupSuccessMsg: function(username) {
 		return `
@@ -54,7 +70,8 @@ const UI = {
 	},
 	renderLoggedInNav: function(username) {
 		const navElements = this.getNavElements(username);
-		$('.js-login, .js-register').remove();
+		$('.js-login, .js-register').attr('hidden', true);
+		$('.js-logout, .js-username').remove();
 		$('.header-container').append(navElements);
 	},
 	getNavElements: function(username) {
@@ -62,7 +79,7 @@ const UI = {
 		<a class="js-logout u-pull-right">
 			<i class="fas fa-sign-out-alt"></i><span class="nav-text"> Log out</span>
 		</a>
-		<p class="u-pull-right li-space">
+		<p class="js-username u-pull-right li-space">
 			${username}
 		</p>`;
 	},
@@ -93,9 +110,9 @@ const UI = {
 			true
 		);
 
-		Holdings.get()
+		App.Holdings.get()
 			.then(data => {
-				return Holdings.populate(data.holdings);
+				return App.Holdings.populate(data.holdings);
 			})
 			.then(_populatedHoldings => {
 				populatedHoldings = _populatedHoldings;
@@ -116,7 +133,7 @@ const UI = {
 					.append(footer);
 
 				if (populatedHoldings.length) {
-					PieChart.render(populatedHoldings);
+					App.Vendor.renderPieChart(populatedHoldings);
 					$('#chart-container').attr('hidden', false);
 				} else {
 					$('#chart-container').attr('hidden', true);
@@ -131,7 +148,9 @@ const UI = {
 			});
 	},
 	getPortfolioHeader: function(populatedHoldings) {
-		const symbol = Lib.getCurrencySymbol(localStorage.getItem('currency'));
+		const symbol = App.Lib.getCurrencySymbol(
+			localStorage.getItem('currency')
+		);
 		let helpOrPerformance = '<p>Your portfolio is currently empty.</p>';
 		let portfolioData = {
 			total: 0,
@@ -139,13 +158,13 @@ const UI = {
 		};
 
 		if (populatedHoldings.length) {
-			portfolioData = Holdings.getTotals(populatedHoldings);
+			portfolioData = App.Holdings.getTotals(populatedHoldings);
 			populatedHoldings.map(
 				holding =>
 					(holding.allocation =
 						100 / portfolioData.total * holding.value)
 			);
-			portfolioData.total = Lib.round(portfolioData.total);
+			portfolioData.total = App.Lib.round(portfolioData.total);
 			helpOrPerformance = this.getPortfolioPerformance(
 				portfolioData,
 				symbol
@@ -199,7 +218,9 @@ const UI = {
 		}%)</small></p>`;
 	},
 	getPortfolioTable: function(populatedHoldings) {
-		const symbol = Lib.getCurrencySymbol(localStorage.getItem('currency'));
+		const symbol = App.Lib.getCurrencySymbol(
+			localStorage.getItem('currency')
+		);
 		let tableRowsHtmlString = '';
 
 		if (populatedHoldings.length) {
@@ -209,9 +230,9 @@ const UI = {
 				const gainOrLoss7Days =
 					holding.percent_change_7d > 0 ? 'gain' : 'loss';
 
-				const price = Lib.round(holding.price);
-				const value = Lib.round(holding.value);
-				const allocation = Lib.round(holding.allocation);
+				const price = App.Lib.round(holding.price);
+				const value = App.Lib.round(holding.value);
+				const allocation = App.Lib.round(holding.allocation);
 
 				tableRowsHtmlString += `
 				<tr>
@@ -295,8 +316,8 @@ const UI = {
 	handleAddPortfolioItemClick: function(populatedHoldings) {
 		$('main').on('click', '.js-add-portfolio-item', function() {
 			$('.portfolio-footer').remove();
-			$('.portfolio-container').append(UI.newItemForm);
-			UI.populateSearchOptions();
+			$('.portfolio-container').append(App.UI.newItemForm);
+			App.UI.populateSearchOptions();
 		});
 	},
 	newItemForm: `
@@ -325,7 +346,9 @@ const UI = {
 	},
 	handleCancelAdditionBtn: function(populatedHoldings) {
 		$('main').on('click', '.cancel-addition-btn', function() {
-			const portfolioFooter = UI.getPortfolioFooter(populatedHoldings);
+			const portfolioFooter = App.UI.getPortfolioFooter(
+				populatedHoldings
+			);
 
 			$('.js-add-coin-form, .portfolio-footer').remove();
 			$('.portfolio-container').append(portfolioFooter);
@@ -337,7 +360,7 @@ const UI = {
 			const inputAmount = $('.coin-amount').val();
 			const inputCoin = $('.coin-search').val();
 
-			UI.validateInput(inputCoin)
+			App.UI.validateInput(inputCoin)
 				.then(isValid => {
 					const coinElements = inputCoin.split('(');
 					const newHolding = {
@@ -346,13 +369,13 @@ const UI = {
 						amount: parseFloat(inputAmount, 10)
 					};
 
-					return Holdings.add(newHolding);
+					return App.Holdings.add(newHolding);
 				})
 				.then(holding => {
-					UI.renderPortfolio();
+					App.UI.renderPortfolio();
 				})
 				.catch(err => {
-					UI.renderSearchHelpMsg(err);
+					App.UI.renderSearchHelpMsg(err);
 				});
 		});
 	},
@@ -372,14 +395,14 @@ const UI = {
 	},
 	handleEditPortfolioModal: function() {
 		$('main').on('click', '.js-edit-portfolio', function() {
-			Holdings.get()
+			App.Holdings.get()
 				.then(data => {
-					return UI.getEditPortfolioForm(data.holdings);
+					return App.UI.getEditPortfolioForm(data.holdings);
 				})
 				.then(editPortfolioForm => {
 					$('.edit-holdings-modal').attr('hidden', false);
 					$('.js-edit-form-container').html(editPortfolioForm);
-					UI.handleEditPortfolioSubmit();
+					App.UI.handleEditPortfolioSubmit();
 				});
 		});
 	},
@@ -424,14 +447,14 @@ const UI = {
 
 			const updates = submittedValues.map(item => {
 				if (item.amount === 0) {
-					return Holdings.delete(item.id);
+					return App.Holdings.delete(item.id);
 				}
-				return Holdings.update(item);
+				return App.Holdings.update(item);
 			});
 
 			Promise.all(updates)
 				.then(values => {
-					UI.renderPortfolio();
+					App.UI.renderPortfolio();
 					$('.modal').attr('hidden', true);
 				})
 				.catch(err => console.error(err));
@@ -441,9 +464,9 @@ const UI = {
 		$('body').on('click', '.delete-holding', function(event) {
 			const id = $(this).data('coin');
 
-			Holdings.delete(id)
+			App.Holdings.delete(id)
 				.then(() => {
-					UI.renderPortfolio();
+					App.UI.renderPortfolio();
 					$('.modal').attr('hidden', true);
 				})
 				.catch(err => console.error(err));
@@ -453,7 +476,7 @@ const UI = {
 		$('main').on('click', '.js-edit-currency', function() {
 			$('.currency-select').val(localStorage.getItem('currency'));
 			$('.edit-currency-modal').attr('hidden', false);
-			UI.handleEditCurrencySubmit();
+			App.UI.handleEditCurrencySubmit();
 		});
 	},
 	handleEditCurrencySubmit: function() {
@@ -462,10 +485,10 @@ const UI = {
 			const currency = $('.currency-select').val();
 			localStorage.setItem('currency', currency);
 
-			getTickerData(currency)
+			App.getTickerData(currency)
 				.then(data => {
 					tickerData = data;
-					UI.renderPortfolio();
+					App.UI.renderPortfolio();
 					$('.modal').attr('hidden', true);
 				})
 				.catch(err => console.error(err));
@@ -476,7 +499,7 @@ const UI = {
 			const $header = $(this);
 			const sortParameter = $header.data('sort');
 
-			UI.sortTable(sortParameter, $header);
+			App.UI.sortTable(sortParameter, $header);
 		});
 	},
 	sortTable: function(param, $header) {
@@ -495,12 +518,12 @@ const UI = {
 				shouldSwitch = false;
 				let x = rows[i].getElementsByTagName('td')[param];
 				let y = rows[i + 1].getElementsByTagName('td')[param];
-				let xValue = Lib.formatForSort(
+				let xValue = App.Lib.formatForSort(
 					x.firstElementChild
 						? x.firstElementChild.textContent
 						: x.textContent
 				);
-				let yValue = Lib.formatForSort(
+				let yValue = App.Lib.formatForSort(
 					y.firstElementChild
 						? y.firstElementChild.textContent
 						: y.textContent

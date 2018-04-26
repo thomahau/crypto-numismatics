@@ -1,5 +1,5 @@
 'use strict';
-const Lib = {
+App.Lib = {
 	round: function(value, decimals = 2) {
 		// rounds input to selected number of decimals and applies a comma thousands-separator
 		return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals)

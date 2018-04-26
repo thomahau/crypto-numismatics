@@ -1,6 +1,6 @@
 'use strict';
-const PieChart = {
-	render: function(holdings) {
+App.Vendor = {
+	renderPieChart: function(holdings) {
 		const sortedHoldings = holdings.sort((a, b) => {
 			return b.allocation - a.allocation;
 		});
@@ -32,7 +32,7 @@ const PieChart = {
 							return (
 								data.labels[tooltipItem.index] +
 								': ' +
-								Lib.round(
+								App.Lib.round(
 									data.datasets[tooltipItem.datasetIndex]
 										.data[tooltipItem.index]
 								) +
