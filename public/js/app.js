@@ -14,8 +14,8 @@ const App = {
 			App.getTickerData(currency)
 				.then(data => {
 					tickerData = data;
-					App.UI.renderPortfolio();
 					App.UI.handleSettingsDropdown();
+					App.UI.renderPortfolio();
 					App.handleLogout();
 				})
 				.catch(err => console.error(err));
@@ -48,6 +48,7 @@ const App = {
 					$(
 						'#register-username, #register-password, #register-password-confirm'
 					).val('');
+					localStorage.setItem('currency', 'USD');
 					App.UI.handleSignupSuccess(user.username);
 				})
 				.catch(err => {

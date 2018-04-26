@@ -173,20 +173,16 @@ App.UI = {
 
 		return `
 		<div class="row darkest">
-			<ul class="nav-list portfolio-header">
-				<li class="u-pull-right">
-					<div class="dropdown">
-						<a class="portfolio-link portfolio-settings js-drop-btn">
-							<i class="fas fa-cog"></i><span> Settings</span>
-						</a>
-						<div class="dropdown-content">
-							<a class="js-edit-portfolio">Edit holdings</a>
-							<a class="js-add-portfolio-item">Add holding</a>
-							<a class="js-edit-currency">Edit currency</a>
-						</div>
-					</div>
-				</li>
-			</ul>
+			<div class="portfolio-header dropdown u-pull-right">
+				<a class="portfolio-link portfolio-settings js-drop-btn">
+					<i class="fas fa-cog"></i><span> Settings</span>
+				</a>
+				<div class="dropdown-content">
+					<a class="js-edit-portfolio">Edit holdings</a>
+					<a class="js-add-portfolio-item">Add holding</a>
+					<a class="js-edit-currency">Edit currency</a>
+				</div>
+			</div>
 		</div>
 		<div class="row darker portfolio-overview">
 			<div class="three columns text-left">
@@ -236,9 +232,7 @@ App.UI = {
 
 				tableRowsHtmlString += `
 				<tr>
-				<td data-label="&nbsp;&nbsp;&nbsp;&nbsp;Coin"><span class="leftmost-cell">${
-					holding.name
-				}</span></td>
+				<td data-label="Coin">${holding.name}</td>
 				<td data-label="Price">${symbol}${price}</td>
 				<td class="${gainOrLoss24Hrs}" data-label="24 hrs">${
 					holding.percent_change_24h
@@ -249,7 +243,7 @@ App.UI = {
 				<td data-label="Amount">${holding.amount}</td>
 				<td data-label="Value">${symbol}${value}</td>
 				<td data-label="Allocation">${allocation}%</td>
-				<td data-label="Delete"><a class="portfolio-link delete-holding rightmost-cell" data-coin="${
+				<td data-label="Delete"><a class="portfolio-link delete-holding" data-coin="${
 					holding.id
 				}">x</a></td>
 				</tr>`;
@@ -261,25 +255,25 @@ App.UI = {
 		  <thead class="darkest">
 		    <tr>
 		      <th>
-		      	<a class="sortable-header leftmost-cell" data-sort="0">Name</a>
+		      	<a class="js-sortable-header" data-sort="0">Name</a>
 		      </th>
 		      <th>
-		      	<a class="sortable-header" data-sort="1">Price</a>
+		      	<a class="js-sortable-header" data-sort="1">Price</a>
 		      </th>
 		      <th>
-		      	<a class="sortable-header" data-sort="2">24 hrs</a>
+		      	<a class="js-sortable-header" data-sort="2">24 hrs</a>
 		      </th>
 		      <th>
-		      	<a class="sortable-header" data-sort="3">7 days</a>
+		      	<a class="js-sortable-header" data-sort="3">7 days</a>
 		      </th>
 		      <th>
-		      	<a class="sortable-header" data-sort="4">Amount</a>
+		      	<a class="js-sortable-header" data-sort="4">Amount</a>
 		      </th>
 		      <th>
-		      	<a class="sortable-header" data-sort="5">Value</a>
+		      	<a class="js-sortable-header" data-sort="5">Value</a>
 		      </th>
 		      <th>
-		      	<a class="sortable-header" data-sort="6">Allocation</a>
+		      	<a class="js-sortable-header" data-sort="6">Allocation</a>
 		      </th>
 		      <th></th>
 		    </tr>
@@ -495,7 +489,7 @@ App.UI = {
 		});
 	},
 	handleTableSorting: function() {
-		$('main').on('click', '.sortable-header', function(event) {
+		$('main').on('click', '.js-sortable-header', function(event) {
 			const $header = $(this);
 			const sortParameter = $header.data('sort');
 
