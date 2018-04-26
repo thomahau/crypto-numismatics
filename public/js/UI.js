@@ -145,6 +145,7 @@ App.UI = {
 				this.handleDeletePortfolioItem();
 				this.handleEditCurrencyModal();
 				this.handleTableSorting();
+				this.handleTableViewSelection();
 			});
 	},
 	getPortfolioHeader: function(populatedHoldings) {
@@ -237,13 +238,13 @@ App.UI = {
 				<td class="${gainOrLoss24Hrs}" data-label="24 hrs">${
 					holding.percent_change_24h
 				}%</td>
-				<td class="${gainOrLoss7Days}" data-label="7 days">${
+				<td class="${gainOrLoss7Days} toggleable-view hidden" data-label="7 days">${
 					holding.percent_change_7d
 				}%</td>
-				<td data-label="Amount">${holding.amount}</td>
-				<td data-label="Value">${symbol}${value}</td>
-				<td data-label="Allocation">${allocation}%</td>
-				<td data-label="Delete"><a class="portfolio-link delete-holding" data-coin="${
+				<td data-label="Amount" class="toggleable-view hidden">${holding.amount}</td>
+				<td data-label="Value" class="toggleable-view hidden">${symbol}${value}</td>
+				<td data-label="Allocation" class="toggleable-view hidden">${allocation}%</td>
+				<td data-label="Delete" class="toggleable-view hidden"><a class="portfolio-link delete-holding" data-coin="${
 					holding.id
 				}">x</a></td>
 				</tr>`;
@@ -251,31 +252,21 @@ App.UI = {
 		}
 
 		return `
+		<div class="row darkest">
+			<a class="button table-view-btn toggled" role="button">simple view</a>
+			<a class="button table-view-btn" role="button">detailed view</a>
+		</div>
 		<table class="u-full-width">
 		  <thead class="darkest">
 		    <tr>
-		      <th>
-		      	<a class="js-sortable-header" data-sort="0">Name</a>
-		      </th>
-		      <th>
-		      	<a class="js-sortable-header" data-sort="1">Price</a>
-		      </th>
-		      <th>
-		      	<a class="js-sortable-header" data-sort="2">24 hrs</a>
-		      </th>
-		      <th>
-		      	<a class="js-sortable-header" data-sort="3">7 days</a>
-		      </th>
-		      <th>
-		      	<a class="js-sortable-header" data-sort="4">Amount</a>
-		      </th>
-		      <th>
-		      	<a class="js-sortable-header" data-sort="5">Value</a>
-		      </th>
-		      <th>
-		      	<a class="js-sortable-header" data-sort="6">Allocation</a>
-		      </th>
-		      <th></th>
+		      <th><a class="js-sortable-header" data-sort="0">Name</a></th>
+		      <th><a class="js-sortable-header" data-sort="1">Price</a></th>
+		      <th><a class="js-sortable-header" data-sort="2">24 hrs</a></th>
+		      <th class="toggleable-view hidden"><a class="js-sortable-header" data-sort="3">7 days</a></th>
+		      <th class="toggleable-view hidden"><a class="js-sortable-header" data-sort="4">Amount</a></th>
+		      <th class="toggleable-view hidden"><a class="js-sortable-header" data-sort="5">Value</a></th>
+		      <th class="toggleable-view hidden"><a class="js-sortable-header" data-sort="6">Allocation</a></th>
+		      <th class="toggleable-view hidden"></th>
 		    </tr>
 		  </thead>
 		  <tbody class="darker">
@@ -558,5 +549,24 @@ App.UI = {
 		<span class="direction-icon">
 			<i class="fas fa-caret-${stub}"></i>
 		</span>`;
+	},
+	handleTableViewSelection: function() {
+		$('main').on('click', '.table-view-btn', function(event) {
+			if (!$(this).hasClass('toggled')) {
+				const viewType = $(this)
+					.html()
+					.split(' ')[0];
+				$('.table-view-btn').toggleClass('toggled');
+				if (viewType === 'detailed') {
+					$('.toggleable-view').removeClass('hidden');
+					$('thead').addClass('hidden');
+					$('tr, td').addClass('detailed');
+				} else if (viewType === 'simple') {
+					$('.toggleable-view').addClass('hidden');
+					$('thead').removeClass('hidden');
+					$('tr, td').removeClass('detailed');
+				}
+			}
+		});
 	}
 };

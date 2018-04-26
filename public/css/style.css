@@ -17,7 +17,7 @@
 
 @media only screen and (min-width: 400px) {
   .container {
-    width: 85%;
+    width: 80%;
     padding: 0;
   }
 }
@@ -153,8 +153,7 @@ form {
   }
 
   .header-container {
-    padding-left: 0;
-    padding-right: 0;
+    width: 100%;
   }
 
   .portfolio-container,
@@ -162,8 +161,18 @@ form {
     width: 100%;
   }
 
+  .chart-container {
+    max-width: 70%;
+    margin-left: 15%;
+  }
+
   .nav-text {
     display: none;
+  }
+
+  .coin-search,
+  .coin-amount {
+    width: 100%;
   }
 }
 
@@ -292,7 +301,7 @@ input[type='submit'].button-primary:focus {
   border-color: #1eaedb;
 }
 
-main .button {
+.portfolio-footer .button {
   color: white;
 }
 
@@ -383,42 +392,53 @@ td:last-child {
   text-align: left;
 }
 
+.table-view-btn {
+  display: none;
+}
+
+.toggled {
+  color: white;
+}
+
 @media only screen and (max-width: 640px) {
-  thead {
-    border: none;
-    clip: rect(0 0 0 0);
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
-    position: absolute;
-    width: 1px;
+  .portfolio-footer .cancel-addition-btn,
+  .portfolio-footer .button-primary,
+  .table-view-btn {
+    width: 49%;
+    display: inline-block;
   }
 
-  tr {
-    border-bottom: 3px solid #ddd;
+  .hidden {
+    display: none;
+  }
+
+  .detailed tr {
     display: block;
   }
 
-  td {
+  .detailed td {
     border-bottom: 1px solid #ddd;
     display: block;
-    text-align: right;
     clear: both;
   }
 
-  td:first-child {
+  .detailed td:first-child {
     text-align: right;
   }
 
-  td:last-child {
+  .detailed td:last-child {
     text-align: right;
     padding-right: 10px;
+    border-bottom: 3px solid #ddd;
   }
 
-  td::before {
+  .detailed td::before {
     content: attr(data-label);
     float: left;
+  }
+
+  .large-text {
+    margin-bottom: 10px;
   }
 }
 

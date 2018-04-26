@@ -52,10 +52,10 @@ App.Vendor = {
 	},
 	colors: [
 		'#4D4D4D',
-		'#5DA5DA',
 		'#FAA43A',
-		'#60BD68',
+		'#5DA5DA',
 		'#F17CB0',
+		'#60BD68',
 		'#B2912F',
 		'#B276B2',
 		'#DECF3F',
