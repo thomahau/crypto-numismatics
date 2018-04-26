@@ -1,18 +1,7 @@
 'use strict';
-const COINMARKETCAP_ENDPOINT = 'https://api.coinmarketcap.com/v1/';
-let tickerData;
+const COINMARKETCAP_URI = 'https://api.coinmarketcap.com/v1/';
 let availableCoins;
-let globalPortfolioValue = 0;
-
-function populateSearchOptions() {
-	availableCoins = tickerData.map(tickerObj => {
-		return `${tickerObj.name} (${tickerObj.symbol})`;
-	});
-
-	$('.coin-search').autocomplete({
-		source: availableCoins
-	});
-}
+let tickerData;
 
 function checkIfLoggedIn() {
 	if (localStorage.getItem('token') && localStorage.getItem('username')) {
@@ -30,18 +19,6 @@ function checkIfLoggedIn() {
 	} else {
 		$('.welcome-container, .stats-wrapper').attr('hidden', false);
 	}
-}
-
-function getTickerData(currency) {
-	// returns current ticker data for all cryptocurrencies tracked by coinmarketcap.com
-	const url = COINMARKETCAP_ENDPOINT + `ticker/?limit=0&convert=${currency}`;
-
-	return fetch(url).then(res => {
-		if (res.ok) {
-			return res.json();
-		}
-		throw new Error('Network response was not ok.');
-	});
 }
 
 function handleSignup() {
@@ -65,15 +42,10 @@ function handleSignup() {
 }
 
 function register(credentials) {
+	const init = getFetchInit(credentials);
 	let res;
 
-	return fetch('users', {
-		method: 'POST',
-		body: JSON.stringify(credentials),
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	})
+	return fetch('users', init)
 		.then(_res => {
 			res = _res;
 			return res.json();
@@ -130,13 +102,8 @@ function handleLogin() {
 }
 
 function login(credentials) {
-	return fetch('auth/login', {
-		method: 'POST',
-		body: JSON.stringify(credentials),
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	}).then(res => {
+	const init = getFetchInit(credentials);
+	return fetch('auth/login', init).then(res => {
 		if (res.ok) {
 			return res.json();
 		}
@@ -152,94 +119,26 @@ function handleLogout() {
 	});
 }
 
-function round(value, decimals = 2) {
-	//TODO: lib ?
-	return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals)
-		.toFixed(decimals)
-		.toString()
-		.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+function getFetchInit(data) {
+	return {
+		method: 'POST',
+		body: JSON.stringify(data),
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	};
 }
 
-function handleTableSorting() {
-	$('main').on('click', '.sortable-header', function(event) {
-		const $header = $(this);
-		const sortParameter = $header.data('sort');
+function getTickerData(currency) {
+	// returns current ticker data for all cryptocurrencies tracked by coinmarketcap.com
+	const url = COINMARKETCAP_URI + `ticker/?limit=0&convert=${currency}`;
 
-		sortTable(sortParameter, $header);
+	return fetch(url).then(res => {
+		if (res.ok) {
+			return res.json();
+		}
+		throw new Error('Network response was not ok.');
 	});
-}
-
-function sortTable(param, $header) {
-	const $table = $('table');
-	let switching = true,
-		switchcount = 0,
-		dir = 'desc',
-		shouldSwitch;
-
-	while (switching) {
-		let rows = $table.find('tr');
-		let i;
-		switching = false;
-
-		for (i = 1; i < rows.length - 1; i++) {
-			shouldSwitch = false;
-			let x = rows[i].getElementsByTagName('td')[param];
-			let y = rows[i + 1].getElementsByTagName('td')[param];
-			let xValue = formatForSort(
-				x.firstElementChild
-					? x.firstElementChild.textContent
-					: x.textContent
-			);
-			let yValue = formatForSort(
-				y.firstElementChild
-					? y.firstElementChild.textContent
-					: y.textContent
-			);
-
-			if (dir === 'desc') {
-				if (xValue < yValue) {
-					shouldSwitch = true;
-					break;
-				}
-			} else if (dir === 'asc') {
-				if (xValue > yValue) {
-					shouldSwitch = true;
-					break;
-				}
-			}
-		}
-
-		if (shouldSwitch) {
-			const directionIcon = getDirectionIcon(dir);
-
-			$('.direction-icon').remove();
-			$header.append(directionIcon);
-			rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-			switching = true;
-			switchcount++;
-		} else {
-			if (switchcount === 0 && dir === 'desc') {
-				dir = 'asc';
-				switching = true;
-			}
-		}
-	}
-}
-
-function formatForSort(s) {
-	// make sure we have clean values to compare in sort function
-	if (/^-?\$?\d*,?\d*\.?\d+%?$/.test(s)) {
-		return parseFloat(s.replace(/[\$€£,]/g, ''), 10);
-	}
-	return s.toLowerCase();
-}
-
-function getDirectionIcon(direction) {
-	const stub = direction === 'desc' ? 'down' : 'up';
-	return `
-	<span class="direction-icon">
-		<i class="fas fa-caret-${stub}"></i>
-	</span>`;
 }
 
 $(function() {

@@ -1,9 +1,9 @@
 'use strict';
-const HOLDINGS_URL = 'holdings';
+const HOLDINGS_URI = 'holdings';
 
 const Holdings = {
 	get: function() {
-		return fetch(HOLDINGS_URL, {
+		return fetch(HOLDINGS_URI, {
 			headers: _getAuthHeaders()
 		}).then(res => {
 			if (res.ok) {
@@ -12,7 +12,7 @@ const Holdings = {
 		});
 	},
 	add: function(data) {
-		return fetch(HOLDINGS_URL, {
+		return fetch(HOLDINGS_URI, {
 			method: 'POST',
 			headers: _getAuthHeaders(),
 			body: JSON.stringify(data)
@@ -23,7 +23,7 @@ const Holdings = {
 		});
 	},
 	update: function(data) {
-		return fetch(`${HOLDINGS_URL}/${data.id}`, {
+		return fetch(`${HOLDINGS_URI}/${data.id}`, {
 			method: 'PUT',
 			headers: _getAuthHeaders(),
 			body: JSON.stringify(data)
@@ -34,7 +34,7 @@ const Holdings = {
 		});
 	},
 	delete: function(id) {
-		return fetch(`${HOLDINGS_URL}/${id}`, {
+		return fetch(`${HOLDINGS_URI}/${id}`, {
 			method: 'DELETE',
 			headers: _getAuthHeaders()
 		}).then(res => {
@@ -86,14 +86,13 @@ const Holdings = {
 		const change7DaysPct = 100 * (total / total7DaysAgo - 1);
 		const totalBTC = _getBTCValue(total);
 
-		globalPortfolioValue = total;
 		return {
 			total: total,
-			totalBTC: round(totalBTC, 3),
-			change24Hrs: round(change24Hrs),
-			change24HrsPct: round(change24HrsPct),
-			change7Days: round(change7Days),
-			change7DaysPct: round(change7DaysPct)
+			totalBTC: Lib.round(totalBTC, 3),
+			change24Hrs: Lib.round(change24Hrs),
+			change24HrsPct: Lib.round(change24HrsPct),
+			change7Days: Lib.round(change7Days),
+			change7DaysPct: Lib.round(change7DaysPct)
 		};
 	}
 };

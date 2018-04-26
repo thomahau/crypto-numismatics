@@ -47,7 +47,7 @@ const PieChart = {
 							return (
 								data.labels[tooltipItem.index] +
 								': ' +
-								round(
+								Lib.round(
 									data.datasets[tooltipItem.datasetIndex]
 										.data[tooltipItem.index]
 								) +

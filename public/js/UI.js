@@ -74,7 +74,6 @@ const UI = {
 			'hidden',
 			true
 		);
-		// .empty();
 
 		Holdings.get()
 			.then(data => {
@@ -110,7 +109,7 @@ const UI = {
 				this.handleCancelAdditionBtn(populatedHoldings);
 				this.handleDeletePortfolioItem();
 				this.handleEditCurrency();
-				handleTableSorting();
+				this.handleTableSorting();
 			});
 	},
 	handleAddPortfolioItemClick: function(populatedHoldings) {
@@ -119,7 +118,16 @@ const UI = {
 
 			$('.portfolio-footer').remove();
 			$('.portfolio-container').append(newItemForm);
-			populateSearchOptions();
+			UI.populateSearchOptions();
+		});
+	},
+	populateSearchOptions: function() {
+		availableCoins = tickerData.map(tickerObj => {
+			return `${tickerObj.name} (${tickerObj.symbol})`;
+		});
+
+		$('.coin-search').autocomplete({
+			source: availableCoins
 		});
 	},
 	handleCancelAdditionBtn: function(populatedHoldings) {
@@ -144,6 +152,7 @@ const UI = {
 						name: coinElements[0].slice(0, -1),
 						amount: parseFloat(inputAmount, 10)
 					};
+
 					return Holdings.add(newHolding);
 				})
 				.then(holding => {
@@ -229,6 +238,70 @@ const UI = {
 				})
 				.catch(err => console.error(err));
 		});
+	},
+	handleTableSorting: function() {
+		$('main').on('click', '.sortable-header', function(event) {
+			const $header = $(this);
+			const sortParameter = $header.data('sort');
+
+			UI.sortTable(sortParameter, $header);
+		});
+	},
+	sortTable: function(param, $header) {
+		const $table = $('table');
+		let switching = true,
+			switchcount = 0,
+			dir = 'desc',
+			shouldSwitch;
+
+		while (switching) {
+			let rows = $table.find('tr');
+			let i;
+			switching = false;
+
+			for (i = 1; i < rows.length - 1; i++) {
+				shouldSwitch = false;
+				let x = rows[i].getElementsByTagName('td')[param];
+				let y = rows[i + 1].getElementsByTagName('td')[param];
+				let xValue = Lib.formatForSort(
+					x.firstElementChild
+						? x.firstElementChild.textContent
+						: x.textContent
+				);
+				let yValue = Lib.formatForSort(
+					y.firstElementChild
+						? y.firstElementChild.textContent
+						: y.textContent
+				);
+
+				if (dir === 'desc') {
+					if (xValue < yValue) {
+						shouldSwitch = true;
+						break;
+					}
+				} else if (dir === 'asc') {
+					if (xValue > yValue) {
+						shouldSwitch = true;
+						break;
+					}
+				}
+			}
+
+			if (shouldSwitch) {
+				const directionIcon = _getDirectionIcon(dir);
+
+				$('.direction-icon').remove();
+				$header.append(directionIcon);
+				rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+				switching = true;
+				switchcount++;
+			} else {
+				if (switchcount === 0 && dir === 'desc') {
+					dir = 'asc';
+					switching = true;
+				}
+			}
+		}
 	}
 };
 
@@ -271,7 +344,7 @@ function _getNewItemForm() {
 }
 
 function _getPortfolioHeader(populatedHoldings) {
-	const symbol = _getCurrencySymbol();
+	const symbol = Lib.getCurrencySymbol(localStorage.getItem('currency'));
 	let helpOrPerformance = '<p>Your portfolio is currently empty.</p>';
 	let portfolioData = {
 		total: 0,
@@ -284,7 +357,7 @@ function _getPortfolioHeader(populatedHoldings) {
 			holding =>
 				(holding.allocation = 100 / portfolioData.total * holding.value)
 		);
-		portfolioData.total = round(portfolioData.total);
+		portfolioData.total = Lib.round(portfolioData.total);
 		helpOrPerformance = _getPortfolioPerformance(portfolioData, symbol);
 	}
 
@@ -292,11 +365,6 @@ function _getPortfolioHeader(populatedHoldings) {
 		<div class="row darkest">
 			<ul class="nav-list portfolio-header">
 				<li class="u-pull-right">
-					<a class="portfolio-link share-portfolio disabled">
-						<i class="fas fa-share-square"></i><span> Share</span>
-					</a>
-				</li>
-				<li class="u-pull-right li-space">
 					<div class="dropdown">
 						<a class="portfolio-link portfolio-settings js-drop-btn">
 							<i class="fas fa-cog"></i><span> Settings</span>
@@ -342,7 +410,7 @@ function _getPortfolioPerformance(data, symbol) {
 }
 
 function _getPortfolioTable(populatedHoldings) {
-	const symbol = _getCurrencySymbol();
+	const symbol = Lib.getCurrencySymbol(localStorage.getItem('currency'));
 	let tableRowsHtmlString = '';
 
 	if (populatedHoldings.length) {
@@ -352,9 +420,9 @@ function _getPortfolioTable(populatedHoldings) {
 			const gainOrLoss7Days =
 				holding.percent_change_7d > 0 ? 'gain' : 'loss';
 
-			const price = round(holding.price);
-			const value = round(holding.value);
-			const allocation = round(holding.allocation);
+			const price = Lib.round(holding.price);
+			const value = Lib.round(holding.value);
+			const allocation = Lib.round(holding.allocation);
 
 			tableRowsHtmlString += `
 		<tr>
@@ -416,7 +484,7 @@ function _getPortfolioFooter(populatedHoldings) {
 	if (!populatedHoldings.length) {
 		return `
 		<div class="row portfolio-footer darkest">
-			<button class="button-primary u-pull-left js-add-portfolio-item start-btn">Get started</button>
+			<button class="button-primary u-pull-left js-add-portfolio-item start-btn">Add your first coin</button>
 		</div>`;
 	}
 
@@ -464,31 +532,25 @@ function _getEditPortfolioForm(holdings) {
 	</div>`;
 }
 
-function _getCurrencySymbol() {
-	const currency = localStorage.getItem('currency');
-
-	if (currency === 'USD') {
-		return '$';
-	} else if (currency === 'EUR') {
-		return '€';
-	} else if (currency === 'GBP') {
-		return '£';
-	}
-}
-
 function _validateInput(input) {
 	return new Promise((resolve, reject) => {
 		let validInput = false;
 		for (let i = 0; i < availableCoins.length && !validInput; i++) {
 			if (input === availableCoins[i]) {
 				validInput = true;
-				$('.search-help')
-					.attr('hidden', true)
-					.empty();
+				$('.search-help').attr('hidden', true);
 				$('.coin-amount, .coin-search').val('');
 				return resolve(validInput);
 			}
 		}
-		setTimeout(() => reject('Invalid input'), 250);
+		setTimeout(() => reject('Invalid input'), 200);
 	});
+}
+
+function _getDirectionIcon(direction) {
+	const stub = direction === 'desc' ? 'down' : 'up';
+	return `
+	<span class="direction-icon">
+		<i class="fas fa-caret-${stub}"></i>
+	</span>`;
 }
