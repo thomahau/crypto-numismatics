@@ -2,9 +2,13 @@
 const HOLDINGS_URI = 'holdings';
 
 const Holdings = {
+	authHeaders: {
+		'Content-Type': 'application/json',
+		Authorization: `Bearer ${localStorage.getItem('token')}`
+	},
 	get: function() {
 		return fetch(HOLDINGS_URI, {
-			headers: _getAuthHeaders()
+			headers: this.authHeaders
 		}).then(res => {
 			if (res.ok) {
 				return res.json();
@@ -14,7 +18,7 @@ const Holdings = {
 	add: function(data) {
 		return fetch(HOLDINGS_URI, {
 			method: 'POST',
-			headers: _getAuthHeaders(),
+			headers: this.authHeaders,
 			body: JSON.stringify(data)
 		}).then(res => {
 			if (res.ok) {
@@ -25,7 +29,7 @@ const Holdings = {
 	update: function(data) {
 		return fetch(`${HOLDINGS_URI}/${data.id}`, {
 			method: 'PUT',
-			headers: _getAuthHeaders(),
+			headers: this.authHeaders,
 			body: JSON.stringify(data)
 		}).then(res => {
 			if (res.ok) {
@@ -36,7 +40,7 @@ const Holdings = {
 	delete: function(id) {
 		return fetch(`${HOLDINGS_URI}/${id}`, {
 			method: 'DELETE',
-			headers: _getAuthHeaders()
+			headers: this.authHeaders
 		}).then(res => {
 			if (res.ok) {
 				return;
@@ -72,19 +76,21 @@ const Holdings = {
 		}, 0);
 		const total24HrsAgo = populatedHoldings.reduce((sum, holding) => {
 			return (
-				sum + _getPastValue(holding.value, holding.percent_change_24h)
+				sum +
+				this.getPastValue(holding.value, holding.percent_change_24h)
 			);
 		}, 0);
 		const change24Hrs = total - total24HrsAgo;
 		const change24HrsPct = 100 * (total / total24HrsAgo - 1);
 		const total7DaysAgo = populatedHoldings.reduce((sum, holding) => {
 			return (
-				sum + _getPastValue(holding.value, holding.percent_change_7d)
+				sum +
+				this.getPastValue(holding.value, holding.percent_change_7d)
 			);
 		}, 0);
 		const change7Days = total - total7DaysAgo;
 		const change7DaysPct = 100 * (total / total7DaysAgo - 1);
-		const totalBTC = _getBTCValue(total);
+		const totalBTC = this.getBTCValue(total);
 
 		return {
 			total: total,
@@ -94,24 +100,14 @@ const Holdings = {
 			change7Days: Lib.round(change7Days),
 			change7DaysPct: Lib.round(change7DaysPct)
 		};
+	},
+	getPastValue: function(value, pctChange) {
+		return value / (1 + pctChange / 100);
+	},
+	getBTCValue: function(value) {
+		const currency = localStorage.getItem('currency').toLowerCase();
+		const btcObj = tickerData.find(element => element.symbol === 'BTC');
+
+		return value / btcObj[`price_${currency}`];
 	}
 };
-
-function _getAuthHeaders() {
-	const token = localStorage.getItem('token');
-	return {
-		'Content-Type': 'application/json',
-		Authorization: `Bearer ${token}`
-	};
-}
-
-function _getPastValue(value, pctChange) {
-	return value / (1 + pctChange / 100);
-}
-
-function _getBTCValue(value) {
-	const currency = localStorage.getItem('currency').toLowerCase();
-	const btcObj = tickerData.find(element => element.symbol === 'BTC');
-
-	return value / btcObj[`price_${currency}`];
-}

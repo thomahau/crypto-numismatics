@@ -1,19 +1,4 @@
 'use strict';
-const COLORS = [
-	'#4D4D4D',
-	'#5DA5DA',
-	'#FAA43A',
-	'#60BD68',
-	'#F17CB0',
-	'#B2912F',
-	'#B276B2',
-	'#DECF3F',
-	'#F15854',
-	'#072A49',
-	'#108A9F',
-	'#431833'
-];
-
 const PieChart = {
 	render: function(holdings) {
 		const sortedHoldings = holdings.sort((a, b) => {
@@ -23,12 +8,12 @@ const PieChart = {
 		const chart = new Chart(ctx, {
 			type: 'pie',
 			data: {
-				labels: _getChartLabels(sortedHoldings),
+				labels: this.getChartLabels(sortedHoldings),
 				datasets: [
 					{
 						label: 'Holdings',
-						data: _getChartData(sortedHoldings),
-						backgroundColor: COLORS,
+						data: this.getChartData(sortedHoldings),
+						backgroundColor: this.colors,
 						borderColor: '#fff',
 						borderWidth: 1
 					}
@@ -58,13 +43,25 @@ const PieChart = {
 				}
 			}
 		});
-	}
+	},
+	getChartLabels: function(sortedHoldings) {
+		return sortedHoldings.map(holding => holding.name);
+	},
+	getChartData: function(sortedHoldings) {
+		return sortedHoldings.map(holding => holding.allocation);
+	},
+	colors: [
+		'#4D4D4D',
+		'#5DA5DA',
+		'#FAA43A',
+		'#60BD68',
+		'#F17CB0',
+		'#B2912F',
+		'#B276B2',
+		'#DECF3F',
+		'#F15854',
+		'#072A49',
+		'#108A9F',
+		'#431833'
+	]
 };
-
-function _getChartLabels(sortedHoldings) {
-	return sortedHoldings.map(holding => holding.name);
-}
-
-function _getChartData(sortedHoldings) {
-	return sortedHoldings.map(holding => holding.allocation);
-}
