@@ -7,7 +7,7 @@ const App = {
 	checkIfLoggedIn: function() {
 		if (localStorage.getItem('token') && localStorage.getItem('username')) {
 			const username = localStorage.getItem('username');
-			const currency = localStorage.getItem('currency') || 'USD';
+			const currency = localStorage.getItem('currency');
 
 			App.UI.renderLoggedInNav(username);
 
@@ -48,6 +48,7 @@ const App = {
 					$(
 						'#register-username, #register-password, #register-password-confirm'
 					).val('');
+					localStorage.setItem('currency', 'USD');
 					App.UI.handleSignupSuccess(user.username);
 				})
 				.catch(err => {
@@ -83,6 +84,9 @@ const App = {
 				.then(data => {
 					localStorage.setItem('username', data.username);
 					localStorage.setItem('token', data.authToken);
+					if (!localStorage.getItem('currency')) {
+						localStorage.setItem('currency', 'USD');
+					}
 
 					$('#login-username, #login-password').val('');
 					$('.modal').attr('hidden', true);
