@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "mocha --exit"
+    "test": "mocha --exit",
+    "postinstall": "gulp default"
   },
   "author": "",
   "license": "ISC",
@@ -14,6 +15,10 @@
     "body-parser": "^1.18.2",
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
+    "gulp": "^3.9.1",
+    "gulp-clean-css": "^3.9.3",
+    "gulp-concat": "^2.6.1",
+    "gulp-uglify-es": "^1.0.1",
     "jsonwebtoken": "^8.2.1",
     "mongoose": "^5.0.13",
     "morgan": "^1.9.0",
@@ -24,10 +29,6 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-http": "^4.0.0",
-    "gulp": "^3.9.1",
-    "gulp-clean-css": "^3.9.3",
-    "gulp-concat": "^2.6.1",
-    "gulp-uglify-es": "^1.0.1",
     "mocha": "^5.0.5"
   }
 }
