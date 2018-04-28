@@ -14,6 +14,7 @@ App.UI = {
 		this.handleRegisterModal();
 		this.handleLoginModal();
 		this.handleEditPortfolioModal();
+		this.handleKeyboardUse();
 	},
 	handleRegisterModal: function() {
 		$('.js-register').click(function() {
@@ -23,6 +24,22 @@ App.UI = {
 	handleLoginModal: function() {
 		$('.js-login').click(function() {
 			$('.js-login-modal').attr('hidden', false);
+		});
+	},
+	handleKeyboardUse: function() {
+		$('body').keyup(function(event) {
+			if (event.keyCode === 27) {
+				$('.modal').attr('hidden', true);
+				$('.dropdown-content').removeClass('show');
+			}
+		});
+		$('body').on('keyup', 'a[role="button"]', function(event) {
+			if (event.keyCode === 13 || event.keyCode === 32) {
+				$(this).click();
+				$(this)
+					.find('span')
+					.click();
+			}
 		});
 	},
 	renderStartPage: function() {
@@ -76,12 +93,10 @@ App.UI = {
 	},
 	getNavElements: function(username) {
 		return `
-		<a class="js-logout u-pull-right">
+		<a class="js-logout u-pull-right" role="button" tabindex="3" aria-label="Log out">
 			<i class="fas fa-sign-out-alt"></i><span class="nav-text"> Log out</span>
 		</a>
-		<p class="js-username u-pull-right li-space">
-			${username}
-		</p>`;
+		<p class="js-username u-pull-right li-space">${username}</p>`;
 	},
 	renderSearchHelpMsg: function(err) {
 		$('.search-help')
@@ -175,19 +190,19 @@ App.UI = {
 		return `
 		<div class="row darkest">
 			<div class="portfolio-header dropdown u-pull-right">
-				<a class="portfolio-link portfolio-settings js-drop-btn">
+				<a class="portfolio-link portfolio-settings js-drop-btn" role="button" tabindex="4" aria-haspopup="true" aria-controls="dropdown-content">
 					<i class="fas fa-cog"></i><span> Settings</span>
 				</a>
-				<div class="dropdown-content">
-					<a class="js-edit-portfolio">Edit holdings</a>
-					<a class="js-add-portfolio-item">Add holding</a>
-					<a class="js-edit-currency">Edit currency</a>
+				<div class="dropdown-content" id="dropdown-content" role="menu">
+					<a class="js-edit-portfolio" role="button" tabindex="5">Edit holdings</a>
+					<a class="js-add-portfolio-item" role="button" tabindex="6">Add holding</a>
+					<a class="js-edit-currency" role="button" tabindex="7">Edit currency</a>
 				</div>
 			</div>
 		</div>
 		<div class="row darker portfolio-overview">
 			<div class="three columns text-left">
-				<strong>PORTFOLIO VALUE</strong>
+				PORTFOLIO VALUE
 				<p class="large-text">${symbol}${portfolioData.total} <small>(₿${
 			portfolioData.totalBTC
 		})</small></p>
@@ -205,11 +220,11 @@ App.UI = {
 		const gainOrLoss7Days = data.change7DaysPct > 0 ? 'gain' : 'loss';
 
 		return `
-		<strong>24 HOURS</strong>
+		24 HOURS CHANGE
 		<p class="${gainOrLoss24Hrs} large-text">${symbol}${data.change24Hrs} <small>(${
 			data.change24HrsPct
 		}%)</small></p>
-		<strong>7 DAYS</strong>
+		7 DAYS CHANGE
 		<p class="${gainOrLoss7Days} large-text">${symbol}${data.change7Days} <small>(${
 			data.change7DaysPct
 		}%)</small></p>`;
@@ -233,39 +248,41 @@ App.UI = {
 
 				tableRowsHtmlString += `
 				<tr>
-				<td data-label="Coin">${holding.name}</td>
-				<td data-label="Price">${symbol}${price}</td>
-				<td class="${gainOrLoss24Hrs}" data-label="24 hrs">${
+					<td data-label="Coin">${holding.name}</td>
+					<td data-label="Price">${symbol}${price}</td>
+					<td class="${gainOrLoss24Hrs}" data-label="24 hrs">${
 					holding.percent_change_24h
 				}%</td>
-				<td class="${gainOrLoss7Days} toggleable-view hidden" data-label="7 days">${
+					<td class="${gainOrLoss7Days} toggleable-view hidden" data-label="7 days">${
 					holding.percent_change_7d
 				}%</td>
-				<td data-label="Amount" class="toggleable-view hidden">${holding.amount}</td>
-				<td data-label="Value" class="toggleable-view hidden">${symbol}${value}</td>
-				<td data-label="Allocation" class="toggleable-view hidden">${allocation}%</td>
-				<td data-label="Delete" class="toggleable-view hidden"><a class="portfolio-link delete-holding" data-coin="${
-					holding.id
-				}">x</a></td>
+					<td data-label="Amount" class="toggleable-view hidden">${holding.amount}</td>
+					<td data-label="Value" class="toggleable-view hidden">${symbol}${value}</td>
+					<td data-label="Allocation" class="toggleable-view hidden">${allocation}%</td>
+					<td data-label="Delete" class="toggleable-view hidden">
+						<a class="portfolio-link delete-holding" role="button" tabindex="0" aria-label="delete ${
+							holding.name
+						}" data-coin="${holding.id}">x</a>
+					</td>
 				</tr>`;
 			});
 		}
 
 		return `
 		<div class="row darkest">
-			<a class="button table-view-btn toggled" role="button">simple view</a>
-			<a class="button table-view-btn" role="button">detailed view</a>
+			<a class="button table-view-btn toggled" role="button" tabindex="0">simple view</a>
+			<a class="button table-view-btn" role="button" tabindex="0">detailed view</a>
 		</div>
 		<table class="u-full-width">
 		  <thead class="darkest">
 		    <tr>
-		      <th><a class="js-sortable-header" data-sort="0">Name</a></th>
-		      <th><a class="js-sortable-header" data-sort="1">Price</a></th>
-		      <th><a class="js-sortable-header" data-sort="2">24 hrs</a></th>
-		      <th class="toggleable-view hidden"><a class="js-sortable-header" data-sort="3">7 days</a></th>
-		      <th class="toggleable-view hidden"><a class="js-sortable-header" data-sort="4">Amount</a></th>
-		      <th class="toggleable-view hidden"><a class="js-sortable-header" data-sort="5">Value</a></th>
-		      <th class="toggleable-view hidden"><a class="js-sortable-header" data-sort="6">Allocation</a></th>
+		      <th><a class="js-sortable-header" role="button" tabindex="0" data-sort="0">Name</a></th>
+		      <th><a class="js-sortable-header" role="button" tabindex="0" data-sort="1">Price</a></th>
+		      <th><a class="js-sortable-header" role="button" tabindex="0" data-sort="2">24 hrs</a></th>
+		      <th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="3">7 days</a></th>
+		      <th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="4">Amount</a></th>
+		      <th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="5">Value</a></th>
+		      <th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="6">Allocation</a></th>
 		      <th class="toggleable-view hidden"></th>
 		    </tr>
 		  </thead>
@@ -286,12 +303,12 @@ App.UI = {
 	<div class="row portfolio-footer darkest">
 		<ul class="nav-list portfolio-footer-menu">
 			<li class="u-pull-left li-space">
-				<a class="portfolio-link js-add-portfolio-item">
+				<a class="portfolio-link js-add-portfolio-item" role="button" tabindex="0">
 					<i class="fas fa-plus"></i> Add
 				</a>
 			</li>
 			<li class="u-pull-left">
-				<a class="portfolio-link js-edit-portfolio">
+				<a class="portfolio-link js-edit-portfolio" role="button" tabindex="0">
 					<i class="fas fa-edit"></i> Edit
 				</a>
 			</li>
@@ -309,13 +326,13 @@ App.UI = {
 	<form class="js-add-coin-form">
 		<div class="row portfolio-footer text-left darkest">
 			<div class="six columns">
-				<input type="search" class="coin-search" placeholder="Coin name" required />
-				<input type="number" class="coin-amount" placeholder="Amount" min="0" step="any" required />
+				<input type="search" class="coin-search" placeholder="Coin name" required autofocus>
+				<input type="number" class="coin-amount" placeholder="Amount" min="0" step="any" required>
 				<p class="search-help" aria-live="assertive" hidden></p>
 			</div>
 			<div class="four columns">
 				<button type="submit" class="button-primary">Add coin</button>
-				<a class="button cancel-addition-btn" role="button">Cancel</a>
+				<a class="button cancel-addition-btn" role="button" tabindex="0">Cancel</a>
 			</div>
 		</div>
 	</form>
@@ -398,13 +415,15 @@ App.UI = {
 			holdingsHtmlString += `
 			<div class="row">
 				<div class="three columns">
-					<label for="${item.id}">${item.name}</label>
+					<label for="${item.name}">${item.name}</label>
 				</div>
 				<div class="nine columns">
-					<input type="number" name="${item.id}" value=${
+					<input type="number" name="${item.id}" id="${item.name}" value=${
 				item.amount
 			} min="0" step="any" />
-					<a class="button delete-holding" role="button" data-coin="${item.id}">Delete</a>
+					<a class="button delete-holding" role="button" tabindex="0" data-coin="${
+						item.id
+					}">Delete</a>
 				</div>
 			</div>`;
 		});
@@ -414,7 +433,7 @@ App.UI = {
 		  ${holdingsHtmlString}
 		  <div class="row">
 			<button type="submit" class="button-primary">Update</button>
-			<a class="button cancel-edit-btn" role="button">Cancel</a>
+			<a class="button cancel-edit-btn" role="button" tabindex="0">Cancel</a>
 		</div>`;
 	},
 	handleEditPortfolioSubmit: function() {

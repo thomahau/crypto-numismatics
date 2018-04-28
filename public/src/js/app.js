@@ -25,15 +25,6 @@ const App = {
 			App.handleLogin();
 		}
 	},
-	getFetchInit: function(data) {
-		return {
-			method: 'POST',
-			body: JSON.stringify(data),
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		};
-	},
 	handleSignup: function() {
 		$('.register-form').submit(function(event) {
 			event.preventDefault();
@@ -105,6 +96,15 @@ const App = {
 			}
 			throw 'ValidationError: Invalid username or password';
 		});
+	},
+	getFetchInit: function(data) {
+		return {
+			method: 'POST',
+			body: JSON.stringify(data),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		};
 	},
 	handleLogout: function() {
 		$('header').on('click', '.js-logout', function() {
