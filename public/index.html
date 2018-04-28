@@ -5,52 +5,80 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="description" content="Cryptocurrency portfolio tracker">
 	<title>Crypto Numismatics</title>
-	<link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,400" rel="stylesheet">
-	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/black-tie/jquery-ui.css">
-	<link rel="stylesheet" href="css/normalize.css">
-	<link rel="stylesheet" href="css/skeleton.css">
-	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,400">
+	<!-- <link rel="stylesheet" href="src/css/jquery-ui.css">
+	<link rel="stylesheet" href="src/css/normalize.css">
+	<link rel="stylesheet" href="src/css/style.css"> -->
+	<link rel="stylesheet" href="build/css/style.css">
 	<link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
 	<header class="u-full-width darkest" role="banner">
-		<nav class="container" role="navigation">
-			<a class="u-pull-left" href="/">
-				<i class="far fa-copyright fa-flip-horizontal"></i> Crypto Numismatics
+		<nav class="container header-container" role="navigation">
+			<a class="u-pull-left li-space" href="/" tabindex="1" title="Crypto Numismatics">
+				<i class="far fa-copyright fa-flip-horizontal"></i><span class="nav-text"> Crypto Numismatics</span>
 			</a>
-			<a class="js-register u-pull-right">
+			<a class="u-pull-left" href="https://github.com/thomahau/crypto-numismatics" tabindex="2" title="GitHub repository" target="_blank" rel="noopener">
+				<i class="fab fa-github"></i>
+			</a>
+			<a class="js-register u-pull-right" role="button" tabindex="4" aria-label="Sign up">
 				<i class="fas fa-user-plus"></i><span class="nav-text"> Sign up</span>
 			</a>
-			<a class="js-login u-pull-right li-space">
+			<a class="js-login u-pull-right li-space" role="button" tabindex="3" aria-label="Log in">
 				<i class="fas fa-sign-in-alt"></i><span class="nav-text"> Log in</span>
 			</a>
 		</nav>
 	</header>
 
 	<main role="main">
-		<div class="container welcome-container" hidden></div>
-		<div class="container portfolio-container" aria-live="polite" hidden></div>
+		<section class="container welcome-container" role="region" aria-live="polite" hidden>
+			<div class="row">
+				<h1>Cryptocurrency portfolio tracker</h1>
+				<p>Crypto Numismatics provides a simple, user-friendly overview of your digital currency holdings. Signing up is free and anonymous.</p>
+				<button class="button-primary js-register">Create account</button>
+			</div>
+		</section>
+		<section class="container portfolio-container" role="region" aria-live="polite" hidden></section>
+		<footer class="darkest u-full-width stats-wrapper" role="contentinfo" hidden>
+			<div class="container">
+				<div class="row">
+					<div class="four columns">
+						<h2>1500+</h2>
+						<p>Cryptocurrencies tracked</p>
+					</div>
+					<div class="four columns">
+						<h2>3</h2>
+						<p>Fiat currencies supported</p>
+					</div>
+					<div class="four columns">
+						<h2>0</h2>
+						<p>Price to use</p>
+					</div>
+				</div>
+			</div>
+		</footer>
 	</main>
 
 	<div class="modal js-register-modal" hidden>
 		<div class="modal-content">
 			<div class="modal-header">
 				<h3>Create your account</h3>
-				<a class="u-pull-right close">x</a>
+				<a class="u-pull-right close" role="button" aria-label="close" tabindex="0">x</a>
 			</div>
 			<div class="modal-body register-modal-body">
 				<form class="register-form">
 					<label for="register-username">Username</label>
 					<input type="text" name="username" id="register-username" required autofocus>
 					<label for="register-password">Password</label>
-					<input type="password" name="password" id="register-password" minlength=8 required>
+					<input type="password" name="password" id="register-password" required>
 					<label for="register-password-confirm">Confirm password</label>
-					<input type="password" name="passwordconfirm" id="register-password-confirm" minlength=8 required>
+					<input type="password" name="passwordconfirm" id="register-password-confirm" required>
 					<div class="row register-help" aria-live="assertive" hidden></div>
 					<div class="row">
 						<input type="submit" class="button-primary" value="Create account">
 					</div>
 				</form>
+				<div class="js-register-success" aria-live="assertive" hidden></div>
 			</div>
 		</div>
 	</div>
@@ -59,7 +87,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<h3>Log in</h3>
-				<a class="u-pull-right close">x</a>
+				<a class="u-pull-right close" role="button" aria-label="close" tabindex="0">x</a>
 			</div>
 			<div class="modal-body">
 				<form class="login-form">
@@ -80,7 +108,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<h3>Edit holdings</h3>
-				<a class="u-pull-right close">x</a>
+				<a class="u-pull-right close" role="button" aria-label="close" tabindex="0">x</a>
 			</div>
 			<div class="modal-body js-edit-form-container"></div>
 		</div>
@@ -90,18 +118,18 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<h3>Edit currency</h3>
-				<a class="u-pull-right close">x</a>
+				<a class="u-pull-right close" role="button" aria-label="close" tabindex="0">x</a>
 			</div>
 			<div class="modal-body">
 				<form class="edit-currency-form">
-					<select class="currency-select">
+					<select class="currency-select" autofocus>
 						<option value="USD">US Dollar (USD)</option>
 						<option value="EUR">Euro (EUR)</option>
 						<option value="GBP">British Pound Sterling (GBP)</option>
 					</select>
 					<div class="row">
 						<button type="submit" class="button-primary">Update</button>
-						<a class="button cancel-edit-btn" role="button">Cancel</a>
+						<a class="button cancel-edit-btn" role="button" tabindex="0">Cancel</a>
 					</div>
 				</form>
 			</div>
@@ -109,9 +137,14 @@
 	</div>
 
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script async defer src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+	<script async defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
 	<script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js"></script>
-	<script src="js/coinlist.js"></script>
-	<script src="js/app.js"></script>
+	<script src="build/js/script.js"></script>
+	<!-- <script src="src/js/app.js"></script>
+	<script src="src/js/ui.js"></script>
+	<script src="src/js/lib.js"></script>
+	<script src="src/js/holdings.js"></script>
+	<script src="src/js/vendor.js"></script> -->
 </body>
 </html>
