@@ -1,6 +1,7 @@
 'use strict';
 App.Vendor = {
 	renderPieChart: function(holdings) {
+		// Chart.js configuration for pie chart of portfolio breakdown
 		const sortedHoldings = holdings.sort((a, b) => {
 			return b.allocation - a.allocation;
 		});

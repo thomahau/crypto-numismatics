@@ -27,6 +27,8 @@ App.UI = {
 		});
 	},
 	handleKeyboardUse: function() {
+		// user can close modal and dropdown-menu with esc key
+		// user can open links with enter or space key
 		$('body').keyup(function(event) {
 			if (event.keyCode === 27) {
 				$('.modal').attr('hidden', true);
@@ -69,6 +71,7 @@ App.UI = {
 	},
 	renderSignupHelpMsg: function(err) {
 		const signupHelpMsg = this.getHelpMsg(err);
+
 		$('#register-password, #register-password-confirm').val('');
 		$('.register-help')
 			.attr('hidden', false)
@@ -76,6 +79,7 @@ App.UI = {
 	},
 	renderLoginHelpMsg: function(err) {
 		const loginHelpMsg = this.getHelpMsg(err);
+
 		$('#login-username, #login-password').val('');
 		$('.login-help')
 			.attr('hidden', false)
@@ -87,7 +91,8 @@ App.UI = {
 	},
 	renderLoggedInNav: function(username) {
 		const navElements = this.getNavElements(username);
-		$('.js-login, .js-register').attr('hidden', true);
+
+		$('.js-login, .js-register, .modal').attr('hidden', true);
 		$('.js-logout, .js-username').remove();
 		$('.header-container').append(navElements);
 	},
@@ -97,11 +102,6 @@ App.UI = {
 			<i class="fas fa-sign-out-alt"></i><span class="nav-text"> Log out</span>
 		</a>
 		<p class="js-username u-pull-right li-space">${username}</p>`;
-	},
-	renderSearchHelpMsg: function(err) {
-		$('.search-help')
-			.attr('hidden', false)
-			.html(err);
 	},
 	handleSettingsDropdown: function() {
 		$('main').on('click', '.js-drop-btn', function() {
@@ -124,7 +124,8 @@ App.UI = {
 			'hidden',
 			true
 		);
-
+		// get all of user's holdings; populate with current ticker data;
+		// render portfolio overview: header + table + footer
 		App.Holdings.get()
 			.then(data => {
 				return App.Holdings.populate(data.holdings);
@@ -234,7 +235,7 @@ App.UI = {
 			localStorage.getItem('currency')
 		);
 		let tableRowsHtmlString = '';
-
+		// if user has holdings, each holding gets a table row
 		if (populatedHoldings.length) {
 			populatedHoldings.forEach(holding => {
 				const gainOrLoss24Hrs =
@@ -267,7 +268,8 @@ App.UI = {
 				</tr>`;
 			});
 		}
-
+		// mobile-first table with toggle functionality between simple overview and all details
+		// table is sortable through clicking on table headers
 		return `
 		<div class="row darkest">
 			<a class="button table-view-btn toggled" role="button" tabindex="0">simple view</a>
@@ -294,11 +296,13 @@ App.UI = {
 	getPortfolioFooter: function(holdings) {
 		return !holdings.length ? this.firstAddHtml : this.subsequentAddHtml;
 	},
+	// user's portfolio is empty
 	firstAddHtml: `
 	<div class="row portfolio-footer darkest">
 		<button class="button-primary u-pull-left js-add-portfolio-item start-btn">Add your first coin</button>
 	</div>
 	`,
+	// user has holdings to display
 	subsequentAddHtml: `
 	<div class="row portfolio-footer darkest">
 		<ul class="nav-list portfolio-footer-menu">
@@ -338,6 +342,7 @@ App.UI = {
 	</form>
 	`,
 	populateSearchOptions: function() {
+		// search box suggestions from all coins available in coinmarketcap.com API call
 		availableCoins = tickerData.map(tickerObj => {
 			return `${tickerObj.name} (${tickerObj.symbol})`;
 		});
@@ -361,7 +366,7 @@ App.UI = {
 			event.preventDefault();
 			const inputAmount = $('.coin-amount').val();
 			const inputCoin = $('.coin-search').val();
-
+			// validate user input and display help text if not valid
 			App.UI.validateInput(inputCoin)
 				.then(isValid => {
 					const coinElements = inputCoin.split('(');
@@ -384,19 +389,27 @@ App.UI = {
 	validateInput: function(input) {
 		return new Promise((resolve, reject) => {
 			let validInput = false;
+
 			for (let i = 0; i < availableCoins.length && !validInput; i++) {
 				if (input === availableCoins[i]) {
 					validInput = true;
 					$('.search-help').attr('hidden', true);
 					$('.coin-amount, .coin-search').val('');
+
 					return resolve(validInput);
 				}
 			}
 			setTimeout(() => reject('Invalid input'), 200);
 		});
 	},
+	renderSearchHelpMsg: function(err) {
+		$('.search-help')
+			.attr('hidden', false)
+			.html(err);
+	},
 	handleEditPortfolioModal: function() {
 		$('main').on('click', '.js-edit-portfolio', function() {
+			// get user's holdings and populate form in modal
 			App.Holdings.get()
 				.then(data => {
 					return App.UI.getEditPortfolioForm(data.holdings);
@@ -448,7 +461,7 @@ App.UI = {
 					amount: parseFloat($(this).val(), 10)
 				});
 			});
-
+			// pdate or delete user's holdings according to values submitted, then re-render portfolio
 			const updates = submittedValues.map(item => {
 				if (item.amount === 0) {
 					return App.Holdings.delete(item.id);
@@ -488,7 +501,7 @@ App.UI = {
 			event.preventDefault();
 			const currency = $('.currency-select').val();
 			localStorage.setItem('currency', currency);
-
+			// make API call to get ticker data converted to new currency, then re-render portfolio
 			App.getTickerData(currency)
 				.then(data => {
 					tickerData = data;
@@ -507,19 +520,21 @@ App.UI = {
 		});
 	},
 	sortTable: function(param, $header) {
+		// custom sorting based on which header user clicked
 		const $table = $('table');
-		let switching = true,
-			switchcount = 0,
-			dir = 'desc',
-			shouldSwitch;
-
+		let switching = true;
+		let switchcount = 0;
+		let dir = 'desc';
+		let shouldSwitch;
+		// loop will continue until no switching has been done
 		while (switching) {
 			let rows = $table.find('tr');
 			let i;
 			switching = false;
-
+			// loop through all table rows except the first (table headers)
 			for (i = 1; i < rows.length - 1; i++) {
 				shouldSwitch = false;
+				// get and format the two elements to compare, one from current row and one from the next
 				let x = rows[i].getElementsByTagName('td')[param];
 				let y = rows[i + 1].getElementsByTagName('td')[param];
 				let xValue = App.Lib.formatForSort(
@@ -532,7 +547,8 @@ App.UI = {
 						? y.firstElementChild.textContent
 						: y.textContent
 				);
-
+				// check if the two rows should switch place, based on direction
+				// if so, mark as a switch and break the loop
 				if (dir === 'desc') {
 					if (xValue < yValue) {
 						shouldSwitch = true;
@@ -547,6 +563,8 @@ App.UI = {
 			}
 
 			if (shouldSwitch) {
+				// if a switch has been marked, make the switch and mark that a switch has been done
+				// also, insert direction icon next to table header
 				const directionIcon = this.getDirectionIcon(dir);
 
 				$('.direction-icon').remove();
@@ -555,6 +573,7 @@ App.UI = {
 				switching = true;
 				switchcount++;
 			} else {
+				// if no switching has been done and direction is 'desc', switch direction and run while loop again
 				if (switchcount === 0 && dir === 'desc') {
 					dir = 'asc';
 					switching = true;
@@ -575,6 +594,7 @@ App.UI = {
 				const viewType = $(this)
 					.html()
 					.split(' ')[0];
+				// update which parts of table are displayed, based on button clicked
 				$('.table-view-btn').toggleClass('toggled');
 				if (viewType === 'detailed') {
 					$('.toggleable-view').removeClass('hidden');

@@ -2,6 +2,7 @@
 App.Holdings = {
 	URI: 'holdings',
 	getAuthHeaders: function() {
+		// access to protected API endpoints requires valid JWT token
 		const token = localStorage.getItem('token');
 		return {
 			'Content-Type': 'application/json',
@@ -52,7 +53,7 @@ App.Holdings = {
 	populate: function(holdings) {
 		const currency = localStorage.getItem('currency').toLowerCase();
 		let populatedHoldings = [];
-
+		// parse desired ticker data for each of user's holdings
 		holdings.forEach(holding => {
 			const tickerObj = tickerData.filter(
 				element => element.symbol === holding.symbol
@@ -70,9 +71,11 @@ App.Holdings = {
 			};
 			populatedHoldings.push(populatedHolding);
 		});
+
 		return populatedHoldings;
 	},
 	getTotals: function(populatedHoldings) {
+		// calculate aggregate portfolio value and performance
 		const total = populatedHoldings.reduce((sum, holding) => {
 			return sum + holding.value;
 		}, 0);

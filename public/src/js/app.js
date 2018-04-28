@@ -80,7 +80,6 @@ const App = {
 					}
 
 					$('#login-username, #login-password').val('');
-					$('.modal').attr('hidden', true);
 					App.checkIfLoggedIn();
 				})
 				.catch(err => {
