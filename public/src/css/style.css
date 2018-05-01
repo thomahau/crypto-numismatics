@@ -328,10 +328,6 @@ input[type='submit'].button-primary:focus {
   color: white;
 }
 
-main .button:hover {
-  color: #33c3f0;
-}
-
 button,
 .button {
   margin-bottom: 1rem;

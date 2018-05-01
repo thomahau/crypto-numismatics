@@ -16,7 +16,7 @@ App.Vendor = {
 						data: this.getChartData(sortedHoldings),
 						backgroundColor: this.colors,
 						borderColor: '#fff',
-						borderWidth: 0.5
+						borderWidth: 0.4
 					}
 				]
 			},

@@ -18,6 +18,10 @@ App.Lib = {
 			return '€';
 		} else if (currency === 'GBP') {
 			return '£';
+		} else if (currency === 'JPY') {
+			return '¥';
+		} else if (currency === 'NOK') {
+			return 'kr ';
 		}
 	},
 	formatForSort: function(s) {
