@@ -399,7 +399,7 @@ App.UI = {
 					return resolve(validInput);
 				}
 			}
-			setTimeout(() => reject('Invalid input'), 250);
+			setTimeout(() => reject('Invalid input'), 300);
 		});
 	},
 	renderSearchHelpMsg: function(err) {

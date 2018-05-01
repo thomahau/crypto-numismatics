@@ -1,11 +1,15 @@
 'use strict';
 App.Lib = {
 	round: function(value, decimals = 2) {
-		// rounds input to selected number of decimals and applies a comma thousands-separator
-		return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals)
-			.toFixed(decimals)
-			.toString()
-			.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+		// rounds input to selected number of decimals and applies a comma thousands-separator to large values
+		if (value >= 1) {
+			return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals)
+				.toFixed(decimals)
+				.toString()
+				.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+		} else {
+			return value.toFixed(5).toString();
+		}
 	},
 	getCurrencySymbol: function(currency) {
 		if (currency === 'USD') {
