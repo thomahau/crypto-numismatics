@@ -320,7 +320,7 @@ App.UI = {
 	`,
 	handleAddPortfolioItemClick: function(populatedHoldings) {
 		$('main').on('click', '.js-add-portfolio-item', function() {
-			$('.portfolio-footer').remove();
+			$('.portfolio-footer, .js-add-coin-form').remove();
 			$('.portfolio-container').append(App.UI.newItemForm);
 			App.UI.populateSearchOptions();
 		});
@@ -363,44 +363,37 @@ App.UI = {
 	handleNewCoinSubmit: function() {
 		$('main').on('submit', '.js-add-coin-form', function(event) {
 			event.preventDefault();
+			event.stopImmediatePropagation();
 			const inputAmount = $('.coin-amount').val();
 			const inputCoin = $('.coin-search').val();
-			// validate user input and display help text if not valid
-			App.UI.validateInput(inputCoin)
-				.then(isValid => {
-					if (isValid) {
-						const coinElements = inputCoin.split('(');
-						const newHolding = {
-							symbol: coinElements[1].slice(0, -1),
-							name: coinElements[0].slice(0, -1),
-							amount: parseFloat(inputAmount, 10)
-						};
 
-						return App.Holdings.add(newHolding);
-					}
+			App.UI.validateInput(inputCoin)
+				.then(function(isValid) {
+					const coinElements = inputCoin.split('(');
+					const newHolding = {
+						symbol: coinElements[1].slice(0, -1),
+						name: coinElements[0].slice(0, -1),
+						amount: parseFloat(inputAmount, 10)
+					};
+
+					$('.coin-search, .coin-amount').val('');
+					$('.search-help').attr('hidden', true);
+
+					return App.Holdings.add(newHolding);
 				})
-				.then(holding => {
+				.then(() => {
 					App.UI.renderPortfolio();
 				})
-				.catch(err => {
+				.catch(function(err) {
 					App.UI.renderSearchHelpMsg(err);
 				});
 		});
 	},
 	validateInput: function(input) {
 		return new Promise((resolve, reject) => {
-			let validInput = false;
-
-			for (let i = 0; i < availableCoins.length && !validInput; i++) {
-				if (input === availableCoins[i]) {
-					validInput = true;
-					$('.search-help').attr('hidden', true);
-					$('.coin-amount, .coin-search').val('');
-
-					return resolve(validInput);
-				}
-			}
-			setTimeout(() => reject('Invalid input'), 200);
+			availableCoins.includes(input)
+				? resolve()
+				: reject('Invalid input');
 		});
 	},
 	renderSearchHelpMsg: function(err) {
