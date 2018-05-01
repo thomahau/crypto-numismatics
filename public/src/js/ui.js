@@ -202,8 +202,7 @@ App.UI = {
 		</div>
 		<div class="row darker portfolio-overview">
 			<div class="three columns text-left">
-				PORTFOLIO VALUE
-				<hr>
+				<span class="portfolio-headline">PORTFOLIO VALUE</span>
 				<p class="large-text">${symbol}${portfolioData.total} <small>(₿${
 			portfolioData.totalBTC
 		})</small></p>
@@ -222,8 +221,7 @@ App.UI = {
 		const gainOrLoss7Days = data.change7DaysPct > 0 ? 'gain' : 'loss';
 
 		return `
-		PERFORMANCE
-		<hr>
+		<span class="portfolio-headline">PERFORMANCE</span>
 		<table class="performance-table">
 			<tr>
 				<td>1 Hour</td>
