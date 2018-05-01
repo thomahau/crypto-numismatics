@@ -2,7 +2,7 @@
 App.Lib = {
 	round: function(value, decimals = 2) {
 		// rounds input to selected number of decimals and applies a comma thousands-separator to large values
-		if (value >= 1) {
+		if (Math.abs(value) >= 1) {
 			return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals)
 				.toFixed(decimals)
 				.toString()

@@ -14,7 +14,6 @@ const App = {
 			App.getTickerData(currency)
 				.then(data => {
 					tickerData = data;
-					App.UI.handleSettingsDropdown();
 					App.UI.renderPortfolio();
 					App.handleLogout();
 				})
@@ -128,4 +127,6 @@ const App = {
 $(function() {
 	App.checkIfLoggedIn();
 	App.UI.handleModals();
+	App.UI.handleSettingsDropdown();
+	App.UI.handleTableSorting();
 });

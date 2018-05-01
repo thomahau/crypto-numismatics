@@ -418,13 +418,6 @@ td:last-child {
 }
 
 @media only screen and (max-width: 640px) {
-  body,
-  h1,
-  h2,
-  h3 {
-    font-weight: 400;
-  }
-
   .portfolio-footer .cancel-addition-btn,
   .portfolio-footer .button-primary,
   .table-view-btn {

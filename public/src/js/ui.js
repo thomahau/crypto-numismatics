@@ -94,14 +94,14 @@ App.UI = {
 
 		$('.js-login, .js-register, .modal').attr('hidden', true);
 		$('.js-logout, .js-username').remove();
-		$('.header-container').append(navElements);
+		$('.header-right').append(navElements);
 	},
 	getNavElements: function(username) {
 		return `
-		<a class="js-logout u-pull-right" role="button" tabindex="3" aria-label="Log out">
+		<span class="js-username li-space">${username}</span>
+		<a class="js-logout" role="button" tabindex="0" aria-label="Log out">
 			<i class="fas fa-sign-out-alt"></i><span class="nav-text"> Log out</span>
-		</a>
-		<p class="js-username u-pull-right li-space">${username}</p>`;
+		</a>`;
 	},
 	handleSettingsDropdown: function() {
 		$('main').on('click', '.js-drop-btn', function() {
@@ -160,7 +160,6 @@ App.UI = {
 				this.handleCancelAdditionBtn(populatedHoldings);
 				this.handleDeletePortfolioItem();
 				this.handleEditCurrencyModal();
-				this.handleTableSorting();
 				this.handleTableViewSelection();
 			});
 	},
@@ -191,13 +190,13 @@ App.UI = {
 		return `
 		<div class="row darkest">
 			<div class="portfolio-header dropdown u-pull-right">
-				<a class="portfolio-link portfolio-settings js-drop-btn" role="button" tabindex="4" aria-haspopup="true" aria-controls="dropdown-content">
+				<a class="portfolio-link portfolio-settings js-drop-btn" role="button" tabindex="0" aria-haspopup="true" aria-controls="dropdown-content">
 					<i class="fas fa-cog"></i><span> Settings</span>
 				</a>
 				<div class="dropdown-content" id="dropdown-content" role="menu">
-					<a class="js-edit-portfolio" role="button" tabindex="5">Edit holdings</a>
-					<a class="js-add-portfolio-item" role="button" tabindex="6">Add holding</a>
-					<a class="js-edit-currency" role="button" tabindex="7">Edit currency</a>
+					<a class="js-edit-portfolio" role="button" tabindex="0">Edit holdings</a>
+					<a class="js-add-portfolio-item" role="button" tabindex="0">Add holding</a>
+					<a class="js-edit-currency" role="button" tabindex="0">Edit currency</a>
 				</div>
 			</div>
 		</div>
@@ -268,7 +267,7 @@ App.UI = {
 				</tr>`;
 			});
 		}
-		// mobile-first table with toggle functionality between simple overview and all details
+		// mobile-first table with toggle functionality between simple overview and all details.
 		// table is sortable through clicking on table headers
 		return `
 		<div class="row darkest">
