@@ -23,9 +23,6 @@
 }
 
 @media only screen and (min-width: 550px) {
-  .container {
-    width: 80%;
-  }
   .column,
   .columns {
     margin-left: 4%;
@@ -59,7 +56,7 @@
   clear: both;
 }
 
-/* Base Styles */
+/* Base styles */
 html {
   font-size: 62.5%;
 }
@@ -80,7 +77,8 @@ header {
   color: white;
 }
 
-main {
+main,
+footer {
   color: white;
   text-align: center;
 }
@@ -147,9 +145,25 @@ form {
   padding-bottom: 5px;
 }
 
+.nav-list {
+  padding-left: 0;
+  margin-top: 0;
+  list-style: none;
+}
+
+@media only screen and (max-height: 600px) {
+  .stats-wrapper {
+    display: none;
+  }
+}
+
 @media only screen and (max-width: 640px) {
   .welcome-container {
     margin-top: 100px;
+  }
+
+  .welcome-container .button-primary {
+    margin-top: 15px;
   }
 
   .header-container {
@@ -159,6 +173,8 @@ form {
   .portfolio-container,
   main .button-primary {
     width: 100%;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .chart-container {
@@ -233,7 +249,7 @@ a:focus {
 
 .large-text {
   font-size: 2.4rem;
-  font-weight: 350;
+  font-weight: 400;
 }
 
 .gain {
@@ -374,13 +390,6 @@ select {
   color: red;
 }
 
-/* Lists */
-.nav-list {
-  padding-left: 0;
-  margin-top: 0;
-  list-style: none;
-}
-
 /* Table */
 table {
   border-collapse: collapse;
@@ -409,6 +418,13 @@ td:last-child {
 }
 
 @media only screen and (max-width: 640px) {
+  body,
+  h1,
+  h2,
+  h3 {
+    font-weight: 400;
+  }
+
   .portfolio-footer .cancel-addition-btn,
   .portfolio-footer .button-primary,
   .table-view-btn {
@@ -419,7 +435,7 @@ td:last-child {
   .hidden {
     display: none;
   }
-
+  /* Detailed table view toggled */
   .detailed tr {
     display: block;
   }
