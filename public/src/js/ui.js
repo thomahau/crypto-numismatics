@@ -203,6 +203,7 @@ App.UI = {
 		<div class="row darker portfolio-overview">
 			<div class="three columns text-left">
 				PORTFOLIO VALUE
+				<hr>
 				<p class="large-text">${symbol}${portfolioData.total} <small>(₿${
 			portfolioData.totalBTC
 		})</small></p>
@@ -216,18 +217,33 @@ App.UI = {
 		</div>`;
 	},
 	getPortfolioPerformance: function(data, symbol) {
+		const gainOrLoss1Hr = data.change1HrPct > 0 ? 'gain' : 'loss';
 		const gainOrLoss24Hrs = data.change24HrsPct > 0 ? 'gain' : 'loss';
 		const gainOrLoss7Days = data.change7DaysPct > 0 ? 'gain' : 'loss';
 
 		return `
-		24 HOURS CHANGE
-		<p class="${gainOrLoss24Hrs} large-text">${symbol}${data.change24Hrs} <small>(${
+		PERFORMANCE
+		<hr>
+		<table class="performance-table">
+			<tr>
+				<td>1 Hour</td>
+				<td><span class="${gainOrLoss1Hr}">${symbol}${data.change1Hr}(${
+			data.change1HrPct
+		}%)</span></td>
+			</tr>
+			<tr>
+				<td>24 Hours</td>
+				<td><span class="${gainOrLoss24Hrs}">${symbol}${data.change24Hrs} (${
 			data.change24HrsPct
-		}%)</small></p>
-		7 DAYS CHANGE
-		<p class="${gainOrLoss7Days} large-text">${symbol}${data.change7Days} <small>(${
+		}%)</span></td>
+			</tr>
+			<tr>
+				<td>7 Days</td>
+				<td><span class="${gainOrLoss7Days}">${symbol}${data.change7Days} (${
 			data.change7DaysPct
-		}%)</small></p>`;
+		}%)</span></td>
+			</tr>
+		</table>`;
 	},
 	getPortfolioTable: function(populatedHoldings) {
 		const symbol = App.Lib.getCurrencySymbol(
@@ -237,6 +253,8 @@ App.UI = {
 		// if user has holdings, each holding gets a table row
 		if (populatedHoldings.length) {
 			populatedHoldings.forEach(holding => {
+				const gainOrLoss1Hr =
+					holding.percent_change_1h > 0 ? 'gain' : 'loss';
 				const gainOrLoss24Hrs =
 					holding.percent_change_24h > 0 ? 'gain' : 'loss';
 				const gainOrLoss7Days =
@@ -250,6 +268,9 @@ App.UI = {
 				<tr>
 					<td data-label="Coin">${holding.name}</td>
 					<td data-label="Price">${symbol}${price}</td>
+					<td class="${gainOrLoss1Hr} toggleable-view hidden" data-label="1 hr">${
+					holding.percent_change_1h
+				}%</td>
 					<td class="${gainOrLoss24Hrs}" data-label="24 hrs">${
 					holding.percent_change_24h
 				}%</td>
@@ -274,16 +295,17 @@ App.UI = {
 			<a class="button table-view-btn toggled" role="button" tabindex="0">simple view</a>
 			<a class="button table-view-btn" role="button" tabindex="0">detailed view</a>
 		</div>
-		<table class="u-full-width">
+		<table class="u-full-width portfolio-table">
 		  <thead class="darkest">
 		    <tr>
 		      <th><a class="js-sortable-header" role="button" tabindex="0" data-sort="0">Name</a></th>
 		      <th><a class="js-sortable-header" role="button" tabindex="0" data-sort="1">Price</a></th>
-		      <th><a class="js-sortable-header" role="button" tabindex="0" data-sort="2">24 hrs</a></th>
-		      <th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="3">7 days</a></th>
-		      <th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="4">Amount</a></th>
-		      <th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="5">Value</a></th>
-		      <th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="6">Allocation</a></th>
+		      <th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="2">1 hr</a></th>
+		      <th><a class="js-sortable-header" role="button" tabindex="0" data-sort="3">24 hrs</a></th>
+		      <th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="4">7 days</a></th>
+		      <th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="5">Amount</a></th>
+		      <th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="6">Value</a></th>
+		      <th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="7">Allocation</a></th>
 		      <th class="toggleable-view hidden"></th>
 		    </tr>
 		  </thead>
@@ -475,12 +497,16 @@ App.UI = {
 		$('body').on('click', '.delete-holding', function(event) {
 			const id = $(this).data('coin');
 
-			App.Holdings.delete(id)
-				.then(() => {
-					App.UI.renderPortfolio();
-					$('.modal').attr('hidden', true);
-				})
-				.catch(err => console.error(err));
+			if (window.confirm('Are you sure?')) {
+				App.Holdings.delete(id)
+					.then(() => {
+						App.UI.renderPortfolio();
+						$('.modal').attr('hidden', true);
+					})
+					.catch(err => console.error(err));
+			} else {
+				return false;
+			}
 		});
 	},
 	handleEditCurrencyModal: function() {
@@ -515,7 +541,7 @@ App.UI = {
 	},
 	sortTable: function(param, $header) {
 		// custom sorting based on which header user clicked
-		const $table = $('table');
+		const $table = $('.portfolio-table');
 		let switching = true;
 		let switchcount = 0;
 		let dir = 'desc';
@@ -592,12 +618,20 @@ App.UI = {
 				$('.table-view-btn').toggleClass('toggled');
 				if (viewType === 'detailed') {
 					$('.toggleable-view').removeClass('hidden');
-					$('thead').addClass('hidden');
-					$('tr, td').addClass('detailed');
+					$('.portfolio-table')
+						.find('thead')
+						.addClass('hidden');
+					$('.portfolio-table')
+						.find('tr, td')
+						.addClass('detailed');
 				} else if (viewType === 'simple') {
 					$('.toggleable-view').addClass('hidden');
-					$('thead').removeClass('hidden');
-					$('tr, td').removeClass('detailed');
+					$('.portfolio-table')
+						.find('thead')
+						.removeClass('hidden');
+					$('.portfolio-table')
+						.find('tr, td')
+						.removeClass('detailed');
 				}
 			}
 		});

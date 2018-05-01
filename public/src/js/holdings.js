@@ -66,6 +66,7 @@ App.Holdings = {
 				price: parseFloat(tickerObj[`price_${currency}`]),
 				value:
 					holding.amount * parseFloat(tickerObj[`price_${currency}`]),
+				percent_change_1h: parseFloat(tickerObj.percent_change_1h),
 				percent_change_24h: parseFloat(tickerObj.percent_change_24h),
 				percent_change_7d: parseFloat(tickerObj.percent_change_7d)
 			};
@@ -79,6 +80,14 @@ App.Holdings = {
 		const total = populatedHoldings.reduce((sum, holding) => {
 			return sum + holding.value;
 		}, 0);
+		const total1HrAgo = populatedHoldings.reduce((sum, holding) => {
+			return (
+				sum +
+				this.getPastValue(holding.value, holding.percent_change_1h)
+			);
+		}, 0);
+		const change1Hr = total - total1HrAgo;
+		const change1HrPct = 100 * (total / total1HrAgo - 1);
 		const total24HrsAgo = populatedHoldings.reduce((sum, holding) => {
 			return (
 				sum +
@@ -100,10 +109,12 @@ App.Holdings = {
 		return {
 			total: total,
 			totalBTC: App.Lib.round(totalBTC, 3),
+			change1Hr: App.Lib.round(change1Hr),
+			change1HrPct: change1HrPct.toPrecision(2),
 			change24Hrs: App.Lib.round(change24Hrs),
-			change24HrsPct: App.Lib.round(change24HrsPct),
+			change24HrsPct: change24HrsPct.toPrecision(2),
 			change7Days: App.Lib.round(change7Days),
-			change7DaysPct: App.Lib.round(change7DaysPct)
+			change7DaysPct: change7DaysPct.toPrecision(2)
 		};
 	},
 	getPastValue: function(value, pctChange) {

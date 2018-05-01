@@ -249,6 +249,7 @@ a:focus {
 
 .large-text {
   font-size: 2.4rem;
+  margin-bottom: 10px;
 }
 
 .gain {
@@ -412,6 +413,15 @@ td:last-child {
   color: white;
 }
 
+.performance-table td {
+  border: 0;
+  padding: 10px 0;
+}
+
+.performance-table td:first-child {
+  padding-right: 10px;
+}
+
 @media only screen and (max-width: 640px) {
   .portfolio-footer .cancel-addition-btn,
   .portfolio-footer .button-primary,
@@ -447,10 +457,6 @@ td:last-child {
   .detailed td::before {
     content: attr(data-label);
     float: left;
-  }
-
-  .large-text {
-    margin-bottom: 10px;
   }
 }
 
