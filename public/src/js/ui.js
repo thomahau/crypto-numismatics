@@ -72,7 +72,7 @@ App.UI = {
 	renderSignupHelpMsg: function(err) {
 		const signupHelpMsg = this.getHelpMsg(err);
 
-		$('#register-password, #register-password-confirm').val('');
+		$('.register-password, .register-password-confirm').val('');
 		$('.register-help')
 			.attr('hidden', false)
 			.html(signupHelpMsg);
@@ -80,7 +80,7 @@ App.UI = {
 	renderLoginHelpMsg: function(err) {
 		const loginHelpMsg = this.getHelpMsg(err);
 
-		$('#login-username, #login-password').val('');
+		$('.login-username, .login-password').val('');
 		$('.login-help')
 			.attr('hidden', false)
 			.html(loginHelpMsg);
@@ -150,9 +150,9 @@ App.UI = {
 
 				if (populatedHoldings.length) {
 					App.Vendor.renderPieChart(populatedHoldings);
-					$('#chart-container').attr('hidden', false);
+					$('.chart-container').attr('hidden', false);
 				} else {
-					$('#chart-container').attr('hidden', true);
+					$('.chart-container').attr('hidden', true);
 				}
 
 				this.handleNewCoinSubmit();
@@ -211,7 +211,7 @@ App.UI = {
 				${helpOrPerformance}
 			</div>
 			<div class="three columns chart-container u-full-width">
-				<canvas id="allocation-chart" hidden></canvas>
+				<canvas class="allocation-chart" hidden></canvas>
 			</div>
 		</div>`;
 	},

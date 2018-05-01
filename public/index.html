@@ -12,7 +12,7 @@
 <body>
 	<header class="u-full-width darkest" role="banner">
 		<nav class="container header-container" role="navigation">
-			<a class="u-pull-left li-space" href="/" tabindex="0" title="Crypto Numismatics">
+			<a class="u-pull-left li-space" href="/" tabindex="0">
 				<i class="far fa-copyright fa-flip-horizontal"></i><span class="nav-text"> Crypto Numismatics</span>
 			</a>
 			<a class="u-pull-left" href="https://github.com/thomahau/crypto-numismatics" tabindex="0" title="GitHub repository" target="_blank" rel="noopener">
@@ -67,11 +67,11 @@
 			<div class="modal-body register-modal-body">
 				<form class="register-form">
 					<label for="register-username">Username</label>
-					<input type="text" name="username" id="register-username" required autofocus>
+					<input type="text" name="username" id="register-username" class="register-username" required autofocus>
 					<label for="register-password">Password</label>
-					<input type="password" name="password" id="register-password" required>
+					<input type="password" name="password" id="register-password" class="register-password" required>
 					<label for="register-password-confirm">Confirm password</label>
-					<input type="password" name="passwordconfirm" id="register-password-confirm" required>
+					<input type="password" name="passwordconfirm" id="register-password-confirm" class="register-password-confirm" required>
 					<div class="row register-help" aria-live="assertive" hidden></div>
 					<div class="row">
 						<input type="submit" class="button-primary" value="Create account">
@@ -91,9 +91,9 @@
 			<div class="modal-body">
 				<form class="login-form">
 					<label for="login-username">Username</label>
-					<input type="text" name="username" id="login-username" required autofocus>
+					<input type="text" name="username" id="login-username" class="login-username" required autofocus>
 					<label for="login-password">Password</label>
-					<input type="password" name="password" id="login-password" required>
+					<input type="password" name="password" id="login-password" class="login-password" required>
 					<div class="row login-help" aria-live="assertive" hidden></div>
 					<div class="row">
 						<input type="submit" class="button-primary" value="Log in">

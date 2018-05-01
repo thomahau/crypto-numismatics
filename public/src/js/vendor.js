@@ -1,11 +1,11 @@
 'use strict';
 App.Vendor = {
 	renderPieChart: function(holdings) {
-		// Chart.js configuration for pie chart of portfolio breakdown
+		// Configuration for pie chart of portfolio breakdown
 		const sortedHoldings = holdings.sort((a, b) => {
 			return b.allocation - a.allocation;
 		});
-		const ctx = document.getElementById('allocation-chart');
+		const ctx = document.getElementsByClassName('allocation-chart')[0];
 		const chart = new Chart(ctx, {
 			type: 'pie',
 			data: {
@@ -16,7 +16,7 @@ App.Vendor = {
 						data: this.getChartData(sortedHoldings),
 						backgroundColor: this.colors,
 						borderColor: '#fff',
-						borderWidth: 1
+						borderWidth: 0.5
 					}
 				]
 			},
@@ -53,8 +53,8 @@ App.Vendor = {
 	},
 	colors: [
 		'#4D4D4D',
-		'#FAA43A',
 		'#5DA5DA',
+		'#FAA43A',
 		'#F17CB0',
 		'#60BD68',
 		'#B2912F',

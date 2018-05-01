@@ -28,15 +28,15 @@ const App = {
 		$('.register-form').submit(function(event) {
 			event.preventDefault();
 			const credentials = {
-				username: $('#register-username').val(),
-				password: $('#register-password').val(),
-				passwordconfirm: $('#register-password-confirm').val()
+				username: $('.register-username').val(),
+				password: $('.register-password').val(),
+				passwordconfirm: $('.register-password-confirm').val()
 			};
 
 			App.register(credentials)
 				.then(user => {
 					$(
-						'#register-username, #register-password, #register-password-confirm'
+						'.register-username, .register-password, .register-password-confirm'
 					).val('');
 					localStorage.setItem('currency', 'USD');
 					App.UI.handleSignupSuccess(user.username);
@@ -66,8 +66,8 @@ const App = {
 		$('.login-form').submit(function(event) {
 			event.preventDefault();
 			const credentials = {
-				username: $('#login-username').val(),
-				password: $('#login-password').val()
+				username: $('.login-username').val(),
+				password: $('.login-password').val()
 			};
 
 			App.login(credentials)
@@ -78,7 +78,7 @@ const App = {
 						localStorage.setItem('currency', 'USD');
 					}
 
-					$('#login-username, #login-password').val('');
+					$('.login-username, .login-password').val('');
 					App.checkIfLoggedIn();
 				})
 				.catch(err => {
