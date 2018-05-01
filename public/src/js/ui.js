@@ -368,14 +368,16 @@ App.UI = {
 			// validate user input and display help text if not valid
 			App.UI.validateInput(inputCoin)
 				.then(isValid => {
-					const coinElements = inputCoin.split('(');
-					const newHolding = {
-						symbol: coinElements[1].slice(0, -1),
-						name: coinElements[0].slice(0, -1),
-						amount: parseFloat(inputAmount, 10)
-					};
+					if (isValid) {
+						const coinElements = inputCoin.split('(');
+						const newHolding = {
+							symbol: coinElements[1].slice(0, -1),
+							name: coinElements[0].slice(0, -1),
+							amount: parseFloat(inputAmount, 10)
+						};
 
-					return App.Holdings.add(newHolding);
+						return App.Holdings.add(newHolding);
+					}
 				})
 				.then(holding => {
 					App.UI.renderPortfolio();
@@ -398,7 +400,7 @@ App.UI = {
 					return resolve(validInput);
 				}
 			}
-			setTimeout(() => reject('Invalid input'), 300);
+			setTimeout(() => reject('Invalid input'), 200);
 		});
 	},
 	renderSearchHelpMsg: function(err) {
