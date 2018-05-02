@@ -66,9 +66,15 @@ App.Holdings = {
 				price: parseFloat(tickerObj[`price_${currency}`]),
 				value:
 					holding.amount * parseFloat(tickerObj[`price_${currency}`]),
-				percent_change_1h: parseFloat(tickerObj.percent_change_1h),
-				percent_change_24h: parseFloat(tickerObj.percent_change_24h),
-				percent_change_7d: parseFloat(tickerObj.percent_change_7d)
+				percent_change_1h: parseFloat(
+					tickerObj.percent_change_1h
+				).toFixed(2),
+				percent_change_24h: parseFloat(
+					tickerObj.percent_change_24h
+				).toFixed(2),
+				percent_change_7d: parseFloat(
+					tickerObj.percent_change_7d
+				).toFixed(2)
 			};
 			populatedHoldings.push(populatedHolding);
 		});
@@ -110,11 +116,11 @@ App.Holdings = {
 			total: total,
 			totalBTC: App.Lib.round(totalBTC, 3),
 			change1Hr: App.Lib.round(change1Hr),
-			change1HrPct: change1HrPct.toPrecision(2),
+			change1HrPct: change1HrPct.toFixed(2),
 			change24Hrs: App.Lib.round(change24Hrs),
-			change24HrsPct: change24HrsPct.toPrecision(2),
+			change24HrsPct: change24HrsPct.toFixed(2),
 			change7Days: App.Lib.round(change7Days),
-			change7DaysPct: change7DaysPct.toPrecision(2)
+			change7DaysPct: change7DaysPct.toFixed(2)
 		};
 	},
 	getPastValue: function(value, pctChange) {

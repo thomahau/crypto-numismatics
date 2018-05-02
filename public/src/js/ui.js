@@ -349,7 +349,7 @@ App.UI = {
 	<form class="js-add-coin-form">
 		<div class="row portfolio-footer text-left darkest">
 			<div class="six columns">
-				<input type="search" class="coin-search" placeholder="Coin name" required autofocus>
+				<input type="search" class="coin-search" placeholder="Search coins..." required autofocus>
 				<input type="number" class="coin-amount" placeholder="Amount" min="0" step="any" required>
 				<p class="search-help" aria-live="assertive" hidden></p>
 			</div>
@@ -413,7 +413,7 @@ App.UI = {
 		return new Promise((resolve, reject) => {
 			availableCoins.includes(input)
 				? resolve()
-				: reject('Invalid input');
+				: reject('Invalid coin name');
 		});
 	},
 	renderSearchHelpMsg: function(err) {
