@@ -1,6 +1,6 @@
 # Crypto Numismatics
 
-[![Portfolio overview](https://s14.postimg.cc/jw1g3m8gx/crypto-numismatics-screenshot.png 'Portfolio overview')](https://crypto-numismatics.herokuapp.com/)
+[![Portfolio overview](https://s14.postimg.cc/uqbjj9b1t/crypto-numismatics-screenshot.png 'Portfolio overview')](https://crypto-numismatics.herokuapp.com/)
 
 ## Description
 
