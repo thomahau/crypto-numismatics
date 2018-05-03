@@ -19,6 +19,7 @@ const App = {
 				})
 				.catch(err => console.error(err));
 		} else {
+			App.Vendor.renderParticles();
 			App.UI.renderStartPage();
 			App.handleSignup();
 			App.handleLogin();
@@ -38,8 +39,9 @@ const App = {
 					$(
 						'.register-username, .register-password, .register-password-confirm'
 					).val('');
-					localStorage.setItem('currency', 'USD');
-					App.UI.handleSignupSuccess(user.username);
+					$('.login-username').val(credentials.username);
+					$('.login-password').val(credentials.password);
+					$('.login-form').submit();
 				})
 				.catch(err => {
 					App.UI.renderSignupHelpMsg(err);
@@ -126,8 +128,6 @@ const App = {
 
 $(function() {
 	App.checkIfLoggedIn();
-	App.Vendor.renderParticles();
 	App.UI.handleModals();
-	App.UI.handleSettingsDropdown();
 	App.UI.handleTableSorting();
 });

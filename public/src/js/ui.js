@@ -27,12 +27,11 @@ App.UI = {
 		});
 	},
 	handleKeyboardUse: function() {
-		// user can close modal and dropdown-menu with esc key
+		// user can close modal with esc key
 		// user can open links with enter or space key
 		$('body').keyup(function(event) {
 			if (event.keyCode === 27) {
 				$('.modal').attr('hidden', true);
-				$('.dropdown-content').removeClass('show');
 			}
 		});
 		$('body').on('keyup', 'a[role="button"]', function(event) {
@@ -49,25 +48,8 @@ App.UI = {
 			'.portfolio-container, .js-username, .js-logout, .js-register-success'
 		).attr('hidden', true);
 		$(
-			'.welcome-container, .stats-wrapper, .js-login, .js-register, .register-form'
+			'.welcome-container, .stats-wrapper, .js-login, .js-register, .register-form, .particles-js-canvas-el'
 		).attr('hidden', false);
-	},
-	handleSignupSuccess: function(username) {
-		const signupSuccessMsg = this.getSignupSuccessMsg(username);
-
-		$('.register-form').attr('hidden', true);
-		$('.js-register-success')
-			.attr('hidden', false)
-			.html(signupSuccessMsg);
-		$('.modal').on('click', '.first-login', function() {
-			$('.js-register-modal').attr('hidden', true);
-			$('.js-login-modal').attr('hidden', false);
-		});
-	},
-	getSignupSuccessMsg: function(username) {
-		return `
-		<p>Welcome aboard, ${username}! You may now log in.</p>
-		<button class="button-primary first-login">Log in</button>`;
 	},
 	renderSignupHelpMsg: function(err) {
 		const signupHelpMsg = this.getHelpMsg(err);
@@ -103,27 +85,11 @@ App.UI = {
 			<i class="fas fa-sign-out-alt"></i> Log out
 		</a>`;
 	},
-	handleSettingsDropdown: function() {
-		$('main').on('click', '.js-drop-btn', function() {
-			$('.dropdown-content').toggleClass('show');
-		});
-
-		$('body').click(function(event) {
-			if (
-				!$(event.target)
-					.parent()
-					.hasClass('js-drop-btn')
-			) {
-				$('.dropdown-content').removeClass('show');
-			}
-		});
-	},
 	renderPortfolio: function() {
 		let populatedHoldings;
-		$('.welcome-container, .search-help, .stats-wrapper').attr(
-			'hidden',
-			true
-		);
+		$(
+			'.welcome-container, .search-help, .stats-wrapper, .particles-js-canvas-el'
+		).attr('hidden', true);
 		// get all of user's holdings; populate with current ticker data;
 		// render portfolio overview: header + table + footer
 		App.Holdings.get()
@@ -189,15 +155,10 @@ App.UI = {
 
 		return `
 		<div class="row darkest">
-			<div class="portfolio-header dropdown u-pull-right">
-				<a class="portfolio-link portfolio-settings js-drop-btn" role="button" tabindex="0" aria-haspopup="true" aria-controls="dropdown-content">
-					<i class="fas fa-cog"></i><span> Settings</span>
+			<div class="portfolio-header u-pull-right">
+				<a class="portfolio-link js-edit-currency" role="button" tabindex="0">
+					<i class="fas fa-cog"></i> Edit currency
 				</a>
-				<div class="dropdown-content" id="dropdown-content" role="menu">
-					<a class="js-edit-portfolio" role="button" tabindex="0">Edit holdings</a>
-					<a class="js-add-portfolio-item" role="button" tabindex="0">Add holding</a>
-					<a class="js-edit-currency" role="button" tabindex="0">Edit currency</a>
-				</div>
 			</div>
 		</div>
 		<div class="row darker portfolio-overview">
