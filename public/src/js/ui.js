@@ -100,7 +100,7 @@ App.UI = {
 		return `
 		<span class="js-username li-space">${username}</span>
 		<a class="js-logout" role="button" tabindex="0" aria-label="Log out">
-			<i class="fas fa-sign-out-alt"></i><span class="nav-text"> Log out</span>
+			<i class="fas fa-sign-out-alt"></i> Log out
 		</a>`;
 	},
 	handleSettingsDropdown: function() {
@@ -224,19 +224,19 @@ App.UI = {
 		<span class="portfolio-headline">PERFORMANCE</span>
 		<table class="performance-table">
 			<tr>
-				<td>1 Hour</td>
+				<td>1 hour</td>
 				<td><span class="${gainOrLoss1Hr}">${symbol}${data.change1Hr}(${
 			data.change1HrPct
 		}%)</span></td>
 			</tr>
 			<tr>
-				<td>24 Hours</td>
+				<td>24 hours</td>
 				<td><span class="${gainOrLoss24Hrs}">${symbol}${data.change24Hrs} (${
 			data.change24HrsPct
 		}%)</span></td>
 			</tr>
 			<tr>
-				<td>7 Days</td>
+				<td>7 days</td>
 				<td><span class="${gainOrLoss7Days}">${symbol}${data.change7Days} (${
 			data.change7DaysPct
 		}%)</span></td>
@@ -278,10 +278,13 @@ App.UI = {
 					<td data-label="Amount" class="toggleable-view hidden">${holding.amount}</td>
 					<td data-label="Value" class="toggleable-view hidden">${symbol}${value}</td>
 					<td data-label="Allocation" class="toggleable-view hidden">${allocation}%</td>
-					<td data-label="Delete" class="toggleable-view hidden">
+					<td data-label="Delete ${holding.name}" class="toggleable-view hidden">
 						<a class="portfolio-link delete-holding" role="button" tabindex="0" aria-label="delete ${
 							holding.name
-						}" data-coin="${holding.id}">x</a>
+						}" data-coin="${
+					holding.id
+				}"><i class="fas fa-trash-alt"></i>
+						</a>
 					</td>
 				</tr>`;
 			});
@@ -475,7 +478,7 @@ App.UI = {
 					amount: parseFloat($(this).val(), 10)
 				});
 			});
-			// pdate or delete user's holdings according to values submitted, then re-render portfolio
+			// update or delete user's holdings according to values submitted, then re-render portfolio
 			const updates = submittedValues.map(item => {
 				if (item.amount === 0) {
 					return App.Holdings.delete(item.id);

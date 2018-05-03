@@ -159,11 +159,11 @@ form {
 
 @media only screen and (max-width: 640px) {
   .welcome-container {
-    margin-top: 100px;
+    margin-top: 90px;
   }
 
   .welcome-container .button-primary {
-    margin-top: 15px;
+    margin-top: 5px;
   }
 
   .header-container {

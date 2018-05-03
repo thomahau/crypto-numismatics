@@ -126,6 +126,7 @@ const App = {
 
 $(function() {
 	App.checkIfLoggedIn();
+	App.Vendor.renderParticles();
 	App.UI.handleModals();
 	App.UI.handleSettingsDropdown();
 	App.UI.handleTableSorting();
