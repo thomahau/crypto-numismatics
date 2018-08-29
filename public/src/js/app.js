@@ -23,6 +23,7 @@ const App = {
       App.UI.renderStartPage();
       App.handleSignup();
       App.handleLogin();
+      App.handleDemo();
     }
   },
   handleSignup: function() {
@@ -84,6 +85,13 @@ const App = {
         .catch(err => {
           App.UI.renderLoginHelpMsg(err);
         });
+    });
+  },
+  handleDemo: function() {
+    $('.js-demo').click(function() {
+      $('.login-username').val('demo');
+      $('.login-password').val('password');
+      $('.login-form').submit();
     });
   },
   login: function(credentials) {

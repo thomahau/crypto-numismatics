@@ -93,6 +93,14 @@ footer {
   margin-top: 20px;
 }
 
+.welcome-container .button {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 48px;
+  padding-right: 48px;
+}
+
 .particles-js-canvas-el {
   position: absolute;
   top: 0;
@@ -346,6 +354,7 @@ input[type='submit'].button-primary:focus {
   border-color: #1eaedb;
 }
 
+.welcome-container .button,
 .portfolio-footer .button {
   color: white;
 }
