@@ -72,7 +72,7 @@ App.UI = {
   renderLoggedInNav: function(username) {
     const navElements = this.getNavElements(username);
 
-    $('.js-login, .js-register, .modal').attr('hidden', true);
+    $('.js-login, .js-register, .js-demo, .modal').attr('hidden', true);
     $('.js-logout, .js-username').remove();
     $('.header-right').append(navElements);
   },
@@ -139,7 +139,7 @@ App.UI = {
     if (populatedHoldings.length) {
       portfolioData = App.Holdings.getTotals(populatedHoldings);
       populatedHoldings.map(
-        holding => (holding.allocation = 100 / portfolioData.total * holding.value)
+        holding => (holding.allocation = (100 / portfolioData.total) * holding.value)
       );
       portfolioData.total = App.Lib.round(portfolioData.total);
       helpOrPerformance = this.getPortfolioPerformance(portfolioData, symbol);
