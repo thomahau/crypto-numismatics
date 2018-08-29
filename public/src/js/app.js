@@ -120,7 +120,7 @@ const App = {
     });
   },
   getTickerData: function(currency) {
-    // returns current ticker data for all cryptocurrencies tracked by coinmarketcap.com
+    // returns current ticker data for all the cryptocurrencies tracked by coinmarketcap.com
     const url = COINMARKETCAP_URI + `ticker/?limit=0&convert=${currency}`;
 
     return fetch(url).then(res => {
