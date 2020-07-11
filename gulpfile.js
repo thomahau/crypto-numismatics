@@ -19,6 +19,7 @@ gulp.task('combine-js', function () {
       })
     )
     .pipe(gulp.dest('public/build/js'));
+		// .pipe(gulp.dest('build/js'));
 });
 
 gulp.task('combine-css', function () {
@@ -27,6 +28,20 @@ gulp.task('combine-css', function () {
     .pipe(concat('style.css'))
     .pipe(cleanCSS())
     .pipe(gulp.dest('public/build/css'));
+		// .pipe(gulp.dest('build/css'));
 });
 
+// gulp.task('copy-html', function() {
+// 	return gulp
+//     .src('public/index.html')
+// 		.pipe(gulp.dest('build'));
+// })
+
+// gulp.task('copy-favicon', function() {
+// 	return gulp
+//     .src('public/favicon.ico')
+// 		.pipe(gulp.dest('build'));
+// })
+
 gulp.task('default', gulp.series('combine-js', 'combine-css'));
+// gulp.task('default', gulp.series('combine-js', 'combine-css', 'copy-html', 'copy-favicon'));
