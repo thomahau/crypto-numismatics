@@ -1,7 +1,7 @@
 language: node_js
 node_js: node
 services:
-  - mongodb
+- mongodb
 deploy:
   provider: heroku
   api_key:
@@ -10,3 +10,6 @@ deploy:
   on:
     repo: thomahau/crypto-numismatics
   skip_cleanup: 'true'
+env:
+  global:
+    secure: AYL+WAkbh6UAWQxezul0LGztl7A4qx3nKKgmSWfnsiuC/zjcBhLxFtGLv2qC2FXAEL505yZOyDp0yvY3IXF6qZiv6Wh2HbQ9VOqah/XhTNaCRd3NVr7YgcLYCYk13ynD7ww+fhxnEcRzGw5x8vmT9ylUghJv9vaax1rZPTWswzmHM4cp/YOHyImdvQFnXWHg67BcZZjgmbMVn/Sj/SoRr/vRC2cI4TpetHgHNbANjSMmiCpDHABAA5x0vlsyHAuSx+4alsW7etGJFl07HOhLjdGwJFpWF8vQVpIvYb9HIRmXxC83Zj0uAG8F0YLgt21bs3xn7YNDGm+EhUiW9CBiwmJqAbwbt6BQAz6RvVSvpgwN7EYEQ99Y090v7+29+NjH4nvo7lVf+6AZClpRoPxYnF/TsKACu3Z2fVGmI3VtIpLLsNWMa+buNPIs0hJKMUkwX5FrMARu7XUR7HRguEB8KoYnIffG86ijAc4EmHOY4nDJK0wBJ5ZzIrXVSU36yVgFa9meSuGzpPNDaXdxUp725Mo39ZHUMTQiwOu7YJrSrway0oiuerVPXx/o91gtQlF70FCfmiKGuey+YmR0iY3hOYaxBdC1QMA4lr5r0cVYrR9AeSIyWqNRvOFugQeYnxYCH+6A/GWCWKU3V8ckedmk93y/8qFKlf6qE0eIZoj6gmo=
