@@ -51,8 +51,7 @@ App.Holdings = {
     });
   },
   populate: function(holdings) {
-    const currency = localStorage.getItem('currency').toLowerCase();
-    let populatedHoldings = [];
+    const populatedHoldings = [];
     // parse desired ticker data for each of user's holdings
     holdings.forEach(holding => {
       const tickerObj = tickerData.filter(element => element.symbol === holding.symbol)[0];
@@ -61,11 +60,11 @@ App.Holdings = {
         symbol: holding.symbol,
         name: holding.name,
         amount: holding.amount,
-        price: parseFloat(tickerObj[`price_${currency}`]),
-        value: holding.amount * parseFloat(tickerObj[`price_${currency}`]),
-        percent_change_1h: parseFloat(tickerObj.percent_change_1h).toFixed(2),
-        percent_change_24h: parseFloat(tickerObj.percent_change_24h).toFixed(2),
-        percent_change_7d: parseFloat(tickerObj.percent_change_7d).toFixed(2)
+        price: parseFloat(tickerObj.price),
+        value: holding.amount * parseFloat(tickerObj.price),
+        percent_change_24h: (parseFloat(tickerObj['1d'].price_change_pct) * 100).toFixed(2),
+        percent_change_7d: (parseFloat(tickerObj['7d'].price_change_pct) * 100).toFixed(2),
+        percent_change_30d: (parseFloat(tickerObj['30d'].price_change_pct) * 100).toFixed(2)
       };
       populatedHoldings.push(populatedHolding);
     });
@@ -77,11 +76,6 @@ App.Holdings = {
     const total = populatedHoldings.reduce((sum, holding) => {
       return sum + holding.value;
     }, 0);
-    const total1HrAgo = populatedHoldings.reduce((sum, holding) => {
-      return sum + this.getPastValue(holding.value, holding.percent_change_1h);
-    }, 0);
-    const change1Hr = total - total1HrAgo;
-    const change1HrPct = 100 * (total / total1HrAgo - 1);
     const total24HrsAgo = populatedHoldings.reduce((sum, holding) => {
       return sum + this.getPastValue(holding.value, holding.percent_change_24h);
     }, 0);
@@ -92,17 +86,22 @@ App.Holdings = {
     }, 0);
     const change7Days = total - total7DaysAgo;
     const change7DaysPct = 100 * (total / total7DaysAgo - 1);
+    const total30DaysAgo = populatedHoldings.reduce((sum, holding) => {
+      return sum + this.getPastValue(holding.value, holding.percent_change_30d);
+    }, 0);
+    const change30Days = total - total30DaysAgo;
+    const change30DaysPct = 100 * (total / total30DaysAgo - 1);
     const totalBTC = this.getBTCValue(total);
 
     return {
       total: total,
       totalBTC: App.Lib.round(totalBTC, 3),
-      change1Hr: App.Lib.round(change1Hr),
-      change1HrPct: change1HrPct.toFixed(2),
       change24Hrs: App.Lib.round(change24Hrs),
       change24HrsPct: change24HrsPct.toFixed(2),
       change7Days: App.Lib.round(change7Days),
-      change7DaysPct: change7DaysPct.toFixed(2)
+      change7DaysPct: change7DaysPct.toFixed(2),
+      change30Days: App.Lib.round(change30Days),
+      change30DaysPct: change30DaysPct.toFixed(2)
     };
   },
   getPastValue: function(value, pctChange) {
@@ -112,6 +111,6 @@ App.Holdings = {
     const currency = localStorage.getItem('currency').toLowerCase();
     const btcObj = tickerData.find(element => element.symbol === 'BTC');
 
-    return value / btcObj[`price_${currency}`];
+    return value / btcObj.price;
   }
 };

@@ -169,17 +169,13 @@ App.UI = {
 		</div>`;
   },
   getPortfolioPerformance: function(data, symbol) {
-    const gainOrLoss1Hr = data.change1HrPct > 0 ? 'gain' : 'loss';
     const gainOrLoss24Hrs = data.change24HrsPct > 0 ? 'gain' : 'loss';
     const gainOrLoss7Days = data.change7DaysPct > 0 ? 'gain' : 'loss';
+    const gainOrLoss30Days = data.change30DaysPct > 0 ? 'gain' : 'loss';
 
     return `
 		<span class="portfolio-headline">PERFORMANCE</span>
 		<table class="performance-table">
-			<tr>
-				<td>1 hour</td>
-				<td><span class="${gainOrLoss1Hr}">${symbol}${data.change1Hr}(${data.change1HrPct}%)</span></td>
-			</tr>
 			<tr>
 				<td>24 hours</td>
 				<td><span class="${gainOrLoss24Hrs}">${symbol}${data.change24Hrs} (${
@@ -191,6 +187,10 @@ App.UI = {
 				<td><span class="${gainOrLoss7Days}">${symbol}${data.change7Days} (${
       data.change7DaysPct
     }%)</span></td>
+      </tr>
+      <tr>
+				<td>30 days</td>
+				<td><span class="${gainOrLoss30Days}">${symbol}${data.change30Days}(${data.change30DaysPct}%)</span></td>
 			</tr>
 		</table>`;
   },
@@ -200,9 +200,9 @@ App.UI = {
     // if user has holdings, each holding gets a table row
     if (populatedHoldings.length) {
       populatedHoldings.forEach(holding => {
-        const gainOrLoss1Hr = holding.percent_change_1h > 0 ? 'gain' : 'loss';
         const gainOrLoss24Hrs = holding.percent_change_24h > 0 ? 'gain' : 'loss';
         const gainOrLoss7Days = holding.percent_change_7d > 0 ? 'gain' : 'loss';
+        const gainOrLoss30Days = holding.percent_change_30d > 0 ? 'gain' : 'loss';
 
         const price = App.Lib.round(holding.price);
         const value = App.Lib.round(holding.value);
@@ -212,12 +212,12 @@ App.UI = {
 				<tr>
 					<td data-label="Coin">${holding.name}</td>
 					<td data-label="Price">${symbol}${price}</td>
-					<td class="${gainOrLoss1Hr} toggleable-view hidden" data-label="1 hr">${
-          holding.percent_change_1h
-        }%</td>
 					<td class="${gainOrLoss24Hrs}" data-label="24 hrs">${holding.percent_change_24h}%</td>
 					<td class="${gainOrLoss7Days} toggleable-view hidden" data-label="7 days">${
           holding.percent_change_7d
+        }%</td>
+        <td class="${gainOrLoss30Days} toggleable-view hidden" data-label="30 days">${
+          holding.percent_change_30d
         }%</td>
 					<td data-label="Amount" class="toggleable-view hidden">${holding.amount}</td>
 					<td data-label="Value" class="toggleable-view hidden">${symbol}${value}</td>
@@ -243,9 +243,9 @@ App.UI = {
 			<tr>
 				<th><a class="js-sortable-header" role="button" tabindex="0" data-sort="0">Name</a></th>
 				<th><a class="js-sortable-header" role="button" tabindex="0" data-sort="1">Price</a></th>
-				<th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="2">1 hr</a></th>
-				<th><a class="js-sortable-header" role="button" tabindex="0" data-sort="3">24 hrs</a></th>
-				<th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="4">7 days</a></th>
+				<th><a class="js-sortable-header" role="button" tabindex="0" data-sort="2">24 hrs</a></th>
+        <th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="3">7 days</a></th>
+        <th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="4">30 days</a></th>
 				<th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="5">Amount</a></th>
 				<th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="6">Value</a></th>
 				<th class="toggleable-view hidden"><a class="js-sortable-header" role="button" tabindex="0" data-sort="7">Allocation</a></th>
@@ -307,7 +307,7 @@ App.UI = {
 	`,
   populateSearchOptions: function() {
     // search box suggestions from all coins available in coinmarketcap.com API call
-    availableCoins = tickerData.map(tickerObj => {
+    availableCoins = tickerData.slice(0,2000).map(tickerObj => {
       return `${tickerObj.name} (${tickerObj.symbol})`;
     });
 

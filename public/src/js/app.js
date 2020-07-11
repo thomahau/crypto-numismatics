@@ -1,5 +1,5 @@
 'use strict';
-const COINMARKETCAP_URI = 'https://api.coinmarketcap.com/v1/';
+const NOMICS_API_URI = 'https://api.nomics.com/v1';
 let availableCoins;
 let tickerData;
 
@@ -120,8 +120,8 @@ const App = {
     });
   },
   getTickerData: function(currency) {
-    // returns current ticker data for all the cryptocurrencies tracked by coinmarketcap.com
-    const url = COINMARKETCAP_URI + `ticker/?limit=0&convert=${currency}`;
+    // returns current ticker data for all the cryptocurrencies tracked by nomics.com
+    const url = `${NOMICS_API_URI}/currencies/ticker?convert=${currency}&key=${API_KEY}`;
 
     return fetch(url).then(res => {
       if (res.ok) {
