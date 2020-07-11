@@ -121,8 +121,7 @@ const App = {
   },
   getTickerData: function(currency) {
     // returns current ticker data for all the cryptocurrencies tracked by nomics.com
-    // const url = `${NOMICS_API_URI}/currencies/ticker?convert=${currency}&key=${API_KEY}`;
-    const url = `tickers/currency`;
+    const url = `tickers/${currency}`;
 
     return fetch(url).then(res => {
       if (res.ok) {
