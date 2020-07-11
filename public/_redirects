@@ -1,1 +1,0 @@
-/tickers/* currency=:currency https://api.nomics.com/v1/currencies/ticker?key=bcf6993be2fc7773511190a31a4c7a8c&convert=:currency  200

@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const passport = require('passport');
-const { PORT, DATABASE_URL } = require('./config');
+const { PORT, DATABASE_URL, NOMICS_API_KEY } = require('./config');
 const { localStrategy, jwtStrategy } = require('./auth');
 
 const app = express();
@@ -36,6 +36,16 @@ const { router: holdingsRouter } = require('./routes/holdings');
 app.use('/users', usersRouter);
 app.use('/auth', authRouter);
 app.use('/holdings', holdingsRouter);
+
+app.use('/tickers/:currency', (req, res) => {
+  fetch(`https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_API_KEY}&convert=${req.params.currency}`).then(_res => {
+    if (_res.ok) {
+      const data = _res.json();
+      return res.status(200).json(data);
+    }
+    throw new Error('Network response was not ok.');
+  })
+});
 
 app.use('*', (req, res) => {
   res.status(404).json({ message: 'Not Found' });
