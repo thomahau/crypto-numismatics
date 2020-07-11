@@ -29,13 +29,4 @@ gulp.task('combine-css', function () {
     .pipe(gulp.dest('public/build/css'));
 });
 
-// gulp.task('copy-html', function () {
-//   return gulp.src('public/index.html').pipe(gulp.dest('public/build'));
-// });
-
-// gulp.task('copy-favicon', function () {
-//   return gulp.src('public/favicon.ico').pipe(gulp.dest('public/build'));
-// });
-
-// gulp.task('default', gulp.series('combine-js', 'combine-css', 'copy-html', 'copy-favicon'));
 gulp.task('default', gulp.series('combine-js', 'combine-css'));
