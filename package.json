@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "test": "mocha --exit",
-    "postinstall": "gulp build"
+    "postinstall": "gulp default"
   },
   "author": "",
   "license": "ISC",
