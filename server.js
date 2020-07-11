@@ -38,7 +38,10 @@ app.use('/auth', authRouter);
 app.use('/holdings', holdingsRouter);
 
 app.use('/tickers/:currency', (req, res) => {
+  console.log(`https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_API_KEY}&convert=${req.params.currency}`)
   fetch(`https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_API_KEY}&convert=${req.params.currency}`).then(_res => {
+    console.log(_res)
+    console.log(_res.json())
     if (_res.ok) {
       const data = _res.json();
       return res.status(200).json(data);
