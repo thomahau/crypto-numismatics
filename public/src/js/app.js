@@ -127,6 +127,7 @@ const App = {
       const rawData = await res.json();
       return rawData.data;
     }
+    throw new Error('Error fetching data');
   }
 };
 
