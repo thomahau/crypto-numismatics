@@ -306,8 +306,8 @@ App.UI = {
 	</form>
 	`,
   populateSearchOptions: function() {
-    // search box suggestions from all coins available in coinmarketcap.com API call
-    availableCoins = tickerData.slice(0,2000).map(tickerObj => {
+    // search box suggestions from all coins available
+    availableCoins = tickerData.map(tickerObj => {
       return `${tickerObj.name} (${tickerObj.symbol})`;
     });
 

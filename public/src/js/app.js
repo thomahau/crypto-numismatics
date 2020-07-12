@@ -1,5 +1,5 @@
 'use strict';
-const NOMICS_API_URI = 'https://api.nomics.com/v1';
+const LAMBDA_URL = 'https://h420wm7t6e.execute-api.us-east-1.amazonaws.com/dev/tickers';
 let availableCoins;
 let tickerData;
 
@@ -13,7 +13,6 @@ const App = {
 
       App.getTickerData(currency)
         .then(data => {
-          console.log('data', data);
           tickerData = data;
           App.UI.renderPortfolio();
           App.handleLogout();
@@ -121,22 +120,13 @@ const App = {
     });
   },
   getTickerData: async function(currency) {
-    // returns current ticker data for all the cryptocurrencies tracked by nomics.com
-    // const url = `tickers/${currency}`;
-    // const res = await fetch(url);
-    const res = await fetch(`https://api.nomics.com/v1/currencies/ticker?key=bcf6993be2fc7773511190a31a4c7a8c&convert=${currency}`);
-    // console.log('res', res);
-    // console.log('res.json', res.json());
-    // return res.json();
-    // return fetch(url).then(res => {
-    //   console.log('res.ok', res.ok);
-    //   console.log('res', res);
-    //   return res.json();
+    // returns current ticker data
+    const res = await fetch(`${LAMBDA_URL}?currency=${currency}`);
+
     if (res.ok) {
-      return res.json();
+      const rawData = await res.json();
+      return rawData.data;
     }
-    //   throw new Error('Network response was not ok.');
-    // });
   }
 };
 
