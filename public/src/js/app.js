@@ -119,19 +119,20 @@ const App = {
       App.checkIfLoggedIn();
     });
   },
-  getTickerData: function(currency) {
+  getTickerData: async function(currency) {
     // returns current ticker data for all the cryptocurrencies tracked by nomics.com
     const url = `tickers/${currency}`;
-
-    return fetch(url).then(res => {
-      console.log('res.ok', res.ok);
-      console.log('res', res);
-      return res.json();
-      // if (res.ok) {
-      //   return res.json();
-      // }
-      // throw new Error('Network response was not ok.');
-    });
+    const res = await fetch(url);
+    return res.json();
+  //   return fetch(url).then(res => {
+  //     console.log('res.ok', res.ok);
+  //     console.log('res', res);
+  //     return res.json();
+  //     // if (res.ok) {
+  //     //   return res.json();
+  //     // }
+  //     // throw new Error('Network response was not ok.');
+  //   });
   }
 };
 
