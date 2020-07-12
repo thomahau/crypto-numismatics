@@ -124,10 +124,13 @@ const App = {
     const url = `tickers/${currency}`;
 
     return fetch(url).then(res => {
-      if (res.ok) {
-        return res.json();
-      }
-      throw new Error('Network response was not ok.');
+      console.log('res.ok', res.ok);
+      console.log('res', res);
+      return res.json();
+      // if (res.ok) {
+      //   return res.json();
+      // }
+      // throw new Error('Network response was not ok.');
     });
   }
 };

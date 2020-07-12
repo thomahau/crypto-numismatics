@@ -39,13 +39,14 @@ app.use('/auth', authRouter);
 app.use('/holdings', holdingsRouter);
 
 app.use('/tickers/:currency', (req, res) => {
-  fetch(`https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_API_KEY}&convert=${req.params.currency}`).then(_res => {
+  return fetch(`https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_API_KEY}&convert=${req.params.currency}`).then(_res => {
     if (_res.ok) {
       const data = _res.json();
-      return res.status(200).json(data);
+      // return res.status(200).json(data);
+      res.status(200).json(data);
     }
-    throw new Error(_res);
-    // throw new Error('Network response was not ok.');
+    // throw new Error(_res);
+    throw new Error('Network response was not ok.');
   })
 });
 
