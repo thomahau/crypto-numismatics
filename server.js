@@ -39,11 +39,12 @@ app.use('/auth', authRouter);
 app.use('/holdings', holdingsRouter);
 
 app.use('/tickers/:currency', async (req, res) => {
-  const _res = await fetch(`https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_API_KEY}&convert=${req.params.currency}`);
-  if (_res.ok) {
-    const data = _res.json();
-    res.status(200).json(data)
-  }
+  const data = await fetch(`https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_API_KEY}&convert=${req.params.currency}`);
+  res.send(data);
+  // if (_res.ok) {
+  //   const data = _res.json();
+  //   res.status(200).json(data)
+  // }
   // return fetch(`https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_API_KEY}&convert=${req.params.currency}`).then(_res => {
   //   if (_res.ok) {
   //     const data = _res.json();
