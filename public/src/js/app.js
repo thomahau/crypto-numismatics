@@ -13,6 +13,7 @@ const App = {
 
       App.getTickerData(currency)
         .then(data => {
+          console.log('data', data);
           tickerData = data;
           App.UI.renderPortfolio();
           App.handleLogout();
@@ -123,7 +124,7 @@ const App = {
     // returns current ticker data for all the cryptocurrencies tracked by nomics.com
     const url = `tickers/${currency}`;
     const res = await fetch(url);
-    console.log('res', res);
+    // console.log('res', res);
     // console.log('res.json', res.json());
     return res.json();
   //   return fetch(url).then(res => {
