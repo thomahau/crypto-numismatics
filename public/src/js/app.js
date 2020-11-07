@@ -9,15 +9,20 @@ const App = {
       const username = localStorage.getItem('username');
       const currency = localStorage.getItem('currency');
 
+      $('.loader').addClass('is-active');
       App.UI.renderLoggedInNav(username);
 
       App.getTickerData(currency)
         .then(data => {
+          $('.loader').removeClass('is-active');
           tickerData = data;
           App.UI.renderPortfolio();
           App.handleLogout();
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+          $('.loader').removeClass('is-active');
+          console.error(err)
+        });
     } else {
       App.Vendor.renderParticles();
       App.UI.renderStartPage();
@@ -29,6 +34,7 @@ const App = {
   handleSignup: function() {
     $('.register-form').submit(function(event) {
       event.preventDefault();
+      $('.loader').addClass('is-active');
       const credentials = {
         username: $('.register-username').val(),
         password: $('.register-password').val(),
@@ -43,6 +49,7 @@ const App = {
           $('.login-form').submit();
         })
         .catch(err => {
+          $('.loader').removeClass('is-active');
           App.UI.renderSignupHelpMsg(err);
         });
     });
@@ -66,6 +73,7 @@ const App = {
   handleLogin: function() {
     $('.login-form').submit(function(event) {
       event.preventDefault();
+      $('.loader').addClass('is-active');
       const credentials = {
         username: $('.login-username').val(),
         password: $('.login-password').val()
@@ -80,6 +88,8 @@ const App = {
           }
 
           $('.login-username, .login-password').val('');
+          $('.login-help').attr('hidden', true);
+          $('.loader').removeClass('is-active');
           App.checkIfLoggedIn();
         })
         .catch(err => {

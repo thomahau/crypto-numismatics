@@ -19,11 +19,13 @@ App.UI = {
   handleRegisterModal: function() {
     $('.js-register').click(function() {
       $('.js-register-modal').attr('hidden', false);
+      $('#register-username').focus();
     });
   },
   handleLoginModal: function() {
     $('.js-login').click(function() {
       $('.js-login-modal').attr('hidden', false);
+      $('#login-username').focus();
     });
   },
   handleKeyboardUse: function() {
@@ -314,6 +316,7 @@ App.UI = {
     $('.coin-search').autocomplete({
       source: availableCoins
     });
+    $('.coin-search').focus();
   },
   handleCancelAdditionBtn: function(populatedHoldings) {
     $('main').on('click', '.cancel-addition-btn', function() {
@@ -453,12 +456,14 @@ App.UI = {
   },
   handleEditCurrencySubmit: function() {
     $('.edit-currency-form').submit(function(event) {
+      $('.loader').addClass('is-active');
       event.preventDefault();
       const currency = $('.currency-select').val();
       localStorage.setItem('currency', currency);
       // make API call to get ticker data converted to new currency, then re-render portfolio
       App.getTickerData(currency)
         .then(data => {
+          $('.loader').removeClass('is-active');
           tickerData = data;
           App.UI.renderPortfolio();
           $('.modal').attr('hidden', true);
