@@ -69,7 +69,7 @@ App.Holdings = {
       populatedHoldings.push(populatedHolding);
     });
 
-    return populatedHoldings;
+    return populatedHoldings.sort((a, b) => b.value - a.value);
   },
   getTotals: function(populatedHoldings) {
     // calculate aggregate portfolio value and performance

@@ -177,6 +177,10 @@ form {
 }
 
 @media only screen and (max-width: 640px) {
+  footer.stats-wrapper {
+    display: none;
+  }
+
   .welcome-container {
     margin-top: 90px;
   }
@@ -284,7 +288,7 @@ a:focus {
 }
 
 .gain {
-  color: green;
+  color: #8dc647;
 }
 
 .loss {
