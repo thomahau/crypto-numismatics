@@ -14,7 +14,7 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
     "dotenv": "^5.0.1",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "gulp": "^4.0.2",
     "gulp-clean-css": "^3.9.3",
     "gulp-concat": "^2.6.1",
