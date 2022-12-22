@@ -19,7 +19,7 @@
     "gulp-clean-css": "^3.9.3",
     "gulp-concat": "^2.6.1",
     "gulp-uglify-es": "^1.0.1",
-    "jsonwebtoken": "^8.2.1",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^5.4.10",
     "morgan": "^1.9.1",
     "passport": "^0.4.0",
